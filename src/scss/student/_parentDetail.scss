@@ -1,0 +1,43 @@
+.me-student {
+  &__parent-detail{
+    &__wrapper {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      gap: 50px;
+      padding: 20px 0;
+      overflow-y: auto;
+    }
+
+    &__container {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex: 0 0 25%;
+    }
+
+    &__number {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 35px;
+      height: 35px;
+      background-color: #ADCEEA;
+      border: 1px solid white;
+      border-radius: 50%;
+      font-weight: 500;
+      color: white;
+      font-size: 20px;
+    }
+
+    &__info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      p {
+        margin: 0;
+      }
+    }
+  }
+}
