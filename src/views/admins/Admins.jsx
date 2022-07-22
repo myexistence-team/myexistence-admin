@@ -3,6 +3,7 @@ import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux';
 import { isLoaded, useFirestore, useFirestoreConnect } from 'react-redux-firebase';
+import { Link } from 'react-router-dom';
 import useQueryString from 'src/hooks/useQueryString'
 import { number } from 'yup';
 import { object } from 'yup';
@@ -34,7 +35,12 @@ export default function Admins() {
     <CCard>
       <CCardHeader className="d-flex justify-content-between">
         <h3>Administrator</h3>
-        <CButton>
+        <CButton
+          color="primary"
+          variant="outline"
+          is={Link}
+          to="/admins/add"
+        >
           + Tambahkan Administrator
         </CButton>
       </CCardHeader>

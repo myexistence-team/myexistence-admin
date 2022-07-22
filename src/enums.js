@@ -7,6 +7,7 @@ export const SCHOOL_TYPES = {
 }
 
 export const ROLE_TYPES = {
+  "SUPER_ADMIN": "Super Administrator",
   ADMIN: "Administrator",
   TEACHER: "Pengajar",
   STUDENT: "Pelajar"

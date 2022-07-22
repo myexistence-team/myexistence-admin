@@ -29,7 +29,7 @@ export const signUp = (newUser) => {
     }, {
       firstName: newUser.firstName,
       lastName: newUser.lastName,
-      roleId: newUser.roleId,
+      role: newUser.role,
       schoolId: profile.schoolId
     })
   }
