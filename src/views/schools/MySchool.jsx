@@ -12,7 +12,6 @@ export default function MySchool() {
 
   useFirestoreConnect([ `/schools/${profile.schoolId}` ]);
   const school = useSelector((state) => state.firestore.data.schools)?.[profile.schoolId];
-  console.log(school)
 
   return (
     <CCard>
@@ -40,6 +39,10 @@ export default function MySchool() {
               <div>
                 <label>Tipe Sekolah</label>
                 <h5>{SCHOOL_TYPES[school.type]}</h5>
+              </div>
+              <div>
+                <label>Lokasi</label>
+                <h5>{school.location}</h5>
               </div>
             </>
           ) : (

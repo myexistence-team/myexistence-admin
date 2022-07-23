@@ -109,6 +109,7 @@ function RegisterSchool(props) {
   const { onSubmit, onBack, isSubmitting } = props;
   const schoolSchema = object().shape({
     name: string().required().strict(),
+    location: string().required().strict(),
     type: string().required().strict()
   })
   const {
