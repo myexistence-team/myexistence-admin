@@ -18,7 +18,7 @@ export function createTeacher(newTeacher) {
   }
 }
 
-export function updateTeacher(newTeacher) {
+export function updateTeacher(teacherId, newTeacher) {
   return async (dispatch, getState, { getFirestore }) => {
     const firestore = getFirestore();
     const auth = getState().firebase.auth;
@@ -28,6 +28,7 @@ export function updateTeacher(newTeacher) {
       .collection("schools")
       .doc(schoolId)
       .collection("teachers")
+      .doc(teacherId)
       .update({ 
         ...newTeacher, 
         updatedBy: auth.uid,

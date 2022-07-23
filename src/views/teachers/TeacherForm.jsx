@@ -10,6 +10,7 @@ import { Link, useHistory, useParams } from 'react-router-dom'
 import meConfirm from 'src/components/meConfirm'
 import MESpinner from 'src/components/MESpinner'
 import METextField from 'src/components/METextField'
+import { useGetData } from 'src/hooks/getters'
 import { createTeacher, updateTeacher } from 'src/store/actions/teacherActions'
 import { getData, getProfile } from 'src/utils/getters'
 import { string } from 'yup'
@@ -32,7 +33,7 @@ export default function TeacherForm() {
   })
 
   const firestore = useFirestore();
-  useFirestoreConnect({
+  useFirestoreConnect(teacherId && {
     collection: "schools",
     doc: schoolId,
     subcollections: [
@@ -44,7 +45,7 @@ export default function TeacherForm() {
     storeAs: "teachers",
   })
 
-  const teacher = getData("teachers", teacherId);
+  const teacher = useGetData("teachers", teacherId);
   console.log(teacher);
 
   function onSubmit(data) {
@@ -87,12 +88,12 @@ export default function TeacherForm() {
                   <METextField
                     { ...register("fullName") }
                     errors={errors}
-                    defaultValue={teacher.fullName}
+                    defaultValue={teacher?.fullName}
                   />
                   <METextField
                     { ...register("idNumber") }
                     errors={errors}
-                    defaultValue={teacher.idNumber}
+                    defaultValue={teacher?.idNumber}
                   />
                 </CCardBody>
                 <CCardFooter className="d-flex justify-content-end">

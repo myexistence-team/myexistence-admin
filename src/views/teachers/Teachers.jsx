@@ -37,19 +37,22 @@ export default function Teachers() {
     <CCard>
       <CCardHeader className="d-flex justify-content-between">
         <h3>Pengajar</h3>
-        <CButton
-          color="primary"
-          variant="outline"
-        >
-          + Tambahkan Pengajar
-        </CButton>
+        <Link to="/teachers/add">
+          <CButton
+            color="primary"
+            variant="outline"
+          >
+            + Tambahkan Pengajar
+          </CButton>
+        </Link>
       </CCardHeader>
       <CCardBody>
         <CDataTable
           items={teachers}
           loading={!isLoaded(teachers)}
           fields={[
-            "fullName",
+            { key: "fullName", label: "Nama Lengkap" },
+            "idNumber",
             { key: "actions", label: "" }
           ]}
           scopedSlots={{
