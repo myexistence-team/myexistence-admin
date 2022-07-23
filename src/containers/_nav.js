@@ -44,6 +44,12 @@ const baseNavs = [
     to: "/admins",
     icon: <MdVerifiedUser className="c-sidebar-nav-icon" />
   },
+  {
+    _tag: "CSidebarNavItem",
+    name: "Pengajar",
+    to: "/teachers",
+    icon: <FaChalkboardTeacher className="c-sidebar-nav-icon" />
+  }
 ];
 
 const _nav = pageAccess => [

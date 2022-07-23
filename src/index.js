@@ -19,7 +19,7 @@ import { firebase } from './utils/firebase';
 
 React.icons = icons;
 
-const store = createStore(
+export const store = createStore(
   rootReducer,
   compose(
     applyMiddleware(

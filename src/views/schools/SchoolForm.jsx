@@ -60,12 +60,12 @@ export default function SchoolForm() {
           editMode && !isLoaded(school) ? (
             <MESpinner/>
           ) : editMode && !school ? (
-            <>
+            <CCardBody>
               <Helmet>
                 <title>School Not Found</title>
               </Helmet>
               <h3>School with ID {schoolId} is not found.</h3>
-            </>
+            </CCardBody>
           ) : (
             <>
               <CCardHeader>
