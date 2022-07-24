@@ -1,4 +1,5 @@
 import { CButton, CCard, CCardBody, CCardHeader, CDataTable, CPagination } from '@coreui/react'
+import moment from 'moment'
 import React, { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
@@ -48,12 +49,13 @@ export default function Teachers() {
       </CCardHeader>
       <CCardBody>
         <CDataTable
-          items={teachers}
+          items={teachers}p
           loading={!isLoaded(teachers)}
           fields={[
             { key: "fullName", label: "Nama Lengkap" },
             "idNumber",
-            { key: "actions", label: "" }
+            { key: "createdAt", label: "Tanggal Dibuat" },
+            { key: "actions", label: "" },
           ]}
           scopedSlots={{
             fullName: (t) => (
@@ -73,6 +75,11 @@ export default function Teachers() {
                     Edit
                   </CButton>
                 </Link>
+              </td>
+            ),
+            createdAt: (t) => (
+              <td>
+                {moment(t.createdAt.toDate()).format("LLL")}
               </td>
             )
           }}

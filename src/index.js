@@ -16,8 +16,11 @@ import { getFirebase, isLoaded, ReactReduxFirebaseProvider } from 'react-redux-f
 import rootReducer from "./store/reducers/rootReducer";
 import thunk from "redux-thunk";
 import { firebase } from './utils/firebase';
+import moment from "moment";
 
 React.icons = icons;
+
+moment.locale("id");
 
 export const store = createStore(
   rootReducer,

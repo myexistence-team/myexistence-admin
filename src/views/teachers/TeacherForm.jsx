@@ -3,7 +3,6 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import React, { useState } from 'react'
 import { Helmet } from 'react-helmet'
 import { useForm } from 'react-hook-form'
-import { useSelector } from 'react-redux'
 import { useDispatch } from 'react-redux'
 import { isLoaded, useFirestore, useFirestoreConnect } from 'react-redux-firebase'
 import { Link, useHistory, useParams } from 'react-router-dom'
@@ -12,7 +11,7 @@ import MESpinner from 'src/components/MESpinner'
 import METextField from 'src/components/METextField'
 import { useGetData } from 'src/hooks/getters'
 import { createTeacher, updateTeacher } from 'src/store/actions/teacherActions'
-import { getData, getProfile } from 'src/utils/getters'
+import { getProfile } from 'src/utils/getters'
 import { string } from 'yup'
 import { object } from 'yup'
 
@@ -111,6 +110,7 @@ export default function TeacherForm() {
                     color="primary"
                     type="submit"
                     className="ml-3"
+                    disabled={isSubmitting}
                   >
                     Simpan
                   </CButton>

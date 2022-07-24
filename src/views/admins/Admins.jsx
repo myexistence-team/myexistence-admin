@@ -47,6 +47,31 @@ export default function Admins() {
       <CCardBody>
         <CDataTable
           items={admins}
+          fields={[
+            { key: "fullName", label: "Nama Lengkap" },
+            { key: "actions", label: "" }
+          ]}
+          scopedSlots={{
+            fullName: (t) => (
+              <td>
+                <Link to={`/admins/${t.id}`}>
+                  {t.fullName}
+                </Link>
+              </td>
+            ),
+            actions: (t) => (
+              <td className="d-flex justify-content-end">
+                <Link to={`/admins/${t.id}/edit`}>
+                  <CButton
+                    color="primary"
+                    variant="outline"
+                  >
+                    Edit
+                  </CButton>
+                </Link>
+              </td>
+            )
+          }}
           loading={!isLoaded(admins)}
         />
       </CCardBody>

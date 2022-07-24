@@ -1,25 +1,21 @@
 import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CForm } from '@coreui/react'
 import { yupResolver } from '@hookform/resolvers/yup';
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useFirestore } from 'react-redux-firebase';
 import { Link, useParams } from 'react-router-dom'
 import meConfirm from 'src/components/meConfirm';
 import METextField from 'src/components/METextField';
+import { createAdmin } from 'src/store/actions/adminActions';
 import { signUp } from 'src/store/actions/authActions';
 import { object, string } from 'yup';
 
 export default function AdminForm() {
   const { adminId } = useParams();
   const dispatch = useDispatch();
-  const firestore = useFirestore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    // if (adminId) {
-    //   firestore.collection()
-    // }
-  }, [adminId])
   const admin = {};
 
   const editMode = Boolean(adminId);
@@ -35,13 +31,9 @@ export default function AdminForm() {
   })
 
   function onSubmit(data) {
-    console.log(data);
     meConfirm({
       onConfirm: () => {
-        dispatch(signUp({
-          ...data,
-          role: "ADMIN" 
-        }))
+        dispatch(createAdmin(data))
       }
     })
   }
