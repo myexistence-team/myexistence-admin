@@ -51,7 +51,6 @@ export default function Teachers() {
             { key: "fullName", label: "Nama Lengkap" },
             "idNumber",
             "email",
-            "id",
             { key: "createdAt", label: "Tanggal Dibuat" },
             { key: "hasRegistered", label: "Terdaftar" },
             { key: "actions", label: "" },
