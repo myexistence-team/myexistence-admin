@@ -8,9 +8,10 @@ import { Link, useHistory, useParams } from 'react-router-dom'
 import meConfirm from 'src/components/meConfirm';
 import meToaster from 'src/components/toaster';
 import METextField from 'src/components/METextField';
-import { createAdmin } from 'src/store/actions/adminActions';
+import { createAdmin, updateAdmin } from 'src/store/actions/adminActions';
 import { signUp } from 'src/store/actions/authActions';
 import { object, string } from 'yup';
+import { useGetData } from 'src/hooks/getters';
 
 export default function AdminForm() {
   const { adminId } = useParams();
@@ -18,7 +19,7 @@ export default function AdminForm() {
   const history = useHistory();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const admin = {};
+  const admin = useGetData("users", adminId);
 
   const editMode = Boolean(adminId);
 
@@ -34,7 +35,7 @@ export default function AdminForm() {
     meConfirm({
       onConfirm: () => {
         setIsSubmitting(true);
-        dispatch(createAdmin(data))
+        dispatch(editMode ? updateAdmin(adminId, data) : createAdmin(data))
           .then(() => {
             history.push("/admins")
           })
