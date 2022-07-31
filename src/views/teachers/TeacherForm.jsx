@@ -32,20 +32,12 @@ export default function TeacherForm() {
     resolver: yupResolver(teacherSchema)
   })
 
-  const firestore = useFirestore();
-  useFirestoreConnect(teacherId && {
-    collection: "schools",
-    doc: schoolId,
-    subcollections: [
-      {
-        collection: "teachers",
-        where: [[firestore.FieldPath.documentId(), "==", teacherId]]
-      }
-    ],
-    storeAs: "teachers",
+  useFirestoreConnect({
+    collection: "users",
+    doc: teacherId,
   })
 
-  const teacher = useGetData("teachers", teacherId);
+  const teacher = useGetData("users", teacherId);
 
   function onSubmit(data) {
     meConfirm({
