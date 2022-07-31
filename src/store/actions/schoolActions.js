@@ -1,3 +1,5 @@
+import { checkEmailAvailability } from "src/utils/checkEmail";
+
 export function createSchool(school) {
   return async (dispatch, getState, { getFirestore }) => {
     const firestore = getFirestore();
@@ -17,15 +19,24 @@ export function createAdminAndTeacher(admin, school) {
     const firestore = getFirestore();
     const firebase = getFirebase();
 
-    console.log("ADMIN", admin);
-    console.log("SCHOOL", school);
+    delete admin.password
+    delete admin.repassword
 
-    const newSchoolRef = firestore.collection("schools");
-    const newSchoolId = newSchoolRef.doc().id;
+    const emailAvailable = await checkEmailAvailability(firestore, admin.email);
+    if (!emailAvailable) {
+      throw Error("Admin dengan email tersebut sudah ada")
+    }
+
+    const schoolRef = firestore.collection("schools");
+    const newSchoolId = schoolRef.doc().id;
 
     console.log(newSchoolId)
 
-    await newSchoolRef.doc(newSchoolId).set(school);
+    await schoolRef.doc(newSchoolId).set({
+      ...school,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
 
     await firebase
       .createUser({
@@ -38,6 +49,18 @@ export function createAdminAndTeacher(admin, school) {
         updatedAt: new Date(),
         schoolId: newSchoolId
       });
+    
+    const newlyCreatedUser = await firestore
+      .collection("users")
+      .where("email", "==", admin.email)
+      .get()
+    
+    await schoolRef.doc(newSchoolId)
+      .update({
+        createdBy: newlyCreatedUser.docs[0].id,
+        updatedBy: newlyCreatedUser.docs[0].id,
+      })
+    
   }
 }
 

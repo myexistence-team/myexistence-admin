@@ -268,6 +268,10 @@ export default function Register() {
     setType(null);
   }
 
+  function handleBackFromSchool() {
+    setHasRegistered(false);
+  }
+
   if (auth?.isLoaded && !auth?.isEmpty) {
     history.replace("/");
   }
@@ -298,6 +302,12 @@ export default function Register() {
       onConfirm: () => {
         setIsSubmitting(true);
         dispatch(createAdminAndTeacher(adminData, data))
+          .catch((e) => {
+            meToaster.warning(e.message);
+          })
+          .finally(() => {
+            setIsSubmitting(false);
+          })
       }
     })
   }
@@ -375,7 +385,7 @@ export default function Register() {
               ) : type === "TEACHER" ? (
                 <RegisterTeacher onBack={handleBack} onSubmit={onSubmitTeacher}/>
               ) : hasRegistered ? (
-                <RegisterSchool onBack={handleBack} onSubmit={onSubmitSchool}/>
+                <RegisterSchool onBack={handleBackFromSchool} onSubmit={onSubmitSchool}/>
               ) : (
                 <RegisterAdmin onBack={handleBack} onSubmit={onSubmitAdmin}/>
               )
