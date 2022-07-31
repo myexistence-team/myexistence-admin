@@ -23,7 +23,6 @@ export default function AdminForm() {
   const adminSchema = object().shape({
     fullName: string().required(),
     email: string().required(),
-    username: string().required(),
     password: string(),
   })
   const { register, handleSubmit, formState: { errors } } = useForm({
@@ -48,11 +47,6 @@ export default function AdminForm() {
           <METextField
             { ...register("fullName") }
             defaultValue={admin.fullName}
-            errors={errors}
-          />
-          <METextField
-            { ...register("username") }
-            defaultValue={admin.username}
             errors={errors}
           />
           <METextField

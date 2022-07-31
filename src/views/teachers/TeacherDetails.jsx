@@ -4,23 +4,26 @@ import React from 'react'
 import { useFirestore, useFirestoreConnect } from 'react-redux-firebase';
 import { Link, useParams } from 'react-router-dom'
 import MESpinner from 'src/components/MESpinner';
-import { useFirestoreConnectInSchool, useGetData } from 'src/hooks/getters';
+import { useFirestoreConnectInSchool, useGetData, useGetSchoolId } from 'src/hooks/getters';
 
 export default function TeacherDetails() {
   const { teacherId } = useParams();
 
-  const teacher = useFirestoreConnectInSchool("teachers", teacherId);
-  console.log(teacher);
+  useFirestoreConnect({
+    collection: "users",
+    doc: teacherId,
+  })
 
   const firestore = useFirestore();
+  const teacher = useGetData("users", teacherId);
   useFirestoreConnect(teacher && {
     collection: "users",
     where: [[firestore.FieldPath.documentId(), "in", [teacher.createdBy, teacher.updatedBy]]],
+    storeAs: "admins"
   })
 
-  const updatedByUser = useGetData("users", teacher?.updatedBy);
-  const createdByUser = useGetData("users", teacher?.createdBy);
-  // console.log(teacher);
+  const updatedByUser = useGetData("admins", teacher?.updatedBy);
+  const createdByUser = useGetData("admins", teacher?.createdBy);
 
   return (
     <CCard>
@@ -56,7 +59,7 @@ export default function TeacherDetails() {
               <small>Dibuat oleh {createdByUser?.fullName} pada {moment(teacher.createdAt.toDate()).format("LLL")}</small>
               <br/>
               {
-                teacher.updatedAt && (
+                teacher.updatedAt.seconds !== teacher.createdAt.seconds && (
                   <small>Diedit oleh {updatedByUser?.fullName} pada {moment(teacher.updatedAt.toDate()).format("LLL")}</small>
                 )
               }

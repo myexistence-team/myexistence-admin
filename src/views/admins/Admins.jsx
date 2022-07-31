@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux';
 import { isLoaded, useFirestore, useFirestoreConnect } from 'react-redux-firebase';
 import { Link } from 'react-router-dom';
+import { useGetSchoolId } from 'src/hooks/getters';
 import useQueryString from 'src/hooks/useQueryString'
 import { number } from 'yup';
 import { object } from 'yup';
@@ -11,6 +12,7 @@ import { object } from 'yup';
 export default function Admins() {
   const { register, watch } = useForm();
   const profile = useSelector((s) => s.firebase.profile);
+  const schoolId = useGetSchoolId();
   console.log(profile)
   const [query] = useQueryString(object().shape({
     page: number().min(0),
@@ -19,17 +21,31 @@ export default function Admins() {
   const firestore = useFirestore();
   const { page, pageSize } = query;
 
-  useFirestoreConnect([
-    {
-      collection: "users",
-      where: [
-        ["role", "==", "ADMIN"],
-        ["schoolId", "==", profile.schoolId],
-      ],
-    }
-  ])
-  // const admins = firestore.collection("users").where("type", "==", "ADMIN").get().then((data) => console.log(data));
-  const admins = useSelector((state) => state.firestore.ordered.users)
+  // useFirestoreConnect([
+  //   {
+  //     collection: "users",
+  //     where: [
+  //       ["role", "==", "ADMIN"],
+  //       ["schoolId", "==", profile.schoolId],
+  //     ],
+  //   }
+  // ])
+  // // const admins = firestore.collection("users").where("type", "==", "ADMIN").get().then((data) => console.log(data));
+
+  // const users = useSelector((state) => state.firestore.ordered.users);
+  // console.log(users);
+
+  useFirestoreConnect({
+    collection: "schools",
+    doc: schoolId,
+    subcollections: [{
+      collection: "admins"
+    }],
+    storeAs: "admins"
+  })
+
+  const admins = useSelector((state) => state.firestore.ordered.admins);
+  console.log(admins);
 
   return (
     <CCard>

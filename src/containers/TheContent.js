@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import { Redirect, Route, Switch } from "react-router-dom";
+import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 import {
   CBreadcrumbRouter,
   CCard,
@@ -17,7 +17,15 @@ const loading = (
 );
 
 const TheContent = () => {
+  const history = useHistory();
   const selfUser = useSelector(state => state.selfUser);
+  const firebase = useSelector(state => state.firebase);
+  const profile = firebase.profile;
+  const auth = firebase.auth;
+
+  if (auth?.isLoaded && auth?.isEmpty) {
+    history.replace("/login");
+  }
 
   return (
     <main className="c-main">
@@ -27,26 +35,30 @@ const TheContent = () => {
           routes={routes()}
         />
         <Suspense fallback={loading}>
-          <Switch>
-            {routes().map((route, idx) => {
-              return (
-                route.component && (
-                  <Route
-                    key={idx}
-                    path={route.path}
-                    exact={route.exact}
-                    name={route.name}
-                    render={props => (
-                      <CFade>
-                        <route.component {...props} />
-                      </CFade>
-                    )}
-                  />
-                )
-              );
-            })}
-            <Redirect from="/" to="/dashboard" />
-          </Switch>
+          {
+            auth?.isLoaded && !auth?.isEmpty && (
+              <Switch>
+                {routes().map((route, idx) => {
+                  return (
+                    route.component && (
+                      <Route
+                        key={idx}
+                        path={route.path}
+                        exact={route.exact}
+                        name={route.name}
+                        render={props => (
+                          <CFade>
+                            <route.component {...props} />
+                          </CFade>
+                        )}
+                      />
+                    )
+                  );
+                })}
+                <Redirect from="/" to="/dashboard" />
+              </Switch>
+            )
+          }
         </Suspense>
       </CContainer>
     </main>

@@ -1,10 +1,12 @@
-import { CButton, CCard, CCardBody, CCardHeader, CDataTable, CPagination } from '@coreui/react'
+import { CButton, CCard, CCardBody, CCardHeader, CDataTable, CNav, CNavItem, CNavLink, CPagination, CTabContent, CTabPane, CTabs } from '@coreui/react'
 import moment from 'moment'
 import React, { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
+import { MdCheck } from 'react-icons/md'
 import { useSelector } from 'react-redux'
 import { isLoaded, useFirebaseConnect, useFirestoreConnect } from 'react-redux-firebase'
 import { Link } from 'react-router-dom'
+import { useGetOrdered } from 'src/hooks/getters'
 import { useFirestorePagination } from 'src/hooks/useFirestorePagination'
 import useQueryString from 'src/hooks/useQueryString'
 import { number } from 'yup'
@@ -22,18 +24,17 @@ export default function Teachers() {
 
   const profile = useSelector((state) => state.firebase.profile);
   const schoolId = profile.schoolId;
-  
-  // const teachers = useSelector((state) => state.firestore.ordered.teachers);
-  // const currLastTeacher = useMemo(() =teachers?.[teachers?.length - 1]);
-  // console.log(currLastTeacher);
-  // const teachers = [];
+  console.log(schoolId)
 
   const { 
     list: teachers, 
     handlePageChange, 
     page, 
-  } = useFirestorePagination("teachers", query); 
-
+  } = useFirestorePagination("users", query, [
+    ["role", "==", "TEACHER"],
+    ["schoolId", "==", schoolId]
+  ]); 
+  
   return (
     <CCard>
       <CCardHeader className="d-flex justify-content-between">
@@ -49,12 +50,15 @@ export default function Teachers() {
       </CCardHeader>
       <CCardBody>
         <CDataTable
-          items={teachers}p
+          items={teachers}
           loading={!isLoaded(teachers)}
           fields={[
             { key: "fullName", label: "Nama Lengkap" },
             "idNumber",
+            "email",
+            "id",
             { key: "createdAt", label: "Tanggal Dibuat" },
+            { key: "hasRegistered", label: "Terdaftar" },
             { key: "actions", label: "" },
           ]}
           scopedSlots={{
@@ -77,19 +81,27 @@ export default function Teachers() {
                 </Link>
               </td>
             ),
+            hasRegistered: (t) => (
+              <td>
+                {t.hasRegistered && <MdCheck/>}
+              </td>
+            ),
             createdAt: (t) => (
               <td>
-                {moment(t.createdAt.toDate()).format("LLL")}
+                {moment(t.createdAt?.toDate()).format("LLL")}
               </td>
             )
           }}
         />
-        <CPagination
-          activePage={page + 1}
-          onActivePageChange={(newPage) => handlePageChange(Math.max(0, newPage - 1))}
-          pages={0}
-          align="end"
-        />
+        {
+          teachers.length > 5 &&
+          <CPagination
+            activePage={page + 1}
+            onActivePageChange={(newPage) => handlePageChange(Math.max(0, newPage - 1))}
+            pages={0}
+            align="end"
+          />
+        }
       </CCardBody>
     </CCard>
   )

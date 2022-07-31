@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import { useFirestore, useFirestoreConnect } from 'react-redux-firebase'
 import meToaster from 'src/components/toaster'
 
-export function useFirestorePagination(listName, query) {
+export function useFirestorePagination(listName, query, where) {
   const [pointer, setPointer] = useState(undefined) // Current pointer
   const [forwardPointer, setForwardPointer] = useState(undefined) // Forward pointer
   const [backwardPointers, setBackwardPointers] = useState([]) // Backward pointers chain
@@ -15,7 +15,13 @@ export function useFirestorePagination(listName, query) {
   const profile = useSelector(({ firebase: { profile } }) => profile);
 
   useFirestoreConnect(
-    {
+    listName === "users" || listName === "schools" ? {
+      collection: listName,
+      orderBy: "createdAt",
+      // limit: limit + 1,
+      // startAt: pointer,
+      where
+    } : {
       collection: "schools",
       doc: profile.schoolId,
       subcollections: [
@@ -26,7 +32,8 @@ export function useFirestorePagination(listName, query) {
       storeAs: listName,
       orderBy: "createdAt",
       limit: limit + 1,
-      startAt: pointer
+      startAt: pointer,
+      where
     },
   );
   
@@ -35,7 +42,9 @@ export function useFirestorePagination(listName, query) {
     ({ firestore: { ordered } }) => ordered[listName]
   );
   var listRet = [ ...list || [] ];
-  listRet.splice(-1,1);
+  if (listRet.length > query.pageSize) {
+    listRet.splice(-1,1);
+  }
 
   // Set forward pointer
   useEffect(() => {

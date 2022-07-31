@@ -25,7 +25,7 @@ export const signUp = (newUser) => {
     firebase.createUser({
       email: newUser.email, 
       password: newUser.password,
-      username: newUser.username,
+      signIn: false
     }, {
       firstName: newUser.firstName,
       lastName: newUser.lastName,

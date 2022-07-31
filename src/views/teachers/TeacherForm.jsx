@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { Helmet } from 'react-helmet'
 import { useForm } from 'react-hook-form'
 import { useDispatch } from 'react-redux'
-import { isLoaded, useFirestore, useFirestoreConnect } from 'react-redux-firebase'
+import { isLoaded, useFirebase, useFirestore, useFirestoreConnect } from 'react-redux-firebase'
 import { Link, useHistory, useParams } from 'react-router-dom'
 import meConfirm from 'src/components/meConfirm'
 import MESpinner from 'src/components/MESpinner'
@@ -26,6 +26,7 @@ export default function TeacherForm() {
   const teacherSchema = object().shape({
     fullName: string().required().strict(),
     idNumber: string().required().strict(),
+    email: string().required().strict()
   })
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(teacherSchema)
@@ -45,7 +46,6 @@ export default function TeacherForm() {
   })
 
   const teacher = useGetData("teachers", teacherId);
-  console.log(teacher);
 
   function onSubmit(data) {
     meConfirm({
@@ -84,6 +84,11 @@ export default function TeacherForm() {
             ) : (
               <>              
                 <CCardBody>
+                  <METextField
+                    { ...register("email") }
+                    errors={errors}
+                    defaultValue={teacher?.email}
+                  />
                   <METextField
                     { ...register("fullName") }
                     errors={errors}
