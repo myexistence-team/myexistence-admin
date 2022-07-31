@@ -1,7 +1,15 @@
+import { checkEmailAvailability } from "src/utils/checkEmail";
+
 export function createTeacher(newTeacher) {
   return async (dispatch, getState, { getFirestore }) => {
     const firestore = getFirestore();
     const auth = getState().firebase.auth;
+    const profile = getState().firebase.profile;
+
+    const emailAvailable = await checkEmailAvailability(firestore, newTeacher.email);
+    if (!emailAvailable) {
+      throw Error("Pengajar dengan email tersebut sudah ada")
+    }
     
     firestore
       .collection("users")
@@ -12,7 +20,8 @@ export function createTeacher(newTeacher) {
         createdBy: auth.uid,
         createdAt: new Date(),
         updatedBy: auth.uid,
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        schoolId: profile.schoolId
       });
   }
 }

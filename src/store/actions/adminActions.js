@@ -80,7 +80,7 @@ export function signUpAsAdmin(newAdmin) {
         })
       } 
       else {
-        throw Error(`Pengajar dengan email ${newAdmin.email} tidak ditemukan dalam sekolah ID ${newAdmin.schoolId}`);
+        throw Error(`Admin dengan email ${newAdmin.email} tidak ditemukan dalam sekolah ID ${newAdmin.schoolId}`);
       }
     }
   }
