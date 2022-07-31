@@ -38,6 +38,7 @@ export const store = createStore(
 const profileConfig = {
   userProfile: 'users',
   useFirestoreForProfile: true,
+  enableClaims: true
 }
 
 const rrfProps = {

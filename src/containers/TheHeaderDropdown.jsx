@@ -16,7 +16,8 @@ import { signOut } from "src/store/actions/authActions";
 const TheHeaderDropdown = () => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const selfUser = useSelector(state => state.selfUser);
+  const profile = useSelector(state => state.firebase.profile);
+
 
   async function handleSignOut() {
     await dispatch(signOut());
@@ -31,13 +32,14 @@ const TheHeaderDropdown = () => {
           <div className="c-avatar mr-3">
             <Avatar
               className="c-avatar-img"
-              alt={selfUser?.username}
-              name={selfUser?.username}
+              alt={profile?.displayName}
+              name={profile?.displayName}
+              src={profile?.avatarUrl}
               size="36"
             />
           </div>
           <span className="text-right">
-            <strong>{selfUser?.username}</strong>
+            <strong>{profile?.username}</strong>
           </span>
         </CDropdownToggle>
         <CDropdownMenu className="pt-0" placement="bottom-end">
@@ -98,7 +100,7 @@ const TheHeaderDropdown = () => {
             </CBadge>
           </CDropdownItem>
           <CDropdownItem divider /> */}
-          <CDropdownItem onClick={() => history.push(`/admins/${selfUser.id}`)}>
+          <CDropdownItem onClick={() => history.push(`/admins/${profile.id}`)}>
             <CIcon name="cil-user" className="mfe-2" /> Profile
           </CDropdownItem>
           <CDropdownItem divider />

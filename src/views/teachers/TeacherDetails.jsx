@@ -47,7 +47,7 @@ export default function TeacherDetails() {
               <CRow>
                 <CCol xs={12} md={6}>
                   <label>Nama Lengkap</label>
-                  <h5>{teacher?.fullName}</h5>
+                  <h5>{teacher?.displayName}</h5>
                 </CCol>
                 <CCol xs={12} md={6}>
                   <label>Nomor ID</label>
@@ -56,11 +56,11 @@ export default function TeacherDetails() {
               </CRow>
             </CCardBody>
             <CCardFooter>
-              <small>Dibuat oleh {createdByUser?.fullName} pada {moment(teacher.createdAt.toDate()).format("LLL")}</small>
+              <small>Dibuat oleh {createdByUser?.displayName} pada {moment(teacher.createdAt.toDate()).format("LLL")}</small>
               <br/>
               {
                 teacher.updatedAt.seconds !== teacher.createdAt.seconds && (
-                  <small>Diedit oleh {updatedByUser?.fullName} pada {moment(teacher.updatedAt.toDate()).format("LLL")}</small>
+                  <small>Diedit oleh {updatedByUser?.displayName} pada {moment(teacher.updatedAt.toDate()).format("LLL")}</small>
                 )
               }
             </CCardFooter>

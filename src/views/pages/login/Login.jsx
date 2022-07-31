@@ -92,6 +92,13 @@ const Login = () => {
     // logAnalyticsEvent("enter login info", {}, null);
   };
 
+  function loginWithGoogle() {
+    firebaseHook.login({
+      provider: "google",
+      type: "popup"
+    })
+  }
+
   return (
     <div
       className="c-app c-default-layout flex-row align-items-center"
@@ -156,6 +163,12 @@ const Login = () => {
                     >
                       Login
                     </CButton>
+                    <span>atau masuk menggunakan</span>
+                    <div className="d-flex my-3">
+                      <CButton onClick={loginWithGoogle}>
+                        Google
+                      </CButton>
+                    </div>
                     <span>Tidak punya akun? <Link to="/register">Daftar disini!</Link></span>
                   </CForm>
                 </CCol>

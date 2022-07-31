@@ -46,15 +46,15 @@ export default function Admins() {
         <CDataTable
           items={admins}
           fields={[
-            { key: "fullName", label: "Nama Lengkap" },
+            { key: "displayName", label: "Nama Lengkap" },
             { key: "hasRegistered", label: "Terdaftar" },
             { key: "actions", label: "" },
           ]}
           scopedSlots={{
-            fullName: (t) => (
+            displayName: (t) => (
               <td>
                 <Link to={`/admins/${t.id}`}>
-                  {t.fullName}
+                  {t.displayName}
                 </Link>
               </td>
             ),

@@ -24,7 +24,7 @@ export default function AdminForm() {
   const editMode = Boolean(adminId);
 
   const adminSchema = object().shape({
-    fullName: string().required(),
+    displayName: string().required(),
     email: string().required(),
   })
   const { register, handleSubmit, formState: { errors } } = useForm({
@@ -57,8 +57,8 @@ export default function AdminForm() {
         </CCardHeader>
         <CCardBody>
           <METextField
-            { ...register("fullName") }
-            defaultValue={admin.fullName}
+            { ...register("displayName") }
+            defaultValue={admin.displayName}
             errors={errors}
           />
           <METextField

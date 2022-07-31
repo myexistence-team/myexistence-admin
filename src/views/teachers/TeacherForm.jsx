@@ -24,7 +24,7 @@ export default function TeacherForm() {
   const schoolId = getProfile().schoolId;
 
   const teacherSchema = object().shape({
-    fullName: string().required().strict(),
+    displayName: string().required().strict(),
     idNumber: string().required().strict(),
     email: string().required().strict()
   })
@@ -82,9 +82,9 @@ export default function TeacherForm() {
                     defaultValue={teacher?.email}
                   />
                   <METextField
-                    { ...register("fullName") }
+                    { ...register("displayName") }
                     errors={errors}
-                    defaultValue={teacher?.fullName}
+                    defaultValue={teacher?.displayName}
                   />
                   <METextField
                     { ...register("idNumber") }

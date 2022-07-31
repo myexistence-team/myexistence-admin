@@ -48,7 +48,7 @@ export default function Teachers() {
           items={teachers}
           loading={!isLoaded(teachers)}
           fields={[
-            { key: "fullName", label: "Nama Lengkap" },
+            { key: "displayName", label: "Nama Lengkap" },
             "idNumber",
             "email",
             { key: "createdAt", label: "Tanggal Dibuat" },
@@ -56,10 +56,10 @@ export default function Teachers() {
             { key: "actions", label: "" },
           ]}
           scopedSlots={{
-            fullName: (t) => (
+            displayName: (t) => (
               <td>
                 <Link to={`/teachers/${t.id}`}>
-                  {t.fullName}
+                  {t.displayName}
                 </Link>
               </td>
             ),

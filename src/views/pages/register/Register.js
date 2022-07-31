@@ -26,7 +26,7 @@ function RegisterAdmin(props) {
   const { onSubmit, onBack, isSubmitting, adminOnly } = props;
   const adminSchema = object().shape({
     email: string().lowercase().required().strict(),
-    fullName: string().required().strict(),
+    displayName: string().required().strict(),
     password: string().required(),
     schoolId: string()
   })
@@ -60,7 +60,7 @@ function RegisterAdmin(props) {
         errors={errors}
       />
       <METextField
-        { ...register("fullName") }
+        { ...register("displayName") }
         startIcon={AiOutlineUser}
         errors={errors}
       />
