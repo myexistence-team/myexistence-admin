@@ -1,6 +1,7 @@
 import { CButton, CCard, CCardBody, CCardHeader, CDataTable, CPagination } from '@coreui/react';
 import React from 'react'
 import { useForm } from 'react-hook-form'
+import { MdCheck } from 'react-icons/md';
 import { isLoaded } from 'react-redux-firebase';
 import { Link } from 'react-router-dom';
 import { useGetSchoolId } from 'src/hooks/getters';
@@ -46,7 +47,8 @@ export default function Admins() {
           items={admins}
           fields={[
             { key: "fullName", label: "Nama Lengkap" },
-            { key: "actions", label: "" }
+            { key: "hasRegistered", label: "Terdaftar" },
+            { key: "actions", label: "" },
           ]}
           scopedSlots={{
             fullName: (t) => (
@@ -67,7 +69,12 @@ export default function Admins() {
                   </CButton>
                 </Link>
               </td>
-            )
+            ),
+            hasRegistered: (t) => (
+              <td>
+                {t.hasRegistered && <MdCheck/>}
+              </td>
+            ),
           }}
           loading={!isLoaded(admins)}
         />

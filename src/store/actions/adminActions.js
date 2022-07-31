@@ -60,6 +60,7 @@ export function signUpAsAdmin(newAdmin) {
       const existingAdmin = await firestore
         .collection("users")
         .where("email", "==", newAdmin.email)
+        .where("role", "==", "ADMIN")
         .get()
 
       if (!existingAdmin.empty) {

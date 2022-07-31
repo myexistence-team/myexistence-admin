@@ -60,6 +60,7 @@ export function signUpAsTeacher(newTeacher) {
       const existingTeacher = await firestore
         .collection("users")
         .where("email", "==", newTeacher.email)
+        .where("role", "==", "TEACHER")
         .get()
 
       if (!existingTeacher.empty) {
