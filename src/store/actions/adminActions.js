@@ -1,32 +1,19 @@
-import { getFirebase } from "react-redux-firebase";
-
 export function createAdmin(newAdmin) {
   return async (dispatch, getState, { getFirestore }) => {
-    const firebase = getFirebase();
     const firestore = getFirestore();
     const auth = getState().firebase.auth;
-    const schoolId = getState().firebase.profile.schoolId;
     
-    // firestore
-    //   .collection("schools")
-    //   .doc(schoolId)
-    //   .collection("admins")
-    //   .add({ 
-    //     ...newAdmin, 
-    //     createdBy: auth.uid,
-    //     createdAt: new Date(),
-    //     updatedBy: auth.uid,
-    //     updatedAt: new Date()
-    //   });
-    firebase.admin().auth().createUser({
-      email: newAdmin.email,
-      password: newAdmin.password,
-      displayName: newAdmin.fullName,
-      uid: "titit",
-      customClaims: {
-        role: "ADMIN"
-      }
-    })
+    firestore
+      .collection("users")
+      .add({ 
+        ...newAdmin, 
+        role: "ADMIN",
+        hasRegistered: false,
+        createdBy: auth.uid,
+        createdAt: new Date(),
+        updatedBy: auth.uid,
+        updatedAt: new Date()
+      });
   }
 }
 
@@ -34,17 +21,58 @@ export function updateAdmin(adminId, newAdmin) {
   return async (dispatch, getState, { getFirestore }) => {
     const firestore = getFirestore();
     const auth = getState().firebase.auth;
-    const schoolId = getState().firebase.profile.schoolId;
     
     firestore
-      .collection("schools")
-      .doc(schoolId)
-      .collection("admins")
+      .collection("users")
       .doc(adminId)
       .update({ 
         ...newAdmin, 
         updatedBy: auth.uid,
         updatedAt: new Date()
       });
+  }
+}
+
+export function signUpAsAdmin(newAdmin) {
+  return async (dispatch, getState, { getFirebase, getFirestore }) => {
+    const firebase = getFirebase();
+    const firestore = getFirestore();
+
+    const schoolRef = firestore
+      .collection("schools")
+      .doc(newAdmin.schoolId)
+
+    const school = await schoolRef.get();
+    if (!school.exists) {
+      throw Error("Sekolah dengan ID tersebut tidak ditemukan")
+    }
+
+    else {
+      const existingAdmin = await firestore
+        .collection("users")
+        .where("email", "==", newAdmin.email)
+        .get()
+
+      if (!existingAdmin.empty) {
+        const exAdmin = { ...existingAdmin.docs[0].data() };
+        await firestore
+          .collection("users")
+          .doc(existingAdmin.docs[0].id)
+          .delete();
+
+        await firebase.createUser({
+          email: newAdmin.email,
+          password: newAdmin.password,
+        }, {
+          ...exAdmin,
+          role: "ADMIN",
+          schoolId: newAdmin.schoolId,
+          hasRegistered: true,
+        })
+      } 
+      else {
+        throw Error(`Pengajar dengan email ${newAdmin.email} tidak ditemukan dalam sekolah ID ${newAdmin.schoolId}`);
+      }
+    }
   }
 }

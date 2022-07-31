@@ -12,19 +12,23 @@ import { Link, useHistory } from 'react-router-dom'
 import meColors from 'src/components/meColors';
 import meConfirm from 'src/components/meConfirm';
 import MENativeSelect from 'src/components/MENativeSelect';
+import METextArea from 'src/components/METextArea';
 import METextField from 'src/components/METextField';
 import meToaster from 'src/components/toaster';
 import { ROLE_TYPES, SCHOOL_TYPES } from 'src/enums';
+import { signUpAsAdmin } from 'src/store/actions/adminActions';
 import { signUp } from 'src/store/actions/authActions';
+import { createAdminAndTeacher } from 'src/store/actions/schoolActions';
 import { signUpAsTeacher } from 'src/store/actions/teacherActions';
 import { object, string } from 'yup';
 
 function RegisterAdmin(props) {
-  const { onSubmit, onBack, isSubmitting } = props;
+  const { onSubmit, onBack, isSubmitting, adminOnly } = props;
   const adminSchema = object().shape({
     email: string().lowercase().required().strict(),
     fullName: string().required().strict(),
-    password: string().required()
+    password: string().required(),
+    schoolId: string()
   })
   const {
     register,
@@ -93,6 +97,15 @@ function RegisterAdmin(props) {
           )}
         </CButton>
       </div>
+      {
+        adminOnly && (
+          <METextField
+            { ...register("schoolId") }
+            startIcon={AiOutlineUser}
+            errors={errors}
+          />
+        )
+      }
       <div className="d-flex">
         {
           onBack && (
@@ -140,15 +153,21 @@ function RegisterSchool(props) {
     <CForm onSubmit={handleSubmit(onSubmit)}>
       <METextField
         { ...register("name") }
-        placeholder="Enter School Name"
-        label="School Name"
+        placeholder="Masukkan Nama Sekolah"
+        label="Nama Sekolah"
         errors={errors}
       />
       <MENativeSelect
         { ...register("type") }
         options={SCHOOL_TYPES}
-        placeholder="Enter School Type"
-        label="School Type"
+        placeholder="Pilih Tipe Sekolah"
+        label="Tipe Sekolah"
+        errors={errors}
+      />
+      <METextArea
+        { ...register("location") }
+        placeholder="Masukkan Lokasi Sekolah"
+        label="Lokasi Sekolah"
         errors={errors}
       />
       <div className="d-flex">
@@ -241,7 +260,7 @@ export default function Register() {
   const authError = firebase.authError;
   const [type, setType] = useState(null);
   const [hasRegistered, setHasRegistered] = useState(false);
-  const [userData, setUserData] = useState(null);
+  const [adminData, setAdminData] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   function handleBack() {
@@ -252,12 +271,25 @@ export default function Register() {
   if (auth?.isLoaded && !auth?.isEmpty) {
     history.replace("/");
   }
-  
-  const firebaseHook = useFirebase();
-  const firestore = useFirestore();
 
   function onSubmitUser(data) {
-    setUserData(data);
+    meConfirm({
+      onConfirm: () => {
+        setIsSubmitting(true);
+        dispatch(signUpAsAdmin(data))
+          .catch((e) => {
+            meToaster.warning(e.message);
+          })
+          .finally(() => {
+            setIsSubmitting(false);
+          })
+      }
+    })
+  }
+
+  function onSubmitAdmin(data) {
+    console.log(data);
+    setAdminData(data);
     setHasRegistered(true);
   }
 
@@ -265,26 +297,7 @@ export default function Register() {
     meConfirm({
       onConfirm: () => {
         setIsSubmitting(true);
-        const schoolsRef = firestore.collection("schools");
-        const schoolId = schoolsRef.doc().id;
-        schoolsRef.doc(schoolId).set({ ...data })
-          .then((sku) => {
-            console.log(sku);
-            firebaseHook.createUser({
-              email: userData.email,
-              password: userData.password,
-            }, {
-              fullName: userData.fullName,
-              schoolId,
-              role: "ADMIN"
-            })
-          })
-          .catch((e) => {
-            meToaster.danger("Error")
-          })
-          .finally(() => {
-            setIsSubmitting(false);
-          })
+        dispatch(createAdminAndTeacher(adminData, data))
       }
     })
   }
@@ -358,13 +371,13 @@ export default function Register() {
                   Sudah punya akun? <Link to="/login">Masuk</Link>
                 </div>
               ) : type === "ADMIN" ? (
-                <RegisterAdmin onBack={handleBack}/>
+                <RegisterAdmin onBack={handleBack} onSubmit={onSubmitUser} adminOnly={true}/>
               ) : type === "TEACHER" ? (
                 <RegisterTeacher onBack={handleBack} onSubmit={onSubmitTeacher}/>
               ) : hasRegistered ? (
-                <RegisterSchool onBack={handleBack}/>
+                <RegisterSchool onBack={handleBack} onSubmit={onSubmitSchool}/>
               ) : (
-                <RegisterAdmin onBack={handleBack}/>
+                <RegisterAdmin onBack={handleBack} onSubmit={onSubmitAdmin}/>
               )
             }
             
