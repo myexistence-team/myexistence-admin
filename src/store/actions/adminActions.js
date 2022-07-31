@@ -4,6 +4,7 @@ export function createAdmin(admin) {
   return async (dispatch, getState, { getFirestore }) => {
     const firestore = getFirestore();
     const auth = getState().firebase.auth;
+    const profile = getState().firebase.profile;
 
     const emailAvailable = await checkEmailAvailability(firestore, admin.email);
     if (!emailAvailable) {
@@ -19,7 +20,8 @@ export function createAdmin(admin) {
         createdBy: auth.uid,
         createdAt: new Date(),
         updatedBy: auth.uid,
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        schoolId: profile.schoolId
       });
   }
 }
