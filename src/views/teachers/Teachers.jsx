@@ -1,18 +1,16 @@
-import { CButton, CCard, CCardBody, CCardHeader, CDataTable, CNav, CNavItem, CNavLink, CPagination, CTabContent, CTabPane, CTabs } from '@coreui/react'
+import { CButton, CCard, CCardBody, CCardHeader, CDataTable, CPagination } from '@coreui/react'
 import moment from 'moment'
 import React, { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { MdCheck } from 'react-icons/md'
-import { useSelector } from 'react-redux'
-import { isLoaded, useFirebaseConnect, useFirestoreConnect } from 'react-redux-firebase'
+import { isLoaded } from 'react-redux-firebase'
 import { Link } from 'react-router-dom'
-import { useGetOrdered } from 'src/hooks/getters'
+import { useGetSchoolId } from 'src/hooks/getters'
 import { useFirestorePagination } from 'src/hooks/useFirestorePagination'
 import useQueryString from 'src/hooks/useQueryString'
 import { number } from 'yup'
 import { object } from 'yup'
 
-const DEFAULT_PAGE = 0;
 const DEFAULT_PAGE_SIZE = 5;
 
 export default function Teachers() {
@@ -20,11 +18,8 @@ export default function Teachers() {
   const [query] = useQueryString(object().shape({
     pageSize: number().default(DEFAULT_PAGE_SIZE),
   }), watch);
-  const { pageSize } = query;
 
-  const profile = useSelector((state) => state.firebase.profile);
-  const schoolId = profile.schoolId;
-  console.log(schoolId)
+  const schoolId = useGetSchoolId();
 
   const { 
     list: teachers, 

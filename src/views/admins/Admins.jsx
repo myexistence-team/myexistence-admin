@@ -1,64 +1,45 @@
-import { CButton, CCard, CCardBody, CCardHeader, CDataTable } from '@coreui/react';
-import React, { useEffect } from 'react'
+import { CButton, CCard, CCardBody, CCardHeader, CDataTable, CPagination } from '@coreui/react';
+import React from 'react'
 import { useForm } from 'react-hook-form'
-import { useSelector } from 'react-redux';
-import { isLoaded, useFirestore, useFirestoreConnect } from 'react-redux-firebase';
+import { isLoaded } from 'react-redux-firebase';
 import { Link } from 'react-router-dom';
 import { useGetSchoolId } from 'src/hooks/getters';
+import { useFirestorePagination } from 'src/hooks/useFirestorePagination';
 import useQueryString from 'src/hooks/useQueryString'
 import { number } from 'yup';
 import { object } from 'yup';
 
 export default function Admins() {
   const { register, watch } = useForm();
-  const profile = useSelector((s) => s.firebase.profile);
-  const schoolId = useGetSchoolId();
-  console.log(profile)
   const [query] = useQueryString(object().shape({
-    page: number().min(0),
-    pageSize: number().min(1)
-  }))
-  const firestore = useFirestore();
-  const { page, pageSize } = query;
+    pageSize: number().default(5)
+  }), watch)
 
-  // useFirestoreConnect([
-  //   {
-  //     collection: "users",
-  //     where: [
-  //       ["role", "==", "ADMIN"],
-  //       ["schoolId", "==", profile.schoolId],
-  //     ],
-  //   }
-  // ])
-  // // const admins = firestore.collection("users").where("type", "==", "ADMIN").get().then((data) => console.log(data));
+  const schoolId = useGetSchoolId();
 
-  // const users = useSelector((state) => state.firestore.ordered.users);
-  // console.log(users);
+  const { 
+    list: admins, 
+    handlePageChange, 
+    page, 
+  } = useFirestorePagination("users", query, [
+    ["role", "==", "ADMIN"],
+    ["schoolId", "==", schoolId]
+  ]); 
 
-  useFirestoreConnect({
-    collection: "schools",
-    doc: schoolId,
-    subcollections: [{
-      collection: "admins"
-    }],
-    storeAs: "admins"
-  })
-
-  const admins = useSelector((state) => state.firestore.ordered.admins);
-  console.log(admins);
+  console.log(admins)
 
   return (
     <CCard>
       <CCardHeader className="d-flex justify-content-between">
         <h3>Administrator</h3>
-        <CButton
-          color="primary"
-          variant="outline"
-          is={Link}
-          to="/admins/add"
-        >
-          + Tambahkan Administrator
-        </CButton>
+        <Link to="/admins/add">
+          <CButton
+            color="primary"
+            variant="outline"
+          >
+            + Tambahkan Administrator
+          </CButton>
+        </Link>
       </CCardHeader>
       <CCardBody>
         <CDataTable
@@ -90,6 +71,15 @@ export default function Admins() {
           }}
           loading={!isLoaded(admins)}
         />
+        {
+          admins.length > 5 &&
+          <CPagination
+            activePage={page + 1}
+            onActivePageChange={(newPage) => handlePageChange(Math.max(0, newPage - 1))}
+            pages={0}
+            align="end"
+          />
+        }
       </CCardBody>
     </CCard>
   )

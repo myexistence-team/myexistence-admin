@@ -18,8 +18,8 @@ export function useFirestorePagination(listName, query, where) {
     listName === "users" || listName === "schools" ? {
       collection: listName,
       orderBy: "createdAt",
-      // limit: limit + 1,
-      // startAt: pointer,
+      limit: limit + 1,
+      startAt: pointer,
       where
     } : {
       collection: "schools",
