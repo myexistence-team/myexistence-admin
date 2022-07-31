@@ -4,8 +4,9 @@ import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useFirestore } from 'react-redux-firebase';
-import { Link, useParams } from 'react-router-dom'
+import { Link, useHistory, useParams } from 'react-router-dom'
 import meConfirm from 'src/components/meConfirm';
+import meToaster from 'src/components/toaster';
 import METextField from 'src/components/METextField';
 import { createAdmin } from 'src/store/actions/adminActions';
 import { signUp } from 'src/store/actions/authActions';
@@ -14,6 +15,7 @@ import { object, string } from 'yup';
 export default function AdminForm() {
   const { adminId } = useParams();
   const dispatch = useDispatch();
+  const history = useHistory();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const admin = {};
@@ -23,7 +25,6 @@ export default function AdminForm() {
   const adminSchema = object().shape({
     fullName: string().required(),
     email: string().required(),
-    password: string(),
   })
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(adminSchema)
@@ -32,7 +33,17 @@ export default function AdminForm() {
   function onSubmit(data) {
     meConfirm({
       onConfirm: () => {
+        setIsSubmitting(true);
         dispatch(createAdmin(data))
+          .then(() => {
+            history.push("/admins")
+          })
+          .catch((e) => {
+            meToaster.warning(e.message);
+          })
+          .finally((e) => {
+            setIsSubmitting(false);
+          })
       }
     })
   }
@@ -54,10 +65,6 @@ export default function AdminForm() {
             defaultValue={admin.email}
             errors={errors}
           />
-          <METextField
-            { ...register("password") }
-            errors={errors}
-          />
         </CCardBody>
         <CCardFooter className="d-flex justify-content-end">
           <CButton
@@ -72,6 +79,7 @@ export default function AdminForm() {
             color="primary"
             type="submit"
             className="ml-3"
+            disabled={isSubmitting}
           >
             Simpan
           </CButton>

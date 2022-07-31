@@ -1,12 +1,19 @@
-export function createAdmin(newAdmin) {
+import { checkEmailAvailability } from "src/utils/checkEmail";
+
+export function createAdmin(admin) {
   return async (dispatch, getState, { getFirestore }) => {
     const firestore = getFirestore();
     const auth = getState().firebase.auth;
+
+    const emailAvailable = await checkEmailAvailability(firestore, admin.email);
+    if (!emailAvailable) {
+      throw Error("Admin dengan email tersebut sudah ada")
+    }
     
     firestore
       .collection("users")
       .add({ 
-        ...newAdmin, 
+        ...admin, 
         role: "ADMIN",
         hasRegistered: false,
         createdBy: auth.uid,

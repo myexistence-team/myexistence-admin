@@ -4,7 +4,5 @@ export async function checkEmailAvailability(firestore, email) {
     .where("email", "==", email)
     .get()
 
-  console.log(existingUsers.empty)
-  
   return (existingUsers.empty)
 }
