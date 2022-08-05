@@ -27,8 +27,6 @@ export default function Admins() {
     ["schoolId", "==", schoolId]
   ]); 
 
-  console.log(admins)
-
   return (
     <CCard>
       <CCardHeader className="d-flex justify-content-between">

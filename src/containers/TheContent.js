@@ -23,10 +23,6 @@ const TheContent = () => {
   const profile = firebase.profile;
   const auth = firebase.auth;
 
-  if (auth?.isLoaded && auth?.isEmpty) {
-    history.replace("/login");
-  }
-
   return (
     <main className="c-main">
       <CContainer fluid>

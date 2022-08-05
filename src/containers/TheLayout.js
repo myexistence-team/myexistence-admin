@@ -15,6 +15,10 @@ const TheLayout = () => {
   const profile = firebase.profile;
   const auth = firebase.auth;
 
+  if (profile?.isLoaded && !profile.schoolId) {
+    history.replace("/register-account")
+  }
+  
   if (auth?.isLoaded && auth?.isEmpty) {
     history.replace("/login");
   }

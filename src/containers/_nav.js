@@ -16,6 +16,7 @@ import {
   AiOutlineStar
 } from "react-icons/ai";
 import {
+  MdClass,
   MdOutlineCalendarToday,
   MdOutlineFamilyRestroom,
   MdOutlineLocationOn,
@@ -49,7 +50,13 @@ const baseNavs = [
     name: "Pengajar",
     to: "/teachers",
     icon: <FaChalkboardTeacher className="c-sidebar-nav-icon" />
-  }
+  },
+  {
+    _tag: "CSidebarNavItem",
+    name: "Kelas",
+    to: "/classes",
+    icon: <MdClass className="c-sidebar-nav-icon" />
+  },
 ];
 
 const _nav = pageAccess => [

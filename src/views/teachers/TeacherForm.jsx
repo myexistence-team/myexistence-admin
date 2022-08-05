@@ -9,6 +9,7 @@ import { Link, useHistory, useParams } from 'react-router-dom'
 import meConfirm from 'src/components/meConfirm'
 import MESpinner from 'src/components/MESpinner'
 import METextField from 'src/components/METextField'
+import meToaster from 'src/components/toaster'
 import { useGetData } from 'src/hooks/getters'
 import { createTeacher, updateTeacher } from 'src/store/actions/teacherActions'
 import { getProfile } from 'src/utils/getters'
@@ -49,6 +50,7 @@ export default function TeacherForm() {
           })
           .catch((e) => {
             console.log(e);
+            meToaster.danger(e.message);
           })
           .finally(() => {
             setIsSubmitting(false);

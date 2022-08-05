@@ -1,4 +1,4 @@
-import { checkEmailAvailability } from "src/utils/checkEmail";
+import { checkEmailAvailability } from "src/utils/checksFunctions";
 
 export function createSchool(school) {
   return async (dispatch, getState, { getFirestore }) => {
@@ -19,9 +19,6 @@ export function createAdminAndTeacher(admin, school) {
     const firestore = getFirestore();
     const firebase = getFirebase();
 
-    delete admin.password
-    delete admin.repassword
-
     const emailAvailable = await checkEmailAvailability(firestore, admin.email);
     if (!emailAvailable) {
       throw Error("Admin dengan email tersebut sudah ada")
@@ -38,12 +35,16 @@ export function createAdminAndTeacher(admin, school) {
       updatedAt: new Date(),
     });
 
+    const adminCopy = { ...admin };
+    delete adminCopy.password;
+    delete adminCopy.repassword;
     await firebase
       .createUser({
         email: admin.email,
-        password: admin.password
+        password: admin.password,
+        signIn: false
       }, {
-        ...admin,
+        ...adminCopy,
         role: "SUPER_ADMIN",
         createdAt: new Date(),
         updatedAt: new Date(),

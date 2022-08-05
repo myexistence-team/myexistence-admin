@@ -1,4 +1,4 @@
-import { checkEmailAvailability } from "src/utils/checkEmail";
+import { checkEmailAvailability } from "src/utils/checksFunctions";
 
 export function createTeacher(newTeacher) {
   return async (dispatch, getState, { getFirestore }) => {
@@ -73,6 +73,7 @@ export function signUpAsTeacher(newTeacher) {
         await firebase.createUser({
           email: newTeacher.email,
           password: newTeacher.password,
+          signIn: false
         }, {
           ...exTeacher,
           role: "TEACHER",

@@ -16,8 +16,8 @@ import { signOut } from "src/store/actions/authActions";
 const TheHeaderDropdown = () => {
   const dispatch = useDispatch();
   const history = useHistory();
+  const auth = useSelector(state => state.firebase.auth);
   const profile = useSelector(state => state.firebase.profile);
-
 
   async function handleSignOut() {
     await dispatch(signOut());
@@ -32,9 +32,8 @@ const TheHeaderDropdown = () => {
           <div className="c-avatar mr-3">
             <Avatar
               className="c-avatar-img"
-              alt={profile?.displayName}
-              name={profile?.displayName}
-              src={profile?.avatarUrl}
+              name={profile.displayName}
+              src={auth?.photoUrl}
               size="36"
             />
           </div>
@@ -43,63 +42,6 @@ const TheHeaderDropdown = () => {
           </span>
         </CDropdownToggle>
         <CDropdownMenu className="pt-0" placement="bottom-end">
-          {/* <CDropdownItem header tag="div" color="light" className="text-center">
-            <strong>Account</strong>
-          </CDropdownItem>
-          <CDropdownItem>
-            <CIcon name="cil-bell" className="mfe-2" />
-            Updates
-            <CBadge color="info" className="mfs-auto">
-              42
-            </CBadge>
-          </CDropdownItem>
-          <CDropdownItem>
-            <CIcon name="cil-envelope-open" className="mfe-2" />
-            Messages
-            <CBadge color="success" className="mfs-auto">
-              42
-            </CBadge>
-          </CDropdownItem>
-          <CDropdownItem>
-            <CIcon name="cil-task" className="mfe-2" />
-            Tasks
-            <CBadge color="danger" className="mfs-auto">
-              42
-            </CBadge>
-          </CDropdownItem>
-          <CDropdownItem>
-            <CIcon name="cil-comment-square" className="mfe-2" />
-            Comments
-            <CBadge color="warning" className="mfs-auto">
-              42
-            </CBadge>
-          </CDropdownItem>
-          <CDropdownItem header tag="div" color="light" className="text-center">
-            <strong>Settings</strong>
-          </CDropdownItem>
-          <CDropdownItem>
-            <CIcon name="cil-user" className="mfe-2" />
-            Profile
-          </CDropdownItem>
-          <CDropdownItem>
-            <CIcon name="cil-settings" className="mfe-2" />
-            Settings
-          </CDropdownItem>
-          <CDropdownItem>
-            <CIcon name="cil-credit-card" className="mfe-2" />
-            Payments
-            <CBadge color="secondary" className="mfs-auto">
-              42
-            </CBadge>
-          </CDropdownItem>
-          <CDropdownItem>
-            <CIcon name="cil-file" className="mfe-2" />
-            Projects
-            <CBadge color="primary" className="mfs-auto">
-              42
-            </CBadge>
-          </CDropdownItem>
-          <CDropdownItem divider /> */}
           <CDropdownItem onClick={() => history.push(`/admins/${profile.id}`)}>
             <CIcon name="cil-user" className="mfe-2" /> Profile
           </CDropdownItem>

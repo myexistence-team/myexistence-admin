@@ -58,12 +58,12 @@ export default function AdminForm() {
         <CCardBody>
           <METextField
             { ...register("displayName") }
-            defaultValue={admin.displayName}
+            defaultValue={admin?.displayName}
             errors={errors}
           />
           <METextField
             { ...register("email") }
-            defaultValue={admin.email}
+            defaultValue={admin?.email}
             errors={errors}
           />
         </CCardBody>

@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import KKSpinner from "./components/MESpinner";
 import "./scss/style.scss";
 import "react-markdown-editor-lite/lib/index.css";
+import RegisterAccount from "./views/pages/register/RegisterAccount";
 
 const loading = (
   <div
@@ -58,6 +59,12 @@ class App extends Component {
               path="/register"
               name="Register Page"
               render={props => <Register {...props} />}
+            />
+            <Route
+              exact
+              path="/register-account"
+              name="Register Account"
+              render={props => <RegisterAccount {...props} />}
             />
             <Route
               exact

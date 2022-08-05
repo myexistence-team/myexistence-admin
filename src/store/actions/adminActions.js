@@ -1,8 +1,9 @@
-import { checkEmailAvailability } from "src/utils/checkEmail";
+import { checkEmailAvailability } from "src/utils/checksFunctions";
 
 export function createAdmin(admin) {
-  return async (dispatch, getState, { getFirestore }) => {
+  return async (dispatch, getState, { getFirestore, getFirebase }) => {
     const firestore = getFirestore();
+    // const firebase = getFirebase();
     const auth = getState().firebase.auth;
     const profile = getState().firebase.profile;
 
@@ -10,6 +11,23 @@ export function createAdmin(admin) {
     if (!emailAvailable) {
       throw Error("Admin dengan email tersebut sudah ada")
     }
+
+    // const adminCopy = { ...admin };
+    // delete adminCopy.password;
+    // delete adminCopy.repassword;
+    // firebase.createUser({
+    //   email: admin.email,
+    //   password: admin.email,
+    //   signIn: false
+    // }, {
+    //   ...adminCopy,
+    //   role: "ADMIN",
+    //   createdBy: auth.uid,
+    //   createdAt: new Date(),
+    //   updatedBy: auth.uid,
+    //   updatedAt: new Date(),
+    //   schoolId: profile.schoolId
+    // })
     
     firestore
       .collection("users")
@@ -42,14 +60,23 @@ export function updateAdmin(adminId, newAdmin) {
   }
 }
 
-export function signUpAsAdmin(newAdmin) {
+export function signUpAsAdminWithGoogle(admin) {
+  return async (dispatch, getState, { getFirebase, getFirestore }) => {
+    const firebase = getFirebase();
+    const firestore = getFirestore();
+
+
+  }
+}
+
+export function signUpAsAdmin(admin) {
   return async (dispatch, getState, { getFirebase, getFirestore }) => {
     const firebase = getFirebase();
     const firestore = getFirestore();
 
     const schoolRef = firestore
       .collection("schools")
-      .doc(newAdmin.schoolId)
+      .doc(admin.schoolId)
 
     const school = await schoolRef.get();
     if (!school.exists) {
@@ -59,7 +86,7 @@ export function signUpAsAdmin(newAdmin) {
     else {
       const existingAdmin = await firestore
         .collection("users")
-        .where("email", "==", newAdmin.email)
+        .where("email", "==", admin.email)
         .where("role", "==", "ADMIN")
         .get()
 
@@ -71,17 +98,18 @@ export function signUpAsAdmin(newAdmin) {
           .delete();
 
         await firebase.createUser({
-          email: newAdmin.email,
-          password: newAdmin.password,
+          email: admin.email,
+          password: admin.password,
+          signIn: false,
         }, {
           ...exAdmin,
           role: "ADMIN",
-          schoolId: newAdmin.schoolId,
+          schoolId: admin.schoolId,
           hasRegistered: true,
         })
       } 
       else {
-        throw Error(`Admin dengan email ${newAdmin.email} tidak ditemukan dalam sekolah ID ${newAdmin.schoolId}`);
+        throw Error(`Admin dengan email ${admin.email} tidak ditemukan dalam sekolah ID ${admin.schoolId}`);
       }
     }
   }

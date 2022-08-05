@@ -34,7 +34,6 @@ export default function SchoolForm() {
   const history = useHistory();
 
   function onSubmit(data) {
-    console.log(data);
     meConfirm({
       onConfirm: () => {
         dispatch(editSchool(data))
@@ -51,7 +50,6 @@ export default function SchoolForm() {
   }])
 
   const school = useSelector(({ firestore: { data } }) => data.schools && data.schools[schoolId]);
-  console.log(school)
 
   return (
     <CCard>

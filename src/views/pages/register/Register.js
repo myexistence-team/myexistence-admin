@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { AiOutlineLock, AiOutlineMail, AiOutlineUser } from 'react-icons/ai';
 import { MdVisibility, MdVisibilityOff } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
-import { useFirebase, useFirestore, useFirestoreConnect } from 'react-redux-firebase';
+import { useFirestore, useFirestoreConnect } from 'react-redux-firebase';
 import { Link, useHistory } from 'react-router-dom'
 import meColors from 'src/components/meColors';
 import meConfirm from 'src/components/meConfirm';
@@ -20,6 +20,7 @@ import { signUpAsAdmin } from 'src/store/actions/adminActions';
 import { signUp } from 'src/store/actions/authActions';
 import { createAdminAndTeacher } from 'src/store/actions/schoolActions';
 import { signUpAsTeacher } from 'src/store/actions/teacherActions';
+import { checkSchoolExistance } from 'src/utils/checksFunctions';
 import { object, string } from 'yup';
 
 function RegisterAdmin(props) {
@@ -28,7 +29,6 @@ function RegisterAdmin(props) {
     email: string().lowercase().required().strict(),
     displayName: string().required().strict(),
     password: string().required(),
-    schoolId: string()
   })
   const {
     register,
@@ -53,7 +53,7 @@ function RegisterAdmin(props) {
 
   return (
     <CForm onSubmit={handleSubmit(onSubmit)}>
-      <h4>Mohon masukkan informasi otentikasi Anda.</h4>
+      <h5>Sebagai Admin</h5>
       <METextField
         { ...register("email") }
         startIcon={AiOutlineMail}
@@ -97,15 +97,6 @@ function RegisterAdmin(props) {
           )}
         </CButton>
       </div>
-      {
-        adminOnly && (
-          <METextField
-            { ...register("schoolId") }
-            startIcon={AiOutlineUser}
-            errors={errors}
-          />
-        )
-      }
       <div className="d-flex">
         {
           onBack && (
@@ -203,7 +194,6 @@ function RegisterTeacher(props) {
   const teacherSchema = object().shape({
     email: string().required().strict(),
     password: string().required().strict(),
-    schoolId: string().required().strict(),
   })
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(teacherSchema)
@@ -211,17 +201,13 @@ function RegisterTeacher(props) {
 
   return (
     <CForm onSubmit={handleSubmit(onSubmit)}>
+      <h5>Sebagai Pengajar</h5>
       <METextField
         { ...register("email") }
         errors={errors}
       />
       <METextField
         { ...register("password") }
-        errors={errors}
-      />
-      <METextField
-        label="Masukkan Kode Sekolah"
-        { ...register("schoolId") }
         errors={errors}
       />
       <div className="d-flex">
@@ -256,12 +242,16 @@ export default function Register() {
   const history = useHistory();
   const dispatch = useDispatch();
   const firebase = useSelector((state) => state.firebase);
+  const firestoreHook = useFirestore();
   const auth = firebase.auth;
   const authError = firebase.authError;
   const [type, setType] = useState(null);
   const [hasRegistered, setHasRegistered] = useState(false);
   const [adminData, setAdminData] = useState(null);
+  const [isCheckingSchool, setIsCheckingSchool] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { register, formState: { errors }, watch, getValues } = useForm();
 
   function handleBack() {
     setHasRegistered(false);
@@ -280,7 +270,7 @@ export default function Register() {
     meConfirm({
       onConfirm: () => {
         setIsSubmitting(true);
-        dispatch(signUpAsAdmin(data))
+        dispatch(signUpAsAdmin({ ...data,schoolId: getValues("schoolId") }))
           .catch((e) => {
             meToaster.warning(e.message);
           })
@@ -292,7 +282,6 @@ export default function Register() {
   }
 
   function onSubmitAdmin(data) {
-    console.log(data);
     setAdminData(data);
     setHasRegistered(true);
   }
@@ -301,7 +290,7 @@ export default function Register() {
     meConfirm({
       onConfirm: () => {
         setIsSubmitting(true);
-        dispatch(createAdminAndTeacher(adminData, data))
+        dispatch(createAdminAndTeacher(adminData, { ...data, schoolId: getValues("schoolId") }))
           .catch((e) => {
             meToaster.warning(e.message);
           })
@@ -310,6 +299,21 @@ export default function Register() {
           })
       }
     })
+  }
+
+  function handleTypeChange(type) {
+    setIsCheckingSchool(true);
+    checkSchoolExistance(firestoreHook, getValues("schoolId"))
+      .then((exists) => {
+        if (exists) {
+          setType(type);
+        } else {
+          meToaster.warning("Sekolah dengan ID tersebut tidak ditemukan");
+        }
+      })
+      .finally(() => {
+        setIsCheckingSchool(false)
+      })
   }
 
   function onSubmitTeacher(data) {
@@ -344,12 +348,17 @@ export default function Register() {
       }}>
         <CCard>
           <CCardBody>
+            <h4 className="mb-3">Daftar Akun Baru</h4>
             {
               type === null ? (
                 <div className="text-center">
-                  <h4>Mohon pilih tipe pendaftaran</h4>
+                  <METextField
+                    { ...register("schoolId") }
+                    label={false}
+                    placeholder="Masukkan ID Sekolah"
+                  />
                   <div 
-                    className="d-flex justify-content-center my-4"
+                    className="d-flex justify-content-center my-3"
                     style={{
                       gap: 16
                     }}
@@ -357,31 +366,38 @@ export default function Register() {
                     <CButton
                       color="primary"
                       variant="outline"
-                      size="lg"
-                      onClick={() => setType("TEACHER")}
+                      className="w-100"
+                      onClick={() => handleTypeChange("TEACHER")}
+                      disabled={!watch("schoolId") || isCheckingSchool}
                     >
-                      Pengajar
+                      Daftar sebagai Pengajar
                     </CButton>
                     <CButton
                       color="primary"
                       variant="outline"
-                      size="lg"
-                      onClick={() => setType("ADMIN")}
+                      className="w-100"
+                      onClick={() => handleTypeChange("ADMIN")}
+                      disabled={!watch("schoolId") || isCheckingSchool}
                     >
-                      Administrator
-                    </CButton>
-                    <CButton
-                      color="primary"
-                      size="lg"
-                      onClick={() => setType("SCHOOL")}
-                    >
-                      Daftarkan sekolah baru
+                      Daftar sebagai Administrator
                     </CButton>
                   </div>
+                  atau
+                  <br/>
+
+                  <CButton
+                    color="primary"
+                    size="lg"
+                    className="mt-3 mb-4"
+                    onClick={() => setType("SCHOOL")}
+                  >
+                    Daftarkan sekolah baru
+                  </CButton>
+                  <br/>
                   Sudah punya akun? <Link to="/login">Masuk</Link>
                 </div>
               ) : type === "ADMIN" ? (
-                <RegisterAdmin onBack={handleBack} onSubmit={onSubmitUser} adminOnly={true}/>
+                <RegisterAdmin onBack={handleBack} onSubmit={onSubmitUser}/>
               ) : type === "TEACHER" ? (
                 <RegisterTeacher onBack={handleBack} onSubmit={onSubmitTeacher}/>
               ) : hasRegistered ? (

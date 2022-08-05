@@ -72,7 +72,7 @@ const TheHeader = () => {
         </CToggler>
         {/* <TheHeaderDropdownNotif />
         <TheHeaderDropdownTasks /> */}
-        <TheHeaderDropdownMssg />
+        {/* <TheHeaderDropdownMssg /> */}
         <TheHeaderDropdown />
         {/* <CToggler
           inHeader
