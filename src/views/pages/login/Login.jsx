@@ -24,6 +24,7 @@ import { signIn } from "src/store/actions/authActions";
 import METextField from "src/components/METextField";
 import { AiOutlineLock, AiOutlineUser } from "react-icons/ai";
 import { isLoaded, useFirebase, useFirebaseConnect } from "react-redux-firebase";
+import meToaster from "src/components/toaster";
 
 const Login = () => {
   useFirebaseConnect(["auth"]);
@@ -31,7 +32,8 @@ const Login = () => {
   const dispatch = useDispatch();
   const firebase = useSelector(state => state.firebase);
   const auth = firebase.auth;
-  console.log(isLoaded(auth))
+
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [passwordInputVisibility, setPasswordInputVisibility] = useState(false);
 
   const formSchema = object().shape({
@@ -77,10 +79,18 @@ const Login = () => {
 
   const firebaseHook = useFirebase();
   const onSubmit = data => {
+    setIsLoggingIn(true);
     firebaseHook.login({
       email: data.email,
       password: data.password
     })
+      .catch((e) => {
+        console.log(e)
+        meToaster.danger(e.message)
+      })
+      .finally(() => {
+        setIsLoggingIn(false);
+      })
     // dispatch(
     //   signIn({
     //     email: data.email,
@@ -159,7 +169,7 @@ const Login = () => {
                       color="primary"
                       className="px-4 w-100 mb-3"
                       size="lg"
-                      disabled={!isLoaded(auth)}
+                      disabled={!isLoaded(auth) || isLoggingIn}
                     >
                       Login
                     </CButton>
