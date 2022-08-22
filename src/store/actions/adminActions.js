@@ -3,7 +3,6 @@ import { checkEmailAvailability } from "src/utils/checksFunctions";
 export function createAdmin(admin) {
   return async (dispatch, getState, { getFirestore, getFirebase }) => {
     const firestore = getFirestore();
-    // const firebase = getFirebase();
     const auth = getState().firebase.auth;
     const profile = getState().firebase.profile;
 
@@ -11,23 +10,6 @@ export function createAdmin(admin) {
     if (!emailAvailable) {
       throw Error("Admin dengan email tersebut sudah ada")
     }
-
-    // const adminCopy = { ...admin };
-    // delete adminCopy.password;
-    // delete adminCopy.repassword;
-    // firebase.createUser({
-    //   email: admin.email,
-    //   password: admin.email,
-    //   signIn: false
-    // }, {
-    //   ...adminCopy,
-    //   role: "ADMIN",
-    //   createdBy: auth.uid,
-    //   createdAt: new Date(),
-    //   updatedBy: auth.uid,
-    //   updatedAt: new Date(),
-    //   schoolId: profile.schoolId
-    // })
     
     firestore
       .collection("users")
