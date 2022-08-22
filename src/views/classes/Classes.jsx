@@ -19,8 +19,6 @@ export default function Classes() {
     page,
   } = useFirestorePagination("classes", query)
 
-  console.log(classes);
-
   return (
     <CCard>
       <CCardHeader className="d-flex justify-content-between">
