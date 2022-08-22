@@ -1,15 +1,13 @@
 import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CForm } from '@coreui/react'
 import { yupResolver } from '@hookform/resolvers/yup';
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { useFirestore } from 'react-redux-firebase';
 import { Link, useHistory, useParams } from 'react-router-dom'
 import meConfirm from 'src/components/meConfirm';
 import meToaster from 'src/components/toaster';
 import METextField from 'src/components/METextField';
 import { createAdmin, updateAdmin } from 'src/store/actions/adminActions';
-import { signUp } from 'src/store/actions/authActions';
 import { object, string } from 'yup';
 import { useGetData } from 'src/hooks/getters';
 
