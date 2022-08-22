@@ -1,0 +1,1 @@
+export const SCHEDULE_START_DATE_MS = 259200000;
