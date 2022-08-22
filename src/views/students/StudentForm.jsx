@@ -32,7 +32,7 @@ export default function StudentForm() {
     meConfirm({
       onConfirm: () => {
         setIsSubmitting(true);
-        dispatch(editMode ? updateStudent(studentId, student) : createStudent(student))
+        dispatch(editMode ? updateStudent(studentId, data) : createStudent(data))
           .then(() => {
             history.push("/students")
           })
