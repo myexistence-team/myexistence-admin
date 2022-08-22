@@ -14,7 +14,6 @@ export function createClass(newClass) {
       createdAt: new Date(),
       updatedBy: auth.uid,
       updatedAt: new Date(),
-      schoolId: profile.schoolId
     });
   }
 }
