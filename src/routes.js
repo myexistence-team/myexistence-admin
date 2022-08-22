@@ -31,6 +31,7 @@ const routes = pageAccess => [
   { path: "/classes", name: "Kelas", component: Classes, exact: true },
   { path: "/classes/add", name: "Tambahkan Kelas", component: ClassForm, exact: true },
   { path: "/classes/:classId", name: "Detail Kelas", component: ClassDetails, exact: true },
+  { path: "/classes/:classId/edit", name: "Edit Kelas", component: ClassForm, exact: true },
   { path: "/students", name: "Pelajar", component: Students, exact: true },
   { path: "/students/add", name: "Tambahkan Pelajar", component: StudentForm, exact: true },
 ];
