@@ -6,13 +6,11 @@ import { Link } from 'react-router-dom'
 export default function Classes() {
   const { register } = useForm();
 
-  
-
   return (
     <CCard>
       <CCardHeader className="d-flex justify-content-between">
         <h3>Kelas</h3>
-        <Link>
+        <Link to="/classes/add">
           <CButton
             variant="outline"
             color="primary"
