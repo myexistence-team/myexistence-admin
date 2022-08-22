@@ -13,6 +13,7 @@ import ClassForm from "./views/classes/ClassForm";
 import Students from "./views/students/Students";
 import StudentForm from "./views/students/StudentForm";
 import ClassDetails from "./views/classes/ClassDetails";
+import StudentDetails from "./views/students/StudentDetails";
 const Dashboard = React.lazy(() => import("./views/dashboard/Dashboard"));
 
 const routes = pageAccess => [
@@ -34,6 +35,7 @@ const routes = pageAccess => [
   { path: "/classes/:classId/edit", name: "Edit Kelas", component: ClassForm, exact: true },
   { path: "/students", name: "Pelajar", component: Students, exact: true },
   { path: "/students/add", name: "Tambahkan Pelajar", component: StudentForm, exact: true },
+  { path: "/students/:studentId", name: "Detail Pelajar", component: StudentDetails, exact: true },
 ];
 
 export default routes;
