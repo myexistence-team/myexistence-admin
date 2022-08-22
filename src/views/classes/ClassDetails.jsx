@@ -24,7 +24,6 @@ export default function ClassDetails() {
     storeAs: "class"
   })
   const classObj = useSelector((state) => state.firestore.data.class)
-  console.log(classObj)
 
   useFirestoreConnect(classObj && {
     collection: "users",
