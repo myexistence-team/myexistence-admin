@@ -36,6 +36,7 @@ const routes = pageAccess => [
   { path: "/students", name: "Pelajar", component: Students, exact: true },
   { path: "/students/add", name: "Tambahkan Pelajar", component: StudentForm, exact: true },
   { path: "/students/:studentId", name: "Detail Pelajar", component: StudentDetails, exact: true },
+  { path: "/students/:studentId/edit", name: "Edit Pelajar", component: StudentForm, exact: true },
 ];
 
 export default routes;
