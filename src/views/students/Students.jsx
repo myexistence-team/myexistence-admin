@@ -7,7 +7,7 @@ export default function Students() {
     <CCard>
       <CCardHeader className="d-flex justify-content-between">
         <h3>Pelajar</h3>
-        <Link to="/classes/add">
+        <Link to="/students/add">
           <CButton
             variant="outline"
             color="primary"

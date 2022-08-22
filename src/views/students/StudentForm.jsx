@@ -1,10 +1,14 @@
+import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CForm } from '@coreui/react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { useHistory, useParams } from 'react-router-dom'
+import { Link, useHistory, useParams } from 'react-router-dom'
 import meConfirm from 'src/components/meConfirm';
+import METextField from 'src/components/METextField';
+import meToaster from 'src/components/toaster';
 import { useGetData } from 'src/hooks/getters';
+import { createStudent, updateStudent } from 'src/store/actions/studentActions';
 import { object, string } from 'yup';
 
 export default function StudentForm() {
@@ -28,12 +32,57 @@ export default function StudentForm() {
     meConfirm({
       onConfirm: () => {
         setIsSubmitting(true);
-        dispatch(editMode ? )
+        dispatch(editMode ? updateStudent(studentId, student) : createStudent(student))
+          .then(() => {
+            history.push("/students")
+          })
+          .catch((e) => {
+            meToaster.warning(e.message);
+          })
+          .finally((e) => {
+            setIsSubmitting(false);
+          })
       }
     })
   }
 
   return (
-    <div>StudentForm</div>
+    <CCard>
+      <CForm onSubmit={handleSubmit(onSubmit)}>
+        <CCardHeader>
+          <h3>{editMode ? "Edit Pelajar" : "Tambahkan Pelajar"}</h3>
+        </CCardHeader>
+        <CCardBody>
+          <METextField
+            { ...register("displayName") }
+            defaultValue={student?.displayName}
+            errors={errors}
+          />
+          <METextField
+            { ...register("email") }
+            defaultValue={student?.email}
+            errors={errors}
+          />
+        </CCardBody>
+        <CCardFooter className="d-flex justify-content-end">
+          <CButton
+            color="primary"
+            variant="outline"
+            is={Link}
+            to="/admins"
+          >
+            Batal
+          </CButton>
+          <CButton
+            color="primary"
+            type="submit"
+            className="ml-3"
+            disabled={isSubmitting}
+          >
+            Simpan
+          </CButton>
+        </CCardFooter>
+      </CForm>
+    </CCard>
   )
 }
