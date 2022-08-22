@@ -5,16 +5,16 @@ export function createClass(newClass) {
     const profile = getState().firebase.profile;
 
     firestore
-    .collection("schools")
-    .doc(profile.schoolId)
-    .collection("classes")
-    .add({ 
-      ...newClass, 
-      createdBy: auth.uid,
-      createdAt: new Date(),
-      updatedBy: auth.uid,
-      updatedAt: new Date(),
-    });
+      .collection("schools")
+      .doc(profile.schoolId)
+      .collection("classes")
+      .add({ 
+        ...newClass, 
+        createdBy: auth.uid,
+        createdAt: new Date(),
+        updatedBy: auth.uid,
+        updatedAt: new Date(),
+      });
   }
 }
 
