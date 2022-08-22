@@ -69,7 +69,7 @@ export default function StudentForm() {
             color="primary"
             variant="outline"
             is={Link}
-            to="/admins"
+            to="/students"
           >
             Batal
           </CButton>
