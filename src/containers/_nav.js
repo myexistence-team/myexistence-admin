@@ -23,6 +23,7 @@ import {
   MdOutlineSpaceDashboard,
   MdVerifiedUser
 } from "react-icons/md";
+import { IoMdSchool } from "react-icons/io"
 
 // Note: need to make sure for all routes name
 
@@ -50,6 +51,12 @@ const baseNavs = [
     name: "Pengajar",
     to: "/teachers",
     icon: <FaChalkboardTeacher className="c-sidebar-nav-icon" />
+  },
+  {
+    _tag: "CSidebarNavItem",
+    name: "Pelajar",
+    to: "/students",
+    icon: <IoMdSchool className="c-sidebar-nav-icon" />
   },
   {
     _tag: "CSidebarNavItem",
