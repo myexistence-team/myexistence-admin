@@ -60,12 +60,15 @@ export default function SchoolForm() {
           ) : editMode && !school ? (
             <CCardBody>
               <Helmet>
-                <title>School Not Found</title>
+                <title>Sekolah Tidak Ditemukan</title>
               </Helmet>
-              <h3>School with ID {schoolId} is not found.</h3>
+              <h3>Sekolah dengan ID {schoolId} tidak ditemukan.</h3>
             </CCardBody>
           ) : (
             <>
+              <Helmet>
+                <title>Edit Sekolahku</title>
+              </Helmet>
               <CCardHeader>
                 <h3>Edit Sekolahku</h3>
               </CCardHeader>

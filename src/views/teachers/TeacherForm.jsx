@@ -61,63 +61,64 @@ export default function TeacherForm() {
 
   return (
     <CCard>
-      <CCardHeader>
-        <h3>{editMode ? "Edit Pengajar" : "Tambahkan Pengajar"}</h3>
-      </CCardHeader>
-      <CForm onSubmit={handleSubmit(onSubmit)}>
-          {
-            editMode && !isLoaded(teacher) ? (
-              <MESpinner/>
-            ) : editMode && !teacher ? (
-              <CCardBody>
-                <Helmet>
-                  <title>Teacher Not Found</title>
-                </Helmet>
-                <h3>Teacher with ID {teacherId} is not found.</h3>
-              </CCardBody>
-            ) : (
-              <>              
-                <CCardBody>
-                  <METextField
-                    { ...register("email") }
-                    errors={errors}
-                    defaultValue={teacher?.email}
-                  />
-                  <METextField
-                    { ...register("displayName") }
-                    errors={errors}
-                    defaultValue={teacher?.displayName}
-                  />
-                  <METextField
-                    { ...register("idNumber") }
-                    errors={errors}
-                    defaultValue={teacher?.idNumber}
-                  />
-                </CCardBody>
-                <CCardFooter className="d-flex justify-content-end">
-                  <Link
-                    to="/teachers"
-                  >
-                    <CButton
-                      color="primary"
-                      variant="outline"
-                    >
-                      Batal
-                    </CButton>
-                  </Link>
-                  <CButton
-                    color="primary"
-                    type="submit"
-                    className="ml-3"
-                    disabled={isSubmitting}
-                  >
-                    Simpan
-                  </CButton>
-                </CCardFooter>
-              </>
-            )
-          }
-      </CForm>
+      {
+        editMode && !isLoaded(teacher) ? (
+          <MESpinner/>
+        ) : editMode && !teacher ? (
+          <CCardBody>
+            <Helmet>
+              <title>Pengajar Tidak Ditemukan</title>
+            </Helmet>
+            <h3>Pengajar dengan ID {teacherId} tidak ditemukan.</h3>
+          </CCardBody>
+        ) : (
+          <CForm onSubmit={handleSubmit(onSubmit)}>
+            <Helmet>
+              <title>{editMode ? `Edit Guru - ${teacher.displayName}` : "Tambahkan Guru"}</title>
+            </Helmet>
+            <CCardHeader>
+              <h3>{editMode ? "Edit Guru" : "Tambahkan Guru"}</h3>
+            </CCardHeader>
+            <CCardBody>
+              <METextField
+                { ...register("email") }
+                errors={errors}
+                defaultValue={teacher?.email}
+              />
+              <METextField
+                { ...register("displayName") }
+                errors={errors}
+                defaultValue={teacher?.displayName}
+              />
+              <METextField
+                { ...register("idNumber") }
+                errors={errors}
+                defaultValue={teacher?.idNumber}
+              />
+            </CCardBody>
+            <CCardFooter className="d-flex justify-content-end">
+              <Link
+                to="/teachers"
+              >
+                <CButton
+                  color="primary"
+                  variant="outline"
+                >
+                  Batal
+                </CButton>
+              </Link>
+              <CButton
+                color="primary"
+                type="submit"
+                className="ml-3"
+                disabled={isSubmitting}
+              >
+                Simpan
+              </CButton>
+            </CCardFooter>
+          </CForm>
+        )
+      }
     </CCard>
   )
 }

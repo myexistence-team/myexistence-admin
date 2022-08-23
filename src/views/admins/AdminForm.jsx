@@ -10,6 +10,9 @@ import METextField from 'src/components/METextField';
 import { createAdmin, updateAdmin } from 'src/store/actions/adminActions';
 import { object, string } from 'yup';
 import { useGetData } from 'src/hooks/getters';
+import { isLoaded } from 'react-redux-firebase';
+import MESpinner from 'src/components/MESpinner';
+import { Helmet } from 'react-helmet';
 
 export default function AdminForm() {
   const { adminId } = useParams();
@@ -49,41 +52,57 @@ export default function AdminForm() {
   
   return (
     <CCard>
-      <CForm onSubmit={handleSubmit(onSubmit)}>
-        <CCardHeader>
-          <h3>{editMode ? "Edit Admin" : "Tambahkan Admin"}</h3>
-        </CCardHeader>
-        <CCardBody>
-          <METextField
-            { ...register("displayName") }
-            defaultValue={admin?.displayName}
-            errors={errors}
-          />
-          <METextField
-            { ...register("email") }
-            defaultValue={admin?.email}
-            errors={errors}
-          />
-        </CCardBody>
-        <CCardFooter className="d-flex justify-content-end">
-          <CButton
-            color="primary"
-            variant="outline"
-            is={Link}
-            to="/admins"
-          >
-            Batal
-          </CButton>
-          <CButton
-            color="primary"
-            type="submit"
-            className="ml-3"
-            disabled={isSubmitting}
-          >
-            Simpan
-          </CButton>
-        </CCardFooter>
-      </CForm>
+      {
+        editMode && !isLoaded(admin) ? (
+          <MESpinner/>
+        ) : editMode && !admin ? (
+          <CCardBody>
+            <Helmet>
+              <title>Admin Tidak Ditemukan</title>
+            </Helmet>
+            <h3>Admin dengan ID {adminId} tidak ditemukan.</h3>
+          </CCardBody>
+        ) : (
+          <CForm onSubmit={handleSubmit(onSubmit)}>
+              <Helmet>
+                <title>{editMode ? `Edit Admin - ${admin.displayName}` : "Tambahkan Admin"}</title>
+              </Helmet>
+            <CCardHeader>
+              <h3>{editMode ? "Edit Admin" : "Tambahkan Admin"}</h3>
+            </CCardHeader>
+            <CCardBody>
+              <METextField
+                { ...register("displayName") }
+                defaultValue={admin?.displayName}
+                errors={errors}
+              />
+              <METextField
+                { ...register("email") }
+                defaultValue={admin?.email}
+                errors={errors}
+              />
+            </CCardBody>
+            <CCardFooter className="d-flex justify-content-end">
+              <CButton
+                color="primary"
+                variant="outline"
+                is={Link}
+                to="/admins"
+              >
+                Batal
+              </CButton>
+              <CButton
+                color="primary"
+                type="submit"
+                className="ml-3"
+                disabled={isSubmitting}
+              >
+                Simpan
+              </CButton>
+            </CCardFooter>
+          </CForm>
+        )
+      }
     </CCard>
   )
 }

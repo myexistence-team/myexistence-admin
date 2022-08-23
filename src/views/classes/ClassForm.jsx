@@ -82,6 +82,9 @@ export default function ClassForm(props) {
           </CCardBody>
         ) : (
           <CForm onSubmit={handleSubmit(onSubmit)}>
+            <Helmet>
+              <title>{editMode ? `Edit Kelas - ${classObj.name}` : "Tambahkan Kelas"}</title>
+            </Helmet>
             <CCardHeader>
               <h3>{editMode ? "Edit Kelas" : "Tambahkan Kelas"}</h3>
             </CCardHeader>
