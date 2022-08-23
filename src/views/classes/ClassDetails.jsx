@@ -1,8 +1,8 @@
-import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CNav, CNavItem, CNavLink, CRow, CTabContent, CTabPane, CTabs } from '@coreui/react';
+import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CDataTable, CNav, CNavItem, CNavLink, CRow, CTabContent, CTabPane, CTabs } from '@coreui/react';
 import moment from 'moment';
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux';
-import { useFirestore, useFirestoreConnect } from 'react-redux-firebase';
+import { isLoaded, useFirestore, useFirestoreConnect } from 'react-redux-firebase';
 import { Link, useParams } from 'react-router-dom'
 import MESpinner from 'src/components/MESpinner';
 import { useGetData, useGetOrdered, useGetSchoolId } from 'src/hooks/getters';
@@ -13,8 +13,113 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import { SCHEDULE_START_DATE_MS } from 'src/constants';
 import { createSchedule, updateSchedule } from 'src/store/actions/scheduleActions';
 import { useDispatch } from 'react-redux';
+import { MdArrowLeft, MdArrowRight } from 'react-icons/md';
+import { updateClassStudents } from 'src/store/actions/classActions';
+import meToaster from 'src/components/toaster';
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
+
+export function ClassStudentAssign(props) {
+  const {
+    classId
+  } = props;
+
+  const dispatch = useDispatch();
+
+  const schoolId = useGetSchoolId();
+  const classObj = useGetData("class");
+  
+  const enrolledStudents = useGetOrdered("students", classObj?.studentIds);
+  const students = useGetOrdered("students")?.filter((s) => !classObj?.studentIds?.includes(s.id));
+
+  const [updatingStudents, setUpdatingStudents] = useState(false);
+
+  useFirestoreConnect([
+    {
+      collection: "users",
+      where: [
+        ["schoolId", "==", schoolId],
+        ["role", "==", "STUDENT"]
+      ],
+      storeAs: "students"
+    },
+  ])
+
+  function handleUpdateClassStudents(studentIds) {
+    setUpdatingStudents(true);
+    dispatch(updateClassStudents(classId, studentIds))
+      .catch((e) => {
+        meToaster.danger(e.message);
+      })
+      .finally(() => {
+        setUpdatingStudents(false);
+      })
+  }
+
+  function handleEnrollStudent(studentId) {
+    const updatedStudentIds = [ ...classObj?.studentIds, studentId ];
+    handleUpdateClassStudents(updatedStudentIds);
+  }
+
+  function handleUnenrollStudent(studentId) {
+    const updatedStudentIds = [ ...classObj?.studentIds ].filter((sId) => sId !== studentId);
+    handleUpdateClassStudents(updatedStudentIds);
+  }
+
+  return (
+    <CRow className="mt-3">
+      <CCol xs={12} md={6}>
+        <h4>Pelajar</h4>
+        <CDataTable
+          items={students}
+          loading={updatingStudents || !isLoaded(students)}
+          fields={[
+            { key: "displayName", label: "Nama" },
+            { key: "enroll", label: "" }
+          ]}
+          tableFilter
+          scopedSlots={{
+            enroll: (s) => (
+              <td className="d-flex justify-content-end">
+                <CButton
+                  color="primary"
+                  onClick={() => handleEnrollStudent(s.id)}
+                >
+                  <MdArrowRight/>
+                </CButton>
+              </td>
+            )
+          }}
+        />
+      </CCol>
+      <CCol xs={12} md={6}>
+        <h4>Pelajar Terdaftar di Kelas</h4>
+        <CDataTable
+          items={enrolledStudents}
+          loading={updatingStudents || !isLoaded(students)}
+          fields={[
+            { key: "unenroll", label: "" },
+            { key: "displayName", label: "Nama" },
+          ]}
+          tableFilter
+          scopedSlots={{
+            unenroll: (s) => (
+              <td>
+                <CButton
+                  color="primary"
+                  variant="outline"
+                  onClick={() => handleUnenrollStudent(s.id)}
+                >
+                  <MdArrowLeft/>
+                </CButton>
+              </td>
+            )
+          }}
+        />
+      </CCol>
+    </CRow>
+  )
+}
 
 export default function ClassDetails() {
   const firestore = useFirestore();
@@ -174,7 +279,7 @@ export default function ClassDetails() {
                     />
                   </CTabPane>
                   <CTabPane data-tab="students">
-                    Pelajar
+                    <ClassStudentAssign classId={classId}/>
                   </CTabPane>
                 </CTabContent>
               </CTabs>
