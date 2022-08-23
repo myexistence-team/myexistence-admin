@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { useFirestore, useFirestoreConnect } from "react-redux-firebase";
+import { isLoaded, useFirestore, useFirestoreConnect } from "react-redux-firebase";
 
 export function useGetData(listName, id) {
   const list = useSelector(({ 
@@ -12,15 +12,20 @@ export function useGetData(listName, id) {
 }
 
 export function useGetOrdered(listName, ids) {
+  var isLoading = true;
   const list = useSelector(({ 
     firestore: { 
       ordered,
-      data
+      data,
+      status: { requesting }
     } 
-  }) => ordered[listName] && ids ? 
-    ids.map((id) => ({ ...data[listName][id], id })) : 
-    ordered[listName] );
-  return list;
+  }) => {
+    isLoading = requesting[listName];
+    return ordered[listName] && ids ? 
+      ids.map((id) => ({ ...data[listName][id], id })) : 
+        ordered[listName] 
+  });
+  return [list, isLoading];
 }
 
 export function useGetProfile() {
