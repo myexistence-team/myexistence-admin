@@ -107,8 +107,11 @@ export default function ClassForm(props) {
                 defaultValue={classObj?.teacherIds}
                 name="teacherIds"
                 listName="users"
-                label="Guru"
-                where={["role", "==", "TEACHER"]}
+                label="Pengajar"
+                where={[
+                  ["role", "==", "TEACHER"],
+                  ["schoolId", "==", schoolId],
+                ]}
                 storeAs="teachers"
                 isMulti
                 labelKey="displayName"
