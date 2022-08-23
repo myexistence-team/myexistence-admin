@@ -11,12 +11,15 @@ export function useGetData(listName, id) {
   return list;
 }
 
-export function useGetOrdered(listName) {
+export function useGetOrdered(listName, ids) {
   const list = useSelector(({ 
     firestore: { 
-      ordered 
+      ordered,
+      data
     } 
-  }) => ordered[listName] && ordered[listName] );
+  }) => ordered[listName] && ids ? 
+    ids.map((id) => ({ ...data[listName][id], id })) : 
+    ordered[listName] );
   return list;
 }
 
