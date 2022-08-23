@@ -36,3 +36,22 @@ export function updateClass(classId, newClass) {
       });
   }
 }
+
+export function updateClassStudents(classId, studentIds) {
+  return async (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore();
+    const auth = getState().firebase.auth;
+    const profile = getState().firebase.profile;
+    
+    firestore
+      .collection("schools")
+      .doc(profile.schoolId)
+      .collection("classes")
+      .doc(classId)
+      .update({ 
+        studentIds, 
+        updatedBy: auth.uid,
+        updatedAt: new Date()
+      });
+  }
+}
