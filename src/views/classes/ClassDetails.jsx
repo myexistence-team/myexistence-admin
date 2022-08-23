@@ -29,8 +29,9 @@ export function ClassStudentAssign(props) {
   const schoolId = useGetSchoolId();
   const classObj = useGetData(`class/${classId}`);
   
-  const enrolledStudents = useGetOrdered("students", classObj?.studentIds);
-  const students = useGetOrdered("students")?.filter((s) => !classObj?.studentIds?.includes(s.id));
+  const [enrolledStudents, enrolledStudentsLoading] = useGetOrdered("students", classObj?.studentIds);
+  const [studentsOrdered, studentsLoading] = useGetOrdered("students")
+  const students = studentsOrdered?.filter((s) => !classObj?.studentIds?.includes(s.id));
 
   const [updatingStudents, setUpdatingStudents] = useState(false);
 
@@ -72,7 +73,7 @@ export function ClassStudentAssign(props) {
         <h4>Pelajar</h4>
         <CDataTable
           items={students}
-          loading={updatingStudents || !isLoaded(students)}
+          loading={updatingStudents || studentsLoading}
           fields={[
             { key: "displayName", label: "Nama" },
             { key: "enroll", label: "" }
@@ -154,7 +155,7 @@ export default function ClassDetails() {
     }
   ])
   const classObj = useSelector((state) => state.firestore.data[`class/${classId}`]);
-  const schedules = useGetOrdered("schedules");
+  const [schedules, schedulesLoading] = useGetOrdered("schedules");
   const schedulesForCalendar = schedules?.map((s) => ({
     ...s,
     title: "",
@@ -242,7 +243,7 @@ export default function ClassDetails() {
                       <small>Jadwal yang dibuat akan diulang per minggu</small>
                     </div>
                     {
-                      isLoaded(schedules) && (
+                      !schedulesLoading ? (
                         <DnDCalendar
                           defaultDate={moment(SCHEDULE_START_DATE_MS).toDate()}
                           toolbar={false}
@@ -257,6 +258,7 @@ export default function ClassDetails() {
                           onEventDrop={handleEventDrop}
                           onSelectEvent={handleEventClick}
                           onSelectSlot={handleSelectSlot}
+                          onEventResize={handleEventDrop}
                           selectable
                           components={{
                             week: {
@@ -264,6 +266,8 @@ export default function ClassDetails() {
                             }
                           }}
                         />
+                      ) : (
+                        <MESpinner/>
                       )
                     }
                   </CTabPane>
