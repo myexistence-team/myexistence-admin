@@ -27,7 +27,7 @@ export function ClassStudentAssign(props) {
   const dispatch = useDispatch();
 
   const schoolId = useGetSchoolId();
-  const classObj = useGetData("class");
+  const classObj = useGetData(`class/${classId}`);
   
   const enrolledStudents = useGetOrdered("students", classObj?.studentIds);
   const students = useGetOrdered("students")?.filter((s) => !classObj?.studentIds?.includes(s.id));
@@ -125,19 +125,7 @@ export default function ClassDetails() {
   const firestore = useFirestore();
   const { classId } = useParams();
   const dispatch = useDispatch();
-  const startMock = new Date(262800000);
-  const endMock = new Date(277200000);
-  const [events, setEvents] = useState([{
-    start: startMock,
-    end: endMock,
-    title: "Test"
-  }]);
-
   const schoolId = useGetSchoolId();
-  useFirestoreConnect({
-    collection: "schoolds",
-
-  })
 
   useFirestoreConnect([
     {
@@ -147,10 +135,9 @@ export default function ClassDetails() {
         {
           collection: "classes",
           doc: classId,
-          storeAs: "class",
         },
       ],
-      storeAs: "class"
+      storeAs: `class/${classId}`
     }, {
       collection: "schools",
       doc: schoolId,
@@ -166,7 +153,7 @@ export default function ClassDetails() {
       storeAs: "schedules"
     }
   ])
-  const classObj = useSelector((state) => state.firestore.data.class);
+  const classObj = useSelector((state) => state.firestore.data[`class/${classId}`]);
   const schedules = useGetOrdered("schedules");
   const schedulesForCalendar = schedules?.map((s) => ({
     ...s,
@@ -211,9 +198,7 @@ export default function ClassDetails() {
   return (
     <CCard>
       {
-        !classObj ? (
-          <MESpinner/>
-        ) : (
+        classObj && isLoaded(classObj) ?  (
           <>
             <CCardHeader className="d-flex justify-content-between">
               <h3>Detail Kelas</h3>
@@ -294,7 +279,9 @@ export default function ClassDetails() {
               }
             </CCardFooter>
           </>
-        )
+        ) : (
+          <MESpinner/>
+        ) 
       }
     </CCard>
   )
