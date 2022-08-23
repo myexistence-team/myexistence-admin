@@ -241,27 +241,31 @@ export default function ClassDetails() {
                     <div className="mb-3">
                       <small>Jadwal yang dibuat akan diulang per minggu</small>
                     </div>
-                    <DnDCalendar
-                      defaultDate={moment(SCHEDULE_START_DATE_MS).toDate()}
-                      toolbar={false}
-                      views={[
-                        "week"
-                      ]}
-                      defaultView="week"
-                      localizer={localizer}
-                      resizable
-                      style={{ height: "500px" }}
-                      events={schedulesForCalendar}
-                      onEventDrop={handleEventDrop}
-                      onSelectEvent={handleEventClick}
-                      onSelectSlot={handleSelectSlot}
-                      selectable
-                      components={{
-                        week: {
-                          header: ({ date, localizer }) => localizer.format(date, 'dddd')
-                        }
-                      }}
-                    />
+                    {
+                      isLoaded(schedules) && (
+                        <DnDCalendar
+                          defaultDate={moment(SCHEDULE_START_DATE_MS).toDate()}
+                          toolbar={false}
+                          views={[
+                            "week"
+                          ]}
+                          defaultView="week"
+                          localizer={localizer}
+                          resizable
+                          style={{ height: "500px" }}
+                          events={schedulesForCalendar}
+                          onEventDrop={handleEventDrop}
+                          onSelectEvent={handleEventClick}
+                          onSelectSlot={handleSelectSlot}
+                          selectable
+                          components={{
+                            week: {
+                              header: ({ date, localizer }) => localizer.format(date, 'dddd')
+                            }
+                          }}
+                        />
+                      )
+                    }
                   </CTabPane>
                   <CTabPane data-tab="students">
                     <ClassStudentAssign classId={classId}/>

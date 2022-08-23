@@ -1,7 +1,6 @@
 import { CButton, CCard, CCardBody, CCardHeader, CDataTable, CPagination } from '@coreui/react'
 import React from 'react'
 import { useForm } from 'react-hook-form'
-import { isLoaded } from 'react-redux-firebase';
 import { Link } from 'react-router-dom'
 import { useFirestorePagination } from 'src/hooks/useFirestorePagination';
 import useQueryString from 'src/hooks/useQueryString';
@@ -14,6 +13,7 @@ export default function Classes() {
   }), watch)
 
   const {
+    isLoading,
     list: classes,
     handlePageChange,
     page,
@@ -61,7 +61,7 @@ export default function Classes() {
               </td>
             )
           }}
-          loading={!isLoaded(classes)}
+          loading={isLoading}
         />
         {
           classes.length > 5 &&
