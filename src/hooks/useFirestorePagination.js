@@ -1,8 +1,7 @@
 import { first, last } from 'lodash'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { useFirestore, useFirestoreConnect } from 'react-redux-firebase'
-import meToaster from 'src/components/toaster'
+import { isLoaded, useFirestoreConnect } from 'react-redux-firebase'
 
 export function useFirestorePagination(listName, query, where) {
   const [pointer, setPointer] = useState(undefined) // Current pointer
@@ -88,5 +87,5 @@ export function useFirestorePagination(listName, query, where) {
     }
   };
 
-  return { list: listRet, limit, setLimit, page, handlePageChange};
+  return { isLoading: !isLoaded(list), list: listRet, limit, setLimit, page, handlePageChange};
 }
