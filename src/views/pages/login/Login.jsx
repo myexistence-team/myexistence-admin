@@ -91,15 +91,6 @@ const Login = () => {
       .finally(() => {
         setIsLoggingIn(false);
       })
-    // dispatch(
-    //   signIn({
-    //     email: data.email,
-    //     password: data.password
-    //   })
-    // ).catch((e) => {
-    //   console.log("WAAAA",  e);
-    // })
-    // logAnalyticsEvent("enter login info", {}, null);
   };
 
   function loginWithGoogle() {

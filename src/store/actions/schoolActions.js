@@ -27,8 +27,6 @@ export function createAdminAndTeacher(admin, school) {
     const schoolRef = firestore.collection("schools");
     const newSchoolId = schoolRef.doc().id;
 
-    console.log(newSchoolId)
-
     await schoolRef.doc(newSchoolId).set({
       ...school,
       createdAt: new Date(),

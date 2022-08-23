@@ -29,7 +29,7 @@ export default function Teachers() {
     ["role", "==", "TEACHER"],
     ["schoolId", "==", schoolId]
   ]); 
-  
+
   return (
     <CCard>
       <CCardHeader className="d-flex justify-content-between">

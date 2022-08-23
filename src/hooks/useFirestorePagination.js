@@ -77,7 +77,6 @@ export function useFirestorePagination(listName, query, where) {
       }
     }
 
-    console.log(list?.length, limit + 1)
     if (list && list.length <= limit + 1) {
       setPage(newPage);
     } else { 

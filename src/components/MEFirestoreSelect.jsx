@@ -48,11 +48,6 @@ export default function MEFirestoreSelect({
   );
   const options = list?.map((a) => ({ value: a[valueKey], label: a[labelKey] }));
 
-  console.group();
-  console.log(defaultValue);    
-  console.log(!isLoaded(list));    
-  console.log(list?.length);    
-  console.groupEnd();
   return (
     <>
       {
