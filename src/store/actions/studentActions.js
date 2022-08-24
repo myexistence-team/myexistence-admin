@@ -1,4 +1,5 @@
 import { checkEmailAvailability } from "src/utils/checksFunctions";
+import { ENROLLMENT_ACTIONS } from "./classActions";
 
 export function createStudent(student) {
   return async (dispatch, getState, { getFirestore, getFirebase }) => {
@@ -36,6 +37,31 @@ export function updateStudent(studentId, student) {
       .doc(studentId)
       .update({ 
         ...student, 
+        updatedBy: auth.uid,
+        updatedAt: new Date()
+      });
+  }
+}
+
+export function updateStudentClass(action, studentId, classId) {
+  return async (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore();
+    const auth = getState().firebase.auth;
+
+    const studentRef = await firestore
+      .collection("users")
+      .doc(studentId)
+      .get()
+    const prevStudent = studentRef.data();
+    console.log(prevStudent);
+
+    firestore
+      .collection("users")
+      .doc(studentId)
+      .update({ 
+        classIds: action === ENROLLMENT_ACTIONS.ENROLL 
+          ? [...prevStudent.classIds || [], classId]
+          : [...prevStudent.classIds].filter((cId) => cId !== classId), 
         updatedBy: auth.uid,
         updatedAt: new Date()
       });

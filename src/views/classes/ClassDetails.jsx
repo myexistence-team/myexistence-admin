@@ -14,8 +14,9 @@ import { SCHEDULE_START_DATE_MS } from 'src/constants';
 import { createSchedule, updateSchedule } from 'src/store/actions/scheduleActions';
 import { useDispatch } from 'react-redux';
 import { MdArrowLeft, MdArrowRight } from 'react-icons/md';
-import { updateClassStudents } from 'src/store/actions/classActions';
+import { ENROLLMENT_ACTIONS, updateClassStudent, updateClassStudents } from 'src/store/actions/classActions';
 import meToaster from 'src/components/toaster';
+import { updateStudentClass } from 'src/store/actions/studentActions';
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
 
@@ -46,9 +47,9 @@ export function ClassStudentAssign(props) {
     },
   ])
 
-  function handleUpdateClassStudents(studentIds) {
+  function handleUpdateClassStudent(action, studentId) {
     setUpdatingStudents(true);
-    dispatch(updateClassStudents(classId, studentIds))
+    dispatch(updateClassStudent(action, classId, studentId))
       .catch((e) => {
         meToaster.danger(e.message);
       })
@@ -58,13 +59,11 @@ export function ClassStudentAssign(props) {
   }
 
   function handleEnrollStudent(studentId) {
-    const updatedStudentIds = [ ...classObj?.studentIds, studentId ];
-    handleUpdateClassStudents(updatedStudentIds);
+    handleUpdateClassStudent(ENROLLMENT_ACTIONS.ENROLL, studentId);
   }
 
   function handleUnenrollStudent(studentId) {
-    const updatedStudentIds = [ ...classObj?.studentIds ].filter((sId) => sId !== studentId);
-    handleUpdateClassStudents(updatedStudentIds);
+    handleUpdateClassStudent(ENROLLMENT_ACTIONS.UNENROLL, studentId);
   }
 
   return (
