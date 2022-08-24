@@ -47,7 +47,8 @@ export function ClassStudents(props) {
       collection: "users",
       where: [
         ["schoolId", "==", schoolId],
-        ["role", "==", "STUDENT"]
+        ["role", "==", "STUDENT"],
+        ["hasRegistered", "==", true],
       ],
       storeAs: "students"
     },
