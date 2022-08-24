@@ -67,10 +67,10 @@ export default function SchoolForm() {
           ) : (
             <>
               <Helmet>
-                <title>Edit Sekolahku</title>
+                <title>Edit Sekolah</title>
               </Helmet>
               <CCardHeader>
-                <h3>Edit Sekolahku</h3>
+                <h3>Edit Sekolah</h3>
               </CCardHeader>
               <CCardBody>
                 <CRow>

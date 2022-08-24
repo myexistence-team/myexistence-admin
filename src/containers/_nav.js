@@ -37,7 +37,7 @@ const baseNavs = [
   },
   {
     _tag: "CSidebarNavItem",
-    name: "Sekolahku",
+    name: "Sekolah",
     to: "/my-school",
     icon: <FaSchool className="c-sidebar-nav-icon" />
   },

@@ -16,7 +16,7 @@ export default function MySchool() {
   return (
     <CCard>
       <CCardHeader className="d-flex justify-content-between">
-        <h3>Sekolahku</h3>
+        <h3>Sekolah</h3>
         {
           profile.role !== "TEACHER" && (
             <div>
