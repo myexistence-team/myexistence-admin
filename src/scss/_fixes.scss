@@ -20,6 +20,15 @@ a {
 
 $calendarBorder: #333;
 
+.c-app {
+  background-color: #EDF2F5;
+
+  .c-footer {
+    background-color: #EDF2F5;
+  }
+}
+
+
 // todo: temp c-dark-theme plumbing for select option
 .c-dark-theme {
   option {
