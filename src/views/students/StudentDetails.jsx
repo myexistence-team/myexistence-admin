@@ -1,11 +1,11 @@
-import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CRow } from '@coreui/react';
+import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CDataTable, CRow } from '@coreui/react';
 import moment from 'moment';
 import React from 'react'
 import { Helmet } from 'react-helmet';
 import { useFirestore, useFirestoreConnect } from 'react-redux-firebase';
 import { Link, useParams } from 'react-router-dom'
 import MESpinner from 'src/components/MESpinner';
-import { useGetData } from 'src/hooks/getters';
+import { useGetData, useGetOrdered, useGetSchoolId } from 'src/hooks/getters';
 
 export default function StudentDetails() {
   const { studentId } = useParams();
@@ -17,14 +17,26 @@ export default function StudentDetails() {
 
   const firestore = useFirestore();
   const student = useGetData("users", studentId);
-  useFirestoreConnect(student && {
-    collection: "users",
-    where: [[firestore.FieldPath.documentId(), "in", [student.createdBy, student.updatedBy]]],
-    storeAs: "admins"
-  })
+  const schoolId = useGetSchoolId();
+  useFirestoreConnect(student && [
+    {
+      collection: "users",
+      where: [[firestore.FieldPath.documentId(), "in", [student.createdBy, student.updatedBy]]],
+      storeAs: "students"
+    }, {
+      collection: "schools",
+      doc: schoolId,
+      subcollections: [{
+        collection: "classes",
+        where: [[firestore.FieldPath.documentId(), "in", student.classIds]]
+      }],
+      storeAs: "classes"
+    }
+  ])
 
-  const updatedByUser = useGetData("admins", student?.updatedBy);
-  const createdByUser = useGetData("admins", student?.createdBy);
+  const updatedByUser = useGetData("students", student?.updatedBy);
+  const createdByUser = useGetData("students", student?.createdBy);
+  const [classes, classesLoading] = useGetOrdered("classes", student?.classIds);
 
   return (
     <CCard>
@@ -56,6 +68,26 @@ export default function StudentDetails() {
               <CCol xs={12} md={6}>
                 <label>Email</label>
                 <h5>{student?.email}</h5>
+              </CCol>
+              <CCol xs={12}>
+                <label className="mt-3">Kelas</label>
+                <CDataTable
+                  items={classes}
+                  fields={[
+                    { key: "name", label: "Nama" },
+                    { key: "description", label: "Deskripsi" },
+                  ]}
+                  scopedSlots={{
+                    name: (c) => (
+                      <td>
+                        <Link to={`/classes/${c.id}`}>
+                          {c.name}
+                        </Link>
+                      </td>
+                    ),
+                  }}
+                  loading={classesLoading}
+                />
               </CCol>
             </CRow>
           </CCardBody>
