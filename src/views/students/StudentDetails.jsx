@@ -23,7 +23,7 @@ export default function StudentDetails() {
       collection: "users",
       where: [[firestore.FieldPath.documentId(), "in", [student.createdBy, student.updatedBy]]],
       storeAs: "students"
-    }, {
+    }, ...student.classIds?.length ? [{
       collection: "schools",
       doc: schoolId,
       subcollections: [{
@@ -31,7 +31,7 @@ export default function StudentDetails() {
         where: [[firestore.FieldPath.documentId(), "in", student.classIds]]
       }],
       storeAs: "classes"
-    }
+    }] : []
   ])
 
   const updatedByUser = useGetData("students", student?.updatedBy);
