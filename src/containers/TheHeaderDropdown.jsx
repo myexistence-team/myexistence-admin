@@ -42,7 +42,7 @@ const TheHeaderDropdown = () => {
           </span>
         </CDropdownToggle>
         <CDropdownMenu className="pt-0" placement="bottom-end">
-          <CDropdownItem onClick={() => history.push(`/${profile.role === "TEACHER" ? "teachers" : "admins"}/${profile.uid}`)}>
+          <CDropdownItem onClick={() => history.push(`/${profile.role === "TEACHER" ? "teachers" : "admins"}/${auth.uid}`)}>
             <CIcon name="cil-user" className="mfe-2" /> Profil
           </CDropdownItem>
           <CDropdownItem divider />
