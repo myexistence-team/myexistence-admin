@@ -30,8 +30,8 @@ const TheLayout = () => {
 
   return (
     <div className={classes}>
-      <Helmet titleTemplate="%s - ME Admin">
-        <title>ME Admin</title>
+      <Helmet titleTemplate="%s - HADIR Admin">
+        <title>HADIR Admin</title>
       </Helmet>
       {
         profile && profile.isLoaded ? (
