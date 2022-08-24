@@ -46,12 +46,15 @@ export default function MEFirestoreSelect({
   const list = useSelector(
     ({ firestore: { ordered } }) => ordered[storeAs || listName]
   );
+  const requesting = useSelector(
+    ({ firestore: { status: { requesting } } }) => requesting[storeAs || listName]
+  );
   const options = list?.map((a) => ({ value: a[valueKey], label: a[labelKey] }));
 
   return (
     <>
       {
-        defaultValue && !isLoaded(list) && !list?.length ? (
+        defaultValue && requesting && !list && !list?.length ? (
           <MESpinner size="small" className="w-100 text-center py-0" />
         ) : (
           <MEControlledSelect
