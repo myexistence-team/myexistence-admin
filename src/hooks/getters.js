@@ -22,7 +22,7 @@ export function useGetOrdered(listName, ids) {
   }) => {
     isLoading = requesting[listName];
     return ordered[listName] && ids ? 
-      ids.map((id) => ({ ...data[listName][id], id })) : 
+      ids.map((id) => ({ ...data[listName]?.[id], id })).filter((d) => d !== null & d !== undefined) : 
         ordered[listName] 
   });
   return [list, isLoading];
