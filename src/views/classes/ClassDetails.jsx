@@ -385,7 +385,7 @@ export default function ClassDetails() {
   return (
     <CCard>
       <Helmet>
-        <title>{classObj?.name} - Detail Kelas</title>
+        <title>{classObj?.name || "Loading..."} - Detail Kelas</title>
       </Helmet>
       {
         classObj && isLoaded(classObj) ?  (
