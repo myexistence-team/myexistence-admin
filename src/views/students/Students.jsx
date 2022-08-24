@@ -43,6 +43,7 @@ export default function Students() {
           items={students}
           fields={[
             { key: "displayName", label: "Nama Lengkap" },
+            "email",
             { key: "hasRegistered", label: "Terdaftar" },
             { key: "actions", label: "" },
           ]}

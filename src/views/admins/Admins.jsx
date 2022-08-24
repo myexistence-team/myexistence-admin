@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { MdCheck } from 'react-icons/md';
 import { isLoaded } from 'react-redux-firebase';
 import { Link } from 'react-router-dom';
+import { ROLE_TYPES } from 'src/enums';
 import { useGetSchoolId } from 'src/hooks/getters';
 import { useFirestorePagination } from 'src/hooks/useFirestorePagination';
 import useQueryString from 'src/hooks/useQueryString'
@@ -23,7 +24,7 @@ export default function Admins() {
     handlePageChange, 
     page, 
   } = useFirestorePagination("users", query, [
-    ["role", "==", "ADMIN"],
+    ["role", "in", ["ADMIN", "SUPER_ADMIN"]],
     ["schoolId", "==", schoolId]
   ]); 
 
@@ -45,10 +46,17 @@ export default function Admins() {
           items={admins}
           fields={[
             { key: "displayName", label: "Nama Lengkap" },
+            "email",
+            { key: "role", label: "Peran" },
             { key: "hasRegistered", label: "Terdaftar" },
             { key: "actions", label: "" },
           ]}
           scopedSlots={{
+            role: (t) => (
+              <td>
+                {ROLE_TYPES[t.role]}
+              </td>
+            ),
             displayName: (t) => (
               <td>
                 <Link to={`/admins/${t.id}`}>

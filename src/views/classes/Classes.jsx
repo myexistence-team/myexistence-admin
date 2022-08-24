@@ -38,9 +38,15 @@ export default function Classes() {
           fields={[
             { key: "name", label: "Nama" },
             { key: "description", label: "Deskripsi" },
+            { key: "studentCount", label: "Jumlah Pelajar" },
             { key: "actions", label: "" },
           ]}
           scopedSlots={{
+            studentCount: (c) => (
+              <td>
+                {c.studentIds?.length}
+              </td>
+            ),
             name: (c) => (
               <td>
                 <Link to={`/classes/${c.id}`}>
