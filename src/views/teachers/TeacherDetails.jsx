@@ -5,28 +5,30 @@ import { Helmet } from 'react-helmet';
 import { useFirestore, useFirestoreConnect } from 'react-redux-firebase';
 import { Link, useParams } from 'react-router-dom'
 import MESpinner from 'src/components/MESpinner';
-import { useFirestoreConnectInSchool, useGetData, useGetProfile, useGetSchoolId } from 'src/hooks/getters';
+import { useGetAuth, useGetData, useGetProfile } from 'src/hooks/getters';
 
 export default function TeacherDetails() {
   const { teacherId } = useParams();
 
-  useFirestoreConnect({
-    collection: "users",
-    doc: teacherId,
-  })
-
   const firestore = useFirestore();
   const teacher = useGetData("users", teacherId);
-  useFirestoreConnect(teacher && {
-    collection: "users",
-    where: [[firestore.FieldPath.documentId(), "in", [teacher.createdBy, teacher.updatedBy]]],
-    storeAs: "admins"
-  })
+  useFirestoreConnect([
+    {
+      collection: "users",
+      doc: teacherId,
+    },
+    ...teacher ? [{
+      collection: "users",
+      where: [[firestore.FieldPath.documentId(), "in", [teacher.createdBy, teacher.updatedBy]]],
+      storeAs: "admins"
+    }] : []
+  ])
 
   const updatedByUser = useGetData("admins", teacher?.updatedBy);
   const createdByUser = useGetData("admins", teacher?.createdBy);
 
   const profile = useGetProfile();
+  const auth = useGetAuth();
 
   return (
     <CCard>
@@ -41,7 +43,7 @@ export default function TeacherDetails() {
             <CCardHeader className="d-flex justify-content-between">
               <h3>Detail Pengajar</h3>
               {
-                profile.role !== "TEACHER" && (
+                (profile.role !== "TEACHER" || teacherId === auth.uid) && (
                   <Link to={`/teachers/${teacherId}/edit`}>
                     <CButton
                       color="primary"
