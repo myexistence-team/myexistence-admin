@@ -33,6 +33,11 @@ export function useGetProfile() {
   return profile;
 }
 
+export function useGetAuth() {
+  const profile = useSelector(({ firebase }) => firebase.auth);
+  return profile;
+}
+
 export function useGetSchoolId() {
   const profile = useSelector(({ firebase }) => firebase.profile);
   return profile?.schoolId;
