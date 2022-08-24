@@ -28,7 +28,38 @@ export function updateClass(classId, newClass) {
     const firestore = getFirestore();
     const auth = getState().firebase.auth;
     const profile = getState().firebase.profile;
+    const batch = firestore.batch();
 
+    const classRef = await firestore
+      .collection("schools")
+      .doc(profile.schoolId)
+      .collection("classes")
+      .doc(classId)
+      .get()
+    const exClass = classRef.data();
+    const removedTeacherIds = exClass.teacherIds.filter((tId) => !newClass.teacherIds.includes(tId));
+    
+    removedTeacherIds.forEach(teacherId => {        
+      batch.update(
+        firestore
+        .collection("users")
+        .doc(teacherId), {
+          classIds: firestore.FieldValue.arrayRemove(classId)
+        }
+      )
+    });
+    
+    newClass.teacherIds.forEach(teacherId => {        
+      batch.update(
+        firestore
+        .collection("users")
+        .doc(teacherId), {
+          classIds: firestore.FieldValue.arrayUnion(classId)
+        }
+      )
+    });
+
+    await batch.commit();
     firestore
       .collection("schools")
       .doc(profile.schoolId)
@@ -48,27 +79,13 @@ export function updateClassStudent(action, classId, studentId) {
     const auth = getState().firebase.auth;
     const profile = getState().firebase.profile;
 
-    const classRef = await firestore
-      .collection("schools")
-      .doc(profile.schoolId)
-      .collection("classes")
-      .doc(classId)
-      .get()
-    const prevClass = classRef.data();
-
-    const studentRef = await firestore
-      .collection("users")
-      .doc(studentId)
-      .get()
-    const prevStudent = studentRef.data();
-
     await firestore
       .collection("users")
       .doc(studentId)
       .update({ 
         classIds: action === ENROLLMENT_ACTIONS.ENROLL 
-          ? [...prevStudent?.classIds || [], classId]
-          : [...prevStudent?.classIds].filter((cId) => cId !== classId), 
+          ? firestore.FieldValue.arrayUnion(classId)
+          : firestore.FieldValue.arrayRemove(classId),
         updatedBy: auth.uid,
         updatedAt: new Date()
       });
@@ -80,8 +97,8 @@ export function updateClassStudent(action, classId, studentId) {
       .doc(classId)
       .update({ 
         studentIds: action === ENROLLMENT_ACTIONS.ENROLL 
-          ? [...prevClass?.studentIds || [], studentId] 
-          : [...prevClass?.studentIds].filter((sId) => sId !== studentId), 
+          ? firestore.FieldValue.arrayUnion(studentId) 
+          : firestore.FieldValue.arrayUnion(studentId), 
         updatedBy: auth.uid,
         updatedAt: new Date()
       });
