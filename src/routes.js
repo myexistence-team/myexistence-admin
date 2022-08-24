@@ -16,27 +16,31 @@ import ClassDetails from "./views/classes/ClassDetails";
 import StudentDetails from "./views/students/StudentDetails";
 const Dashboard = React.lazy(() => import("./views/dashboard/Dashboard"));
 
-const routes = pageAccess => [
-  { path: "/", exact: true, name: "" },
-  { path: "/dashboard", name: "Dashboard", component: Dashboard },
-  { path: "/schools", name: "Sekolah", component: Schools, exact: true },
-  { path: "/my-school", name: "Sekolahku", component: MySchool, exact: true },
+const adminRoutes = [
   { path: "/my-school/edit", name: "Edit Sekolahku", component: SchoolForm, exact: true },
   { path: "/admins", name: "Admin", component: Admins, exact: true },
   { path: "/admins/add", name: "Tambahkan Admin", component: AdminForm, exact: true },
   { path: "/admins/:adminId/edit", name: "Edit Admin", component: AdminForm, exact: true },
-  { path: "/teachers", name: "Pengajar", component: Teachers, exact: true },
   { path: "/teachers/add", name: "Tambahkan Pengajar", component: TeacherForm, exact: true },
+  { path: "/classes/add", name: "Tambahkan Kelas", component: ClassForm, exact: true },
+  { path: "/students/add", name: "Tambahkan Pelajar", component: StudentForm, exact: true },
+  { path: "/students/:studentId/edit", name: "Edit Pelajar", component: StudentForm, exact: true },
+]
+
+const routes = ({ role }) => [
+  ...role !== "TEACHER" ? adminRoutes : [],
+  { path: "/", exact: true, name: "" },
+  { path: "/dashboard", name: "Dashboard", component: Dashboard },
+  { path: "/schools", name: "Sekolah", component: Schools, exact: true },
+  { path: "/my-school", name: "Sekolahku", component: MySchool, exact: true },
+  { path: "/teachers", name: "Pengajar", component: Teachers, exact: true },
   { path: "/teachers/:teacherId", name: "Detail Pengajar", component: TeacherDetails, exact: true },
   { path: "/teachers/:teacherId/edit", name: "Edit Pengajar", component: TeacherForm, exact: true },
   { path: "/classes", name: "Kelas", component: Classes, exact: true },
-  { path: "/classes/add", name: "Tambahkan Kelas", component: ClassForm, exact: true },
   { path: "/classes/:classId", name: "Detail Kelas", component: ClassDetails, exact: true },
   { path: "/classes/:classId/edit", name: "Edit Kelas", component: ClassForm, exact: true },
   { path: "/students", name: "Pelajar", component: Students, exact: true },
-  { path: "/students/add", name: "Tambahkan Pelajar", component: StudentForm, exact: true },
   { path: "/students/:studentId", name: "Detail Pelajar", component: StudentDetails, exact: true },
-  { path: "/students/:studentId/edit", name: "Edit Pelajar", component: StudentForm, exact: true },
 ];
 
 export default routes;

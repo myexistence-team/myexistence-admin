@@ -28,13 +28,13 @@ const TheContent = () => {
       <CContainer fluid>
         <CBreadcrumbRouter
           className="border-0 m-0 p-0 pb-3"
-          routes={routes()}
+          routes={routes(profile)}
         />
         <Suspense fallback={loading}>
           {
             auth?.isLoaded && !auth?.isEmpty && (
               <Switch>
-                {routes().map((route, idx) => {
+                {routes(profile).map((route, idx) => {
                   return (
                     route.component && (
                       <Route
