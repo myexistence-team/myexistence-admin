@@ -15,7 +15,7 @@ const TheLayout = () => {
   const profile = firebase.profile;
   const auth = firebase.auth;
 
-  if (profile?.isLoaded && !profile.schoolId) {
+  if (profile?.isLoaded && profile && !profile.schoolId) {
     history.replace("/register-account")
   }
   

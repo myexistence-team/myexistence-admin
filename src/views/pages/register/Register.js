@@ -282,7 +282,7 @@ export default function Register() {
   }
 
   function onSubmitAdmin(data) {
-    setAdminData(data);
+    setAdminData({ ...data, schoolId: getValues("schoolId") });
     setHasRegistered(true);
   }
 
@@ -317,10 +317,14 @@ export default function Register() {
   }
 
   function onSubmitTeacher(data) {
+    const payload = {
+      ...data,
+      schoolId: getValues("schoolId")
+    }
     meConfirm({
       onConfirm: () => {
         setIsSubmitting(true);
-        dispatch(signUpAsTeacher(data))
+        dispatch(signUpAsTeacher(payload))
           .catch((e) => {
             meToaster.warning(e.message);
           })
