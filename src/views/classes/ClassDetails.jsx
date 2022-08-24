@@ -375,12 +375,13 @@ export default function ClassDetails() {
 
   useFirestoreConnect(classObj && {
     collection: "users",
-    where: [[firestore.FieldPath.documentId(), "in", [classObj.createdBy, classObj.updatedBy]]],
+    where: [[firestore.FieldPath.documentId(), "in", [classObj.createdBy, classObj.updatedBy, ...classObj.teacherIds]]],
     storeAs: "users"
   })
 
   const updatedByUser = useGetData("users", classObj?.updatedBy);
   const createdByUser = useGetData("users", classObj?.createdBy);
+  const [teachers] = useGetOrdered("users", classObj?.teacherIds);
 
   return (
     <CCard>
@@ -410,6 +411,16 @@ export default function ClassDetails() {
                 <CCol xs={12} md={6}>
                   <label>Deskripsi</label>
                   <h5>{classObj?.description}</h5>
+                </CCol>
+                <CCol xs={12}>
+                  <label>Pengajar</label>
+                  {
+                    teachers?.map((t) => (
+                      <Link to={`/teachers/${t.id}`}>
+                        <h5>{t.displayName}</h5>
+                      </Link>
+                    ))
+                  }
                 </CCol>
               </CRow>
               <CTabs activeTab="schedule">
