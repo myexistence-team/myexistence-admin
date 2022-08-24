@@ -1,4 +1,4 @@
-import { CButton, CCol, CLabel, CModal, CModalBody, CModalHeader, CRow } from '@coreui/react';
+import { CButton, CCard, CCardBody, CCol, CLabel, CModal, CModalBody, CModalHeader, CRow } from '@coreui/react';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react'
 import { Calendar, momentLocalizer } from 'react-big-calendar';
@@ -114,15 +114,19 @@ export default function MySchedule() {
       <Helmet>
         <title>Jadwal</title>
       </Helmet>
-      {
-        schedulesLoading ? (
-          <MESpinner/>
-        ) : (
-          <Calendar
-            {...calendarProps}
-          />
-        )
-      }
+      <CCard>
+        <CCardBody>
+          {
+            schedulesLoading ? (
+              <MESpinner/>
+            ) : (
+              <Calendar
+                {...calendarProps}
+              />
+            )
+          }
+        </CCardBody>
+      </CCard>
     </div>
   )
 }
