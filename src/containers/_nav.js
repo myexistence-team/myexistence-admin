@@ -72,7 +72,7 @@ const adminNavs = [
 
 const _nav = ({ role }) => [
   ...baseNavs,
-  ...role === "ADMIN" ? adminNavs : [],
+  ...role === "ADMIN" || role === "SUPER_ADMIN" ? adminNavs : [],
 ];
 
 export default _nav;
