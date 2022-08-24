@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { isLoaded, useFirestore, useFirestoreConnect } from 'react-redux-firebase';
 import { Link, useParams } from 'react-router-dom'
 import MESpinner from 'src/components/MESpinner';
-import { useGetData, useGetOrdered, useGetProfile, useGetSchoolId } from 'src/hooks/getters';
+import { useGetAuth, useGetData, useGetOrdered, useGetProfile, useGetSchoolId } from 'src/hooks/getters';
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
@@ -26,7 +26,7 @@ import { Helmet } from 'react-helmet';
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
 
-export function ClassStudentAssign(props) {
+export function ClassStudents(props) {
   const {
     classId
   } = props;
@@ -72,16 +72,20 @@ export function ClassStudentAssign(props) {
     handleUpdateClassStudent(ENROLLMENT_ACTIONS.UNENROLL, studentId);
   }
 
+  const auth = useGetAuth();
+  const profile = useGetProfile();
+  const isOwnClassOrAdmin = classObj?.teacherIds?.includes(auth.uid) || profile.role !== "TEACHER";
+
   return (
     <CRow className="mt-3">
-      <CCol xs={12} md={6}>
+      <CCol xs={12} md={!isOwnClassOrAdmin ? 12 : 6}>
         <h4>Pelajar</h4>
         <CDataTable
           items={students}
           loading={updatingStudents || studentsLoading}
           fields={[
             { key: "displayName", label: "Nama" },
-            { key: "enroll", label: "" }
+            ...isOwnClassOrAdmin ? [{ key: "enroll", label: "" }] : []
           ]}
           tableFilter
           scopedSlots={{
@@ -98,31 +102,35 @@ export function ClassStudentAssign(props) {
           }}
         />
       </CCol>
-      <CCol xs={12} md={6}>
-        <h4>Pelajar Terdaftar di Kelas</h4>
-        <CDataTable
-          items={enrolledStudents}
-          loading={updatingStudents || !isLoaded(students)}
-          fields={[
-            { key: "unenroll", label: "" },
-            { key: "displayName", label: "Nama" },
-          ]}
-          tableFilter
-          scopedSlots={{
-            unenroll: (s) => (
-              <td>
-                <CButton
-                  color="primary"
-                  variant="outline"
-                  onClick={() => handleUnenrollStudent(s.id)}
-                >
-                  <MdArrowLeft/>
-                </CButton>
-              </td>
-            )
-          }}
-        />
-      </CCol>
+      {
+        isOwnClassOrAdmin && (
+          <CCol xs={12} md={6}>
+            <h4>Pelajar Terdaftar di Kelas</h4>
+            <CDataTable
+              items={enrolledStudents}
+              loading={updatingStudents || !isLoaded(students)}
+              fields={[
+                { key: "unenroll", label: "" },
+                { key: "displayName", label: "Nama" },
+              ]}
+              tableFilter
+              scopedSlots={{
+                unenroll: (s) => (
+                  <td>
+                    <CButton
+                      color="primary"
+                      variant="outline"
+                      onClick={() => handleUnenrollStudent(s.id)}
+                    >
+                      <MdArrowLeft/>
+                    </CButton>
+                  </td>
+                )
+              }}
+            />
+          </CCol>
+        )
+      }
     </CRow>
   )
 }
@@ -152,7 +160,7 @@ export function ClassSchedule({ classId }) {
 
   const schedulesForCalendar = schedules?.map((s) => ({
     ...s,
-    title: "",
+    title: "Toleransi " + s.tolerance + " Menit",
     start: s.start.toDate(),
     end: s.end.toDate(),
   }))
@@ -253,6 +261,38 @@ export function ClassSchedule({ classId }) {
     })
   }
 
+  const profile = useGetProfile();
+  const auth = useGetAuth();
+  const classObj = useSelector((state) => state.firestore.data[`class/${classId}`]);
+
+  const calendarProps = {
+    defaultDate: moment(SCHEDULE_START_DATE_MS).toDate(),
+    toolbar: false,
+    views: [
+      "week"
+    ],
+    defaultView: "week",
+    localizer,
+    style: { height: "500px" },
+    events: schedulesForCalendar,
+    components: {
+      week: {
+        header: ({ date, localizer }) => localizer.format(date, 'dddd')
+      }
+    },
+    onSelectEvent: handleEventClick,
+  }
+  
+  const dndCalendarProps = {
+    selectable: true,
+    resizable: true,
+    onEventDrop: handleEventDrop,
+    onSelectSlot: handleSelectSlot,
+    onEventResize: handleEventDrop, 
+  }
+
+  const isOwnClassOrAdmin = classObj?.teacherIds?.includes(auth.uid) || profile.role !== "TEACHER";
+
   return (
     <>
       <CModal 
@@ -262,14 +302,18 @@ export function ClassSchedule({ classId }) {
       >
         <CForm onSubmit={handleSubmit(onSubmitEvent)}>
           <CModalHeader className="d-flex justify-content-between">
-            <h4>Edit Jadwal</h4>
-            <CButton
-              variant="outline"
-              color="danger"
-              onClick={handleDeleteEvent}
-            >
-              Hapus
-            </CButton>
+            <h4>{isOwnClassOrAdmin ? "Edit Jadwal" : "Detail Jadwal"}</h4>
+            {
+              isOwnClassOrAdmin && (
+                <CButton
+                  variant="outline"
+                  color="danger"
+                  onClick={handleDeleteEvent}
+                >
+                  Hapus
+                </CButton>
+              )
+            }
           </CModalHeader>
           <CModalBody>
             {
@@ -280,73 +324,67 @@ export function ClassSchedule({ classId }) {
                     options={DAY_NUMBERS}
                     errors={errors}
                     label="Hari"
+                    disabled={!isOwnClassOrAdmin}
                   />
                   <METextField
                     { ...register("start") }
                     errors={errors}
                     type="time"
                     label="Jam Mulai"
+                    disabled={!isOwnClassOrAdmin}
                   />
                   <METextField
                     { ...register("end") }
                     errors={errors}
                     type="time"
                     label="Jam Selesai"
+                    disabled={!isOwnClassOrAdmin}
                   />
                   <METextField
                     { ...register("tolerance") }
                     errors={errors}
                     type="number"
                     label="Toleransi (dalam menit)"
+                    disabled={!isOwnClassOrAdmin}
                   />
                 </>
               )
             }
           </CModalBody>
-          <CModalFooter className="d-flex justify-content-end">
-          <CButton
-            color="primary"
-            variant="outline"
-            onClick={handleCancelEventEdit}
-          >
-            Batal
-          </CButton>
-          <CButton
-            color="primary"
-            type="submit"
-            className="ml-3"
-          >
-            Simpan
-          </CButton>
-          </CModalFooter>
+          {
+            isOwnClassOrAdmin && (
+              <CModalFooter className="d-flex justify-content-end">
+                <CButton
+                  color="primary"
+                  variant="outline"
+                  onClick={handleCancelEventEdit}
+                >
+                  Batal
+                </CButton>
+                <CButton
+                  color="primary"
+                  type="submit"
+                  className="ml-3"
+                >
+                  Simpan
+                </CButton>
+              </CModalFooter>
+            )
+          }
         </CForm>
       </CModal>
       {
-        !schedulesLoading ? (
+        schedulesLoading ? (
+          <MESpinner/>
+        ) : isOwnClassOrAdmin ? (
           <DnDCalendar
-            defaultDate={moment(SCHEDULE_START_DATE_MS).toDate()}
-            toolbar={false}
-            views={[
-              "week"
-            ]}
-            defaultView="week"
-            localizer={localizer}
-            resizable
-            style={{ height: "500px" }}
-            events={schedulesForCalendar}
-            onEventDrop={handleEventDrop}
-            onSelectEvent={handleEventClick}
-            onSelectSlot={handleSelectSlot}
-            onEventResize={handleEventDrop}
-            selectable
-            components={{
-              week: {
-                header: ({ date, localizer }) => localizer.format(date, 'dddd')
-              }
-            }}
+            {...calendarProps}
+            {...dndCalendarProps}
           />
         ) : (
-          <MESpinner/>
+          <Calendar
+            {...calendarProps}
+          />
         )
       }
     </>
@@ -383,7 +421,9 @@ export default function ClassDetails() {
   const createdByUser = useGetData("users", classObj?.createdBy);
   const [teachers] = useGetOrdered("users", classObj?.teacherIds);
 
+  
   const profile = useGetProfile();
+  console.log(profile, classObj, teachers);
 
   return (
     <CCard>
@@ -418,16 +458,20 @@ export default function ClassDetails() {
                   <label>Deskripsi</label>
                   <h5>{classObj?.description}</h5>
                 </CCol>
-                <CCol xs={12}>
-                  <label>Pengajar</label>
-                  {
-                    teachers?.map((t) => (
-                      <Link to={`/teachers/${t.id}`}>
-                        <h5>{t.displayName}</h5>
-                      </Link>
-                    ))
-                  }
-                </CCol>
+                {
+                  teachers?.length && (
+                    <CCol xs={12}>
+                      <label>Pengajar</label>
+                      {
+                        teachers?.map((t) => (
+                          <Link to={`/teachers/${t.id}`}>
+                            <h5>{t.displayName}</h5>
+                          </Link>
+                        ))
+                      }
+                    </CCol>
+                  )
+                }
               </CRow>
               <CTabs activeTab="schedule">
                 <CNav variant="tabs">
@@ -451,7 +495,7 @@ export default function ClassDetails() {
                     <ClassSchedule classId={classId}/>
                   </CTabPane>
                   <CTabPane data-tab="students">
-                    <ClassStudentAssign classId={classId}/>
+                    <ClassStudents classId={classId}/>
                   </CTabPane>
                 </CTabContent>
               </CTabs>
