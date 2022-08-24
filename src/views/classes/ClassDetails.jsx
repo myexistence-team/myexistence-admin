@@ -79,51 +79,27 @@ export function ClassStudents(props) {
 
   return (
     <CRow className="mt-3">
-      <CCol xs={12} md={!isOwnClassOrAdmin ? 12 : 6}>
-        <h4>Pelajar</h4>
-        <CDataTable
-          items={students}
-          loading={updatingStudents || studentsLoading}
-          fields={[
-            { key: "displayName", label: "Nama" },
-            ...isOwnClassOrAdmin ? [{ key: "enroll", label: "" }] : []
-          ]}
-          tableFilter
-          scopedSlots={{
-            enroll: (s) => (
-              <td className="d-flex justify-content-end">
-                <CButton
-                  color="primary"
-                  onClick={() => handleEnrollStudent(s.id)}
-                >
-                  <MdArrowRight/>
-                </CButton>
-              </td>
-            )
-          }}
-        />
-      </CCol>
       {
         isOwnClassOrAdmin && (
           <CCol xs={12} md={6}>
-            <h4>Pelajar Terdaftar di Kelas</h4>
+            <h4>Pelajar</h4>
+            <small>Pelajar yang sudah terdaftar di sekolah</small>
             <CDataTable
-              items={enrolledStudents}
-              loading={updatingStudents || !isLoaded(students)}
+              items={students}
+              loading={updatingStudents || studentsLoading}
               fields={[
-                { key: "unenroll", label: "" },
                 { key: "displayName", label: "Nama" },
+                ...isOwnClassOrAdmin ? [{ key: "enroll", label: "" }] : []
               ]}
               tableFilter
               scopedSlots={{
-                unenroll: (s) => (
-                  <td>
+                enroll: (s) => (
+                  <td className="d-flex justify-content-end">
                     <CButton
                       color="primary"
-                      variant="outline"
-                      onClick={() => handleUnenrollStudent(s.id)}
+                      onClick={() => handleEnrollStudent(s.id)}
                     >
-                      <MdArrowLeft/>
+                      <MdArrowRight/>
                     </CButton>
                   </td>
                 )
@@ -132,6 +108,32 @@ export function ClassStudents(props) {
           </CCol>
         )
       }
+      <CCol xs={12} md={!isOwnClassOrAdmin ? 12 : 6}>
+        <h4>Pelajar di Kelas</h4>
+        <small>Pelajar yang sudah terdaftar di kelas</small>
+        <CDataTable
+          items={enrolledStudents}
+          loading={updatingStudents || !isLoaded(students)}
+          fields={[
+            { key: "unenroll", label: "" },
+            { key: "displayName", label: "Nama" },
+          ]}
+          tableFilter
+          scopedSlots={{
+            unenroll: (s) => (
+              <td>
+                <CButton
+                  color="primary"
+                  variant="outline"
+                  onClick={() => handleUnenrollStudent(s.id)}
+                >
+                  <MdArrowLeft/>
+                </CButton>
+              </td>
+            )
+          }}
+        />
+      </CCol>
     </CRow>
   )
 }
@@ -454,32 +456,13 @@ export default function ClassDetails() {
               }
             </CCardHeader>
             <CCardBody>
-              <CRow className="mb-3">
-                <CCol xs={12} md={6}>
-                  <label>Nama</label>
-                  <h5>{classObj?.name}</h5>
-                </CCol>
-                <CCol xs={12} md={6}>
-                  <label>Deskripsi</label>
-                  <h5>{classObj?.description}</h5>
-                </CCol>
-                {
-                  teachers?.length ? (
-                    <CCol xs={12}>
-                      <label>Pengajar</label>
-                      {
-                        teachers?.map((t) => (
-                          <Link to={`/teachers/${t.id}`}>
-                            <h5>{t.displayName}</h5>
-                          </Link>
-                        ))
-                      }
-                    </CCol>
-                  ) : null
-                }
-              </CRow>
-              <CTabs activeTab="schedule">
+              <CTabs activeTab="details">
                 <CNav variant="tabs">
+                  <CNavItem>
+                    <CNavLink data-tab="details">
+                      Detail
+                    </CNavLink>
+                  </CNavItem>
                   <CNavItem>
                     <CNavLink data-tab="schedule">
                       Jadwal
@@ -492,6 +475,32 @@ export default function ClassDetails() {
                   </CNavItem>
                 </CNav>
                 <CTabContent>
+                  <CTabPane data-tab="details">
+                    <CRow className="mt-3">
+                      <CCol xs={12} md={6}>
+                        <label>Nama</label>
+                        <h5>{classObj?.name}</h5>
+                      </CCol>
+                      <CCol xs={12} md={6}>
+                        <label>Deskripsi</label>
+                        <h5>{classObj?.description}</h5>
+                      </CCol>
+                      {
+                        teachers?.length ? (
+                          <CCol xs={12}>
+                            <label>Pengajar</label>
+                            {
+                              teachers?.map((t) => (
+                                <Link to={`/teachers/${t.id}`}>
+                                  <h5>{t.displayName}</h5>
+                                </Link>
+                              ))
+                            }
+                          </CCol>
+                        ) : null
+                      }
+                    </CRow>
+                  </CTabPane>
                   <CTabPane data-tab="schedule">
                     <h4 className="mt-3 mb-0">Jadwal</h4>
                     <div className="mb-3">
