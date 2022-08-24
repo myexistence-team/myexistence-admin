@@ -1,8 +1,17 @@
-export async function checkEmailAvailability(firestore, email) {
-  const existingUsers = await firestore
-    .collection("users")
-    .where("email", "==", email)
-    .get()
+export async function checkEmailAvailability(firestore, email, schoolId) {
+  let existingUsers;
+  if (schoolId) {
+    existingUsers = await firestore
+      .collection("users")
+      .where("email", "==", email)
+      .where("schoolId", "==", schoolId)
+      .get()
+  } else {
+    existingUsers = await firestore
+      .collection("users")
+      .where("email", "==", email)
+      .get()
+  }
 
   return (existingUsers.empty)
 }

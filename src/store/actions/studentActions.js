@@ -7,7 +7,7 @@ export function createStudent(student) {
     const auth = getState().firebase.auth;
     const profile = getState().firebase.profile;
 
-    const emailAvailable = await checkEmailAvailability(firestore, student.email);
+    const emailAvailable = await checkEmailAvailability(firestore, student.email, profile.schoolId);
     if (!emailAvailable) {
       throw Error("Pengguna dengan email tersebut sudah ada")
     }
