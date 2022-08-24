@@ -1,7 +1,7 @@
 import { first, last } from 'lodash'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { isLoaded, useFirestoreConnect } from 'react-redux-firebase'
+import { useFirestoreConnect } from 'react-redux-firebase'
 
 export function useFirestorePagination(listName, query, where) {
   const [pointer, setPointer] = useState(undefined) // Current pointer
@@ -39,6 +39,9 @@ export function useFirestorePagination(listName, query, where) {
   // Get list from redux state
   var list = useSelector(
     ({ firestore: { ordered } }) => ordered[listName]
+  );
+  var requesting = useSelector(
+    ({ firestore: { status: { requesting } } }) => requesting[listName]
   );
   var listRet = [ ...list || [] ];
   if (listRet.length > query.pageSize) {
@@ -86,5 +89,5 @@ export function useFirestorePagination(listName, query, where) {
     }
   };
 
-  return { isLoading: !isLoaded(list), list: listRet, limit, setLimit, page, handlePageChange};
+  return { isLoading: requesting, list: listRet, limit, setLimit, page, handlePageChange};
 }
