@@ -11,13 +11,13 @@ import { useFirestore, useFirestoreConnect } from 'react-redux-firebase';
 import { Link, useHistory } from 'react-router-dom'
 import meColors from 'src/components/meColors';
 import meConfirm from 'src/components/meConfirm';
+import MEFirestoreSelect from 'src/components/MEFirestoreSelect';
 import MENativeSelect from 'src/components/MENativeSelect';
 import METextArea from 'src/components/METextArea';
 import METextField from 'src/components/METextField';
 import meToaster from 'src/components/toaster';
-import { ROLE_TYPES, SCHOOL_TYPES } from 'src/enums';
+import { SCHOOL_TYPES } from 'src/enums';
 import { signUpAsAdmin } from 'src/store/actions/adminActions';
-import { signUp } from 'src/store/actions/authActions';
 import { createAdminAndTeacher } from 'src/store/actions/schoolActions';
 import { signUpAsTeacher } from 'src/store/actions/teacherActions';
 import { checkSchoolExistance } from 'src/utils/checksFunctions';
@@ -251,7 +251,7 @@ export default function Register() {
   const [isCheckingSchool, setIsCheckingSchool] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { register, formState: { errors }, watch, getValues } = useForm();
+  const { register, control, formState: { errors }, watch, getValues } = useForm();
 
   function handleBack() {
     setHasRegistered(false);
@@ -351,51 +351,56 @@ export default function Register() {
             <h4 className="mb-3">Daftar Akun Baru</h4>
             {
               type === null ? (
-                <div className="text-center">
-                  <METextField
-                    { ...register("schoolId") }
+                <>
+                  <MEFirestoreSelect
+                    control={control}
+                    name="schoolId"
+                    listName="schools"
                     label={false}
-                    placeholder="Masukkan ID Sekolah"
+                    labelKey="name"
+                    placeholder="Cari Sekolah"
                   />
-                  <div 
-                    className="d-flex justify-content-center my-3"
-                    style={{
-                      gap: 16
-                    }}
-                  >
-                    <CButton
-                      color="primary"
-                      variant="outline"
-                      className="w-100"
-                      onClick={() => handleTypeChange("TEACHER")}
-                      disabled={!watch("schoolId") || isCheckingSchool}
+                  <div className="text-center">
+                    <div 
+                      className="d-flex justify-content-center my-3"
+                      style={{
+                        gap: 16
+                      }}
                     >
-                      Daftar sebagai Pengajar
-                    </CButton>
-                    <CButton
-                      color="primary"
-                      variant="outline"
-                      className="w-100"
-                      onClick={() => handleTypeChange("ADMIN")}
-                      disabled={!watch("schoolId") || isCheckingSchool}
-                    >
-                      Daftar sebagai Administrator
-                    </CButton>
-                  </div>
-                  atau
-                  <br/>
+                      <CButton
+                        color="primary"
+                        variant="outline"
+                        className="w-100"
+                        onClick={() => handleTypeChange("TEACHER")}
+                        disabled={!watch("schoolId") || isCheckingSchool}
+                      >
+                        Daftar sebagai Pengajar
+                      </CButton>
+                      <CButton
+                        color="primary"
+                        variant="outline"
+                        className="w-100"
+                        onClick={() => handleTypeChange("ADMIN")}
+                        disabled={!watch("schoolId") || isCheckingSchool}
+                      >
+                        Daftar sebagai Administrator
+                      </CButton>
+                    </div>
+                    atau
+                    <br/>
 
-                  <CButton
-                    color="primary"
-                    size="lg"
-                    className="mt-3 mb-4"
-                    onClick={() => setType("SCHOOL")}
-                  >
-                    Daftarkan sekolah baru
-                  </CButton>
-                  <br/>
-                  Sudah punya akun? <Link to="/login">Masuk</Link>
-                </div>
+                    <CButton
+                      color="primary"
+                      size="lg"
+                      className="mt-3 mb-4"
+                      onClick={() => setType("SCHOOL")}
+                    >
+                      Daftarkan sekolah baru
+                    </CButton>
+                    <br/>
+                    Sudah punya akun? <Link to="/login">Masuk</Link>
+                  </div>
+                </>
               ) : type === "ADMIN" ? (
                 <RegisterAdmin onBack={handleBack} onSubmit={onSubmitUser}/>
               ) : type === "TEACHER" ? (
