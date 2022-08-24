@@ -9,13 +9,6 @@ const TheFooter = () => {
         HADIR Admin WebApp
         <span className="ml-1">
           &copy; {moment().format("YYYY")}{" "}
-          <a
-            href="https://zone.binabangsaschool.com/binabangsa/"
-            target="_blank"
-          >
-            ME
-          </a>
-          .
         </span>
       </div>
     </CFooter>
