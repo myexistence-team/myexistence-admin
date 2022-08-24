@@ -61,8 +61,8 @@ export default function MEFirestoreSelect({
             options={options}
             defaultValue={defaultValue}
             label={
-              label ||
-              capitalCase((isMulti ? listName : singularName) || listName)
+              typeof label !== "boolean" ? label ||
+              capitalCase((isMulti ? listName : singularName) || listName) : label
             }
             placeholder={
               placeholder ||
