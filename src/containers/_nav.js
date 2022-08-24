@@ -11,6 +11,7 @@ import { FaChalkboardTeacher, FaListUl, FaSchool, FaUserGraduate } from "react-i
 import { BsBook } from "react-icons/bs";
 import { FiTarget } from "react-icons/fi";
 import {
+  AiFillCalendar,
   AiOutlineMessage,
   AiOutlineProject,
   AiOutlineStar
@@ -70,9 +71,18 @@ const adminNavs = [
   },
 ]
 
+const teacherNavs = [
+  {
+    _tag: "CSidebarNavItem",
+    name: "Jadwal",
+    to: "/my-schedule",
+    icon: <AiFillCalendar className="c-sidebar-nav-icon" />
+  },
+]
+
 const _nav = ({ role }) => [
   ...baseNavs,
-  ...role === "ADMIN" || role === "SUPER_ADMIN" ? adminNavs : [],
+  ...role === "ADMIN" || role === "SUPER_ADMIN" ? adminNavs : teacherNavs,
 ];
 
 export default _nav;
