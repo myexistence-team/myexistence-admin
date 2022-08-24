@@ -12,9 +12,9 @@ const loading = (
   >
     <div>
       <h3 className="mb-3 text-center text-primary">
-        ME
+        HADIR
         <br />
-        <strong>Admin</strong>
+        <strong>Web App</strong>
       </h3>
       <KKSpinner />
     </div>
