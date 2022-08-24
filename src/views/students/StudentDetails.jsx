@@ -5,7 +5,7 @@ import { Helmet } from 'react-helmet';
 import { useFirestore, useFirestoreConnect } from 'react-redux-firebase';
 import { Link, useParams } from 'react-router-dom'
 import MESpinner from 'src/components/MESpinner';
-import { useGetData, useGetOrdered, useGetSchoolId } from 'src/hooks/getters';
+import { useGetData, useGetOrdered, useGetProfile, useGetSchoolId } from 'src/hooks/getters';
 
 export default function StudentDetails() {
   const { studentId } = useParams();
@@ -38,6 +38,8 @@ export default function StudentDetails() {
   const createdByUser = useGetData("students", student?.createdBy);
   const [classes, classesLoading] = useGetOrdered("classes", student?.classIds);
 
+  const profile = useGetProfile();
+
   return (
     <CCard>
     <Helmet>
@@ -50,14 +52,18 @@ export default function StudentDetails() {
         <>
           <CCardHeader className="d-flex justify-content-between">
             <h3>Detail Pelajar</h3>
-            <Link to={`/students/${studentId}/edit`}>
-              <CButton
-                color="primary"
-                variant="outline"
-              >
-                Edit
-              </CButton>
-            </Link>
+            {
+              profile.role !== "TEACHER" && (
+                <Link to={`/students/${studentId}/edit`}>
+                  <CButton
+                    color="primary"
+                    variant="outline"
+                  >
+                    Edit
+                  </CButton>
+                </Link>
+              )
+            }
           </CCardHeader>
           <CCardBody>
             <CRow>

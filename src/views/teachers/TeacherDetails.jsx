@@ -5,7 +5,7 @@ import { Helmet } from 'react-helmet';
 import { useFirestore, useFirestoreConnect } from 'react-redux-firebase';
 import { Link, useParams } from 'react-router-dom'
 import MESpinner from 'src/components/MESpinner';
-import { useFirestoreConnectInSchool, useGetData, useGetSchoolId } from 'src/hooks/getters';
+import { useFirestoreConnectInSchool, useGetData, useGetProfile, useGetSchoolId } from 'src/hooks/getters';
 
 export default function TeacherDetails() {
   const { teacherId } = useParams();
@@ -26,6 +26,8 @@ export default function TeacherDetails() {
   const updatedByUser = useGetData("admins", teacher?.updatedBy);
   const createdByUser = useGetData("admins", teacher?.createdBy);
 
+  const profile = useGetProfile();
+
   return (
     <CCard>
       <Helmet>
@@ -38,14 +40,18 @@ export default function TeacherDetails() {
           <>
             <CCardHeader className="d-flex justify-content-between">
               <h3>Detail Pengajar</h3>
-              <Link to={`/teachers/${teacherId}/edit`}>
-                <CButton
-                  color="primary"
-                  variant="outline"
-                >
-                  Edit
-                </CButton>
-              </Link>
+              {
+                profile.role !== "TEACHER" && (
+                  <Link to={`/teachers/${teacherId}/edit`}>
+                    <CButton
+                      color="primary"
+                      variant="outline"
+                    >
+                      Edit
+                    </CButton>
+                  </Link>
+                )
+              }
             </CCardHeader>
             <CCardBody>
               <CRow>

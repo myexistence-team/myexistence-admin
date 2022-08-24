@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { isLoaded, useFirestore, useFirestoreConnect } from 'react-redux-firebase';
 import { Link, useParams } from 'react-router-dom'
 import MESpinner from 'src/components/MESpinner';
-import { useGetData, useGetOrdered, useGetSchoolId } from 'src/hooks/getters';
+import { useGetData, useGetOrdered, useGetProfile, useGetSchoolId } from 'src/hooks/getters';
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
@@ -383,6 +383,8 @@ export default function ClassDetails() {
   const createdByUser = useGetData("users", classObj?.createdBy);
   const [teachers] = useGetOrdered("users", classObj?.teacherIds);
 
+  const profile = useGetProfile();
+
   return (
     <CCard>
       <Helmet>
@@ -393,14 +395,18 @@ export default function ClassDetails() {
           <>
             <CCardHeader className="d-flex justify-content-between">
               <h3>Detail Kelas</h3>
-              <Link to={`/classes/${classId}/edit`}>
-                <CButton
-                  color="primary"
-                  variant="outline"
-                >
-                  Edit
-                </CButton>
-              </Link>
+              {
+                profile.role !== "TEACHER" && (
+                  <Link to={`/classes/${classId}/edit`}>
+                    <CButton
+                      color="primary"
+                      variant="outline"
+                    >
+                      Edit
+                    </CButton>
+                  </Link>
+                )
+              }
             </CCardHeader>
             <CCardBody>
               <CRow className="mb-3">
