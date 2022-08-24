@@ -287,7 +287,7 @@ export function ClassSchedule({ classId }) {
           <CButton
             color="primary"
             variant="outline"
-            onClose={handleCancelEventEdit}
+            onClick={handleCancelEventEdit}
           >
             Batal
           </CButton>
