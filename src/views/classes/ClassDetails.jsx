@@ -1,6 +1,6 @@
-import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CDataTable, CNav, CNavItem, CNavLink, CRow, CTabContent, CTabPane, CTabs } from '@coreui/react';
+import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CDataTable, CForm, CModal, CModalBody, CModalFooter, CModalHeader, CNav, CNavItem, CNavLink, CRow, CTabContent, CTabPane, CTabs } from '@coreui/react';
 import moment from 'moment';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import { isLoaded, useFirestore, useFirestoreConnect } from 'react-redux-firebase';
 import { Link, useParams } from 'react-router-dom'
@@ -10,13 +10,18 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { SCHEDULE_START_DATE_MS } from 'src/constants';
+import { DAY_NUMBERS, SCHEDULE_START_DATE_MS } from 'src/constants';
 import { createSchedule, updateSchedule } from 'src/store/actions/scheduleActions';
 import { useDispatch } from 'react-redux';
 import { MdArrowLeft, MdArrowRight } from 'react-icons/md';
 import { ENROLLMENT_ACTIONS, updateClassStudent, updateClassStudents } from 'src/store/actions/classActions';
 import meToaster from 'src/components/toaster';
 import { updateStudentClass } from 'src/store/actions/studentActions';
+import { date, number, object, string } from 'yup';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import METextField from 'src/components/METextField';
+import MENativeSelect from 'src/components/MENativeSelect';
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
 
@@ -121,24 +126,11 @@ export function ClassStudentAssign(props) {
   )
 }
 
-export default function ClassDetails() {
-  const firestore = useFirestore();
-  const { classId } = useParams();
+export function ClassSchedule({ classId }) {
   const dispatch = useDispatch();
   const schoolId = useGetSchoolId();
-
   useFirestoreConnect([
     {
-      collection: "schools",
-      doc: schoolId,
-      subcollections: [
-        {
-          collection: "classes",
-          doc: classId,
-        },
-      ],
-      storeAs: `class/${classId}`
-    }, {
       collection: "schools",
       doc: schoolId,
       subcollections: [
@@ -153,14 +145,213 @@ export default function ClassDetails() {
       storeAs: "schedules"
     }
   ])
-  const classObj = useSelector((state) => state.firestore.data[`class/${classId}`]);
   const [schedules, schedulesLoading] = useGetOrdered("schedules");
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const schedulesForCalendar = schedules?.map((s) => ({
     ...s,
     title: "",
     start: s.start.toDate(),
     end: s.end.toDate(),
   }))
+
+  function handleEventDrop(slot) {
+    const { start, end, event } = slot;
+    const payload = {
+      start,
+      end,
+      day: start.getDay(),
+      tolerance: 15
+    }
+    dispatch(updateSchedule(classId, event.id, payload));
+  }
+
+  function handleEventClick(event) {
+    setSelectedEvent(event);
+  }
+
+  function handleSelectSlot(slot) {
+    const { start, end } = slot;
+    const payload = {
+      start,
+      end,
+      day: start.getDay(),
+      tolerance: 15,
+    }
+    dispatch(createSchedule(classId, payload));
+  }
+
+  const scheduleSchema = object().shape({
+    start: string().required().strict(),
+    end: string().required().strict(),
+    day: string().required().strict(),
+    tolerance: string().required().strict().default("15")
+  })
+  const { register, watch, handleSubmit, setValue, formState: { errors } } = useForm({
+    resolver: yupResolver(scheduleSchema),
+  })
+
+  useEffect(() => {
+    if (selectedEvent) {
+      setValue("day", selectedEvent.day.toString());
+      setValue("tolerance", selectedEvent.tolerance.toString());
+      setValue("start", moment(selectedEvent.start).format("HH:mm"));
+      setValue("end", moment(selectedEvent.end).format("HH:mm"));
+    }
+  }, [selectedEvent])
+
+  function onSubmitEvent(data) {
+    var startMoment = moment(selectedEvent.start);
+    const startSplit = data.start.split(":");
+
+    var endMoment = moment(selectedEvent.end);
+    const endSplit = data.end.split(":");
+
+    const payload = {
+      day: parseInt(data.day),
+      tolerance: parseInt(data.tolerance),
+      start: (startMoment).set({
+        day: parseInt(data.day),
+        h: parseInt(startSplit[0]), 
+        m: parseInt(startSplit[1])
+      }).toDate(),
+      end: (endMoment).set({
+        day: parseInt(data.day),
+        h: parseInt(endSplit[0]), 
+        m: parseInt(endSplit[1])
+      }).toDate(),
+    }
+
+    setIsSubmitting(true);
+    dispatch(updateSchedule(classId, selectedEvent.id, payload))
+      .then(() => {
+        setSelectedEvent(null);
+      })
+      .catch((e) => {
+        meToaster.danger(e.message)
+      })
+      .finally(() => {
+        setIsSubmitting(false)
+      })
+  }
+
+  function handleCancelEventEdit() {
+    setSelectedEvent(null);
+  }
+
+  return (
+    <>
+      <CModal 
+        centered 
+        show={Boolean(selectedEvent)}
+        onClose={handleCancelEventEdit}
+      >
+        <CForm onSubmit={handleSubmit(onSubmitEvent)}>
+          <CModalHeader>
+            <h4>Edit Jadwal</h4>
+          </CModalHeader>
+          <CModalBody>
+            {
+              Boolean(selectedEvent) && (
+                <>
+                  <MENativeSelect
+                    { ...register("day") }
+                    options={DAY_NUMBERS}
+                    errors={errors}
+                    label="Hari"
+                  />
+                  <METextField
+                    { ...register("start") }
+                    errors={errors}
+                    type="time"
+                    label="Jam Mulai"
+                  />
+                  <METextField
+                    { ...register("end") }
+                    errors={errors}
+                    type="time"
+                    label="Jam Selesai"
+                  />
+                  <METextField
+                    { ...register("tolerance") }
+                    errors={errors}
+                    type="number"
+                    label="Toleransi (dalam menit)"
+                  />
+                </>
+              )
+            }
+          </CModalBody>
+          <CModalFooter className="d-flex justify-content-end">
+          <CButton
+            color="primary"
+            variant="outline"
+            onClose={handleCancelEventEdit}
+          >
+            Batal
+          </CButton>
+          <CButton
+            color="primary"
+            type="submit"
+            className="ml-3"
+          >
+            Simpan
+          </CButton>
+          </CModalFooter>
+        </CForm>
+      </CModal>
+      {
+        !schedulesLoading ? (
+          <DnDCalendar
+            defaultDate={moment(SCHEDULE_START_DATE_MS).toDate()}
+            toolbar={false}
+            views={[
+              "week"
+            ]}
+            defaultView="week"
+            localizer={localizer}
+            resizable
+            style={{ height: "500px" }}
+            events={schedulesForCalendar}
+            onEventDrop={handleEventDrop}
+            onSelectEvent={handleEventClick}
+            onSelectSlot={handleSelectSlot}
+            onEventResize={handleEventDrop}
+            selectable
+            components={{
+              week: {
+                header: ({ date, localizer }) => localizer.format(date, 'dddd')
+              }
+            }}
+          />
+        ) : (
+          <MESpinner/>
+        )
+      }
+    </>
+  )
+}
+
+export default function ClassDetails() {
+  const firestore = useFirestore();
+  const { classId } = useParams();
+  const schoolId = useGetSchoolId();
+
+  useFirestoreConnect([
+    {
+      collection: "schools",
+      doc: schoolId,
+      subcollections: [
+        {
+          collection: "classes",
+          doc: classId,
+        },
+      ],
+      storeAs: `class/${classId}`
+    }, 
+  ])
+  const classObj = useSelector((state) => state.firestore.data[`class/${classId}`]);
 
   useFirestoreConnect(classObj && {
     collection: "users",
@@ -170,30 +361,6 @@ export default function ClassDetails() {
 
   const updatedByUser = useGetData("users", classObj?.updatedBy);
   const createdByUser = useGetData("users", classObj?.createdBy);
-
-  function handleEventDrop(slot) {
-    const { start, end, event } = slot;
-    const payload = {
-      start,
-      end,
-      day: start.getDay()
-    }
-    dispatch(updateSchedule(classId, event.id, payload));
-  }
-
-  function handleEventClick(event) {
-    console.log(event);
-  }
-
-  function handleSelectSlot(slot) {
-    const { start, end } = slot;
-    const payload = {
-      start,
-      end,
-      day: start.getDay()
-    }
-    dispatch(createSchedule(classId, payload));
-  }
 
   return (
     <CCard>
@@ -241,34 +408,7 @@ export default function ClassDetails() {
                     <div className="mb-3">
                       <small>Jadwal yang dibuat akan diulang per minggu</small>
                     </div>
-                    {
-                      !schedulesLoading ? (
-                        <DnDCalendar
-                          defaultDate={moment(SCHEDULE_START_DATE_MS).toDate()}
-                          toolbar={false}
-                          views={[
-                            "week"
-                          ]}
-                          defaultView="week"
-                          localizer={localizer}
-                          resizable
-                          style={{ height: "500px" }}
-                          events={schedulesForCalendar}
-                          onEventDrop={handleEventDrop}
-                          onSelectEvent={handleEventClick}
-                          onSelectSlot={handleSelectSlot}
-                          onEventResize={handleEventDrop}
-                          selectable
-                          components={{
-                            week: {
-                              header: ({ date, localizer }) => localizer.format(date, 'dddd')
-                            }
-                          }}
-                        />
-                      ) : (
-                        <MESpinner/>
-                      )
-                    }
+                    <ClassSchedule classId={classId}/>
                   </CTabPane>
                   <CTabPane data-tab="students">
                     <ClassStudentAssign classId={classId}/>
