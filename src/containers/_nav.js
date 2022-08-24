@@ -40,12 +40,7 @@ const baseNavs = [
     to: "/my-school",
     icon: <FaSchool className="c-sidebar-nav-icon" />
   },
-  {
-    _tag: "CSidebarNavItem",
-    name: "Administrasi",
-    to: "/admins",
-    icon: <MdVerifiedUser className="c-sidebar-nav-icon" />
-  },
+
   {
     _tag: "CSidebarNavItem",
     name: "Pengajar",
@@ -66,8 +61,18 @@ const baseNavs = [
   },
 ];
 
-const _nav = pageAccess => [
+const adminNavs = [
+  {
+    _tag: "CSidebarNavItem",
+    name: "Administrasi",
+    to: "/admins",
+    icon: <MdVerifiedUser className="c-sidebar-nav-icon" />
+  },
+]
+
+const _nav = ({ role }) => [
   ...baseNavs,
+  ...role === "ADMIN" ? adminNavs : [],
 ];
 
 export default _nav;
