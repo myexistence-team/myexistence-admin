@@ -443,7 +443,7 @@ export default function ClassDetails() {
             <CCardHeader className="d-flex justify-content-between">
               <h3>Detail Kelas</h3>
               {
-                isOwnClassOrAdmin && (
+                profile.role !== "TEACHER" && (
                   <Link to={`/classes/${classId}/edit`}>
                     <CButton
                       color="primary"
