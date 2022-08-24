@@ -172,7 +172,8 @@ export function ClassSchedule({ classId }) {
       start,
       end,
       day: start.getDay(),
-      tolerance: 15
+      tolerance: 15,
+      classId
     }
     dispatch(updateSchedule(classId, event.id, payload));
   }
@@ -188,6 +189,7 @@ export function ClassSchedule({ classId }) {
       end,
       day: start.getDay(),
       tolerance: 15,
+      classId
     }
     dispatch(createSchedule(classId, payload));
   }
@@ -231,6 +233,7 @@ export function ClassSchedule({ classId }) {
         h: parseInt(endSplit[0]), 
         m: parseInt(endSplit[1])
       }).toDate(),
+      classId
     }
 
     setIsSubmitting(true);
