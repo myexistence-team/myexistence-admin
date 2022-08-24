@@ -20,7 +20,7 @@ export default function AdminForm() {
   const history = useHistory();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const admin = useGetData("users", adminId);
+  const [admin] = useGetData("users", adminId);
 
   const editMode = Boolean(adminId);
 

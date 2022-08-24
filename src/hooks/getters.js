@@ -3,12 +3,17 @@ import { useSelector } from "react-redux";
 import { isLoaded, useFirestore, useFirestoreConnect } from "react-redux-firebase";
 
 export function useGetData(listName, id) {
+  var isLoading = true;
   const list = useSelector(({ 
     firestore: { 
-      data 
+      data,
+      status: { requesting }
     } 
-  }) => data[listName] && id ? data[listName][id] : data[listName] );
-  return list;
+  }) => {
+    isLoading = requesting[listName];
+    return data[listName] && id ? data[listName][id] : data[listName]
+  });
+  return [list, isLoading];
 }
 
 export function useGetOrdered(listName, ids) {
@@ -57,6 +62,6 @@ export function useFirestoreConnectInSchool(name, id) {
     ],
     storeAs: name,
   })
-  const data = useGetData(name, id);
+  const [data] = useGetData(name, id);
   return data;
 }

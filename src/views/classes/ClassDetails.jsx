@@ -34,7 +34,7 @@ export function ClassStudents(props) {
   const dispatch = useDispatch();
 
   const schoolId = useGetSchoolId();
-  const classObj = useGetData(`class/${classId}`);
+  const [classObj] = useGetData(`class/${classId}`);
   
   const [enrolledStudents, enrolledStudentsLoading] = useGetOrdered("students", classObj?.studentIds);
   const [studentsOrdered, studentsLoading] = useGetOrdered("students")
@@ -418,8 +418,8 @@ export default function ClassDetails() {
     storeAs: "users"
   })
 
-  const updatedByUser = useGetData("users", classObj?.updatedBy);
-  const createdByUser = useGetData("users", classObj?.createdBy);
+  const [updatedByUser] = useGetData("users", classObj?.updatedBy);
+  const [createdByUser] = useGetData("users", classObj?.createdBy);
   const [teachers] = useGetOrdered("users", classObj?.teacherIds);
 
   

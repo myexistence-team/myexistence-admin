@@ -16,7 +16,7 @@ export default function StudentDetails() {
   })
 
   const firestore = useFirestore();
-  const student = useGetData("users", studentId);
+  const [student] = useGetData("users", studentId);
   const schoolId = useGetSchoolId();
   useFirestoreConnect(student && [
     {
@@ -34,8 +34,8 @@ export default function StudentDetails() {
     }] : []
   ])
 
-  const updatedByUser = useGetData("students", student?.updatedBy);
-  const createdByUser = useGetData("students", student?.createdBy);
+  const [updatedByUser] = useGetData("students", student?.updatedBy);
+  const [createdByUser] = useGetData("students", student?.createdBy);
   const [classes, classesLoading] = useGetOrdered("classes", student?.classIds);
 
   const profile = useGetProfile();

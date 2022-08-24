@@ -22,7 +22,7 @@ export default function ClassForm(props) {
   const history = useHistory();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const classObj = useGetData(`class/${classId}`);
+  const [classObj, classLoading] = useGetData(`class/${classId}`);
 
   const schoolId = useGetSchoolId();
   useFirestoreConnect([
@@ -72,6 +72,8 @@ export default function ClassForm(props) {
   const profile = useGetProfile();
   const isOwnClassOrAdmin = classObj?.teacherIds?.includes(auth.uid) || profile.role !== "TEACHER";
 
+  console.log(classLoading, classObj)
+
   return (
     <CCard>
       {
@@ -82,7 +84,7 @@ export default function ClassForm(props) {
             </Helmet>
             <h3>Anda tidak diizinkan untuk mengedit kelas yang bukan milik Anda. Mohon hubungi Administrator.</h3>
           </CCardBody>
-        ) : editMode && !isLoaded(classObj) ? (
+        ) : editMode && classLoading ? (
           <MESpinner/>
         ) : editMode && !classObj ? (
           <CCardBody>
@@ -115,7 +117,7 @@ export default function ClassForm(props) {
               />
               <MEFirestoreSelect
                 control={control}
-                defaultValue={classObj?.teacherIds}
+                defaultValue={classObj.teacherIds}
                 name="teacherIds"
                 listName="users"
                 label="Pengajar"

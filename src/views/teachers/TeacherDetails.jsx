@@ -11,7 +11,7 @@ export default function TeacherDetails() {
   const { teacherId } = useParams();
 
   const firestore = useFirestore();
-  const teacher = useGetData("users", teacherId);
+  const [teacher] = useGetData("users", teacherId);
   useFirestoreConnect([
     {
       collection: "users",
@@ -24,8 +24,8 @@ export default function TeacherDetails() {
     }] : []
   ])
 
-  const updatedByUser = useGetData("admins", teacher?.updatedBy);
-  const createdByUser = useGetData("admins", teacher?.createdBy);
+  const [updatedByUser] = useGetData("admins", teacher?.updatedBy);
+  const [createdByUser] = useGetData("admins", teacher?.createdBy);
 
   const profile = useGetProfile();
   const auth = useGetAuth();

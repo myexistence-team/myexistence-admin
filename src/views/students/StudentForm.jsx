@@ -21,7 +21,7 @@ export default function StudentForm() {
   const history = useHistory(); 
   const [isSubmitting, setIsSubmitting] = useState(false); 
 
-  const student = useGetData("users", studentId);
+  const [student] = useGetData("users", studentId);
 
   const studentSchema = object().shape({
     displayName: string().required().strict(),

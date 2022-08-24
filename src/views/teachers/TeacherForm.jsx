@@ -38,7 +38,7 @@ export default function TeacherForm() {
     doc: teacherId,
   })
 
-  const teacher = useGetData("users", teacherId);
+  const [teacher] = useGetData("users", teacherId);
 
   function onSubmit(data) {
     meConfirm({
