@@ -1,4 +1,6 @@
 // todo: disabled button styles
+// If you want to override variables do it here
+@import "variables";
 button {
   &:disabled {
     cursor: default;
@@ -27,4 +29,8 @@ a {
   .c-icon {
     margin-top: 0 !important;
   }
+}
+
+.rbc-event {
+  background-color: $primary !important;
 }
