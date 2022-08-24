@@ -42,13 +42,13 @@ const TheHeaderDropdown = () => {
           </span>
         </CDropdownToggle>
         <CDropdownMenu className="pt-0" placement="bottom-end">
-          <CDropdownItem onClick={() => history.push(`/admins/${profile.id}`)}>
-            <CIcon name="cil-user" className="mfe-2" /> Profile
+          <CDropdownItem onClick={() => history.push(`/${profile.role === "TEACHER" ? "teachers" : "admins"}/${profile.uid}`)}>
+            <CIcon name="cil-user" className="mfe-2" /> Profil
           </CDropdownItem>
           <CDropdownItem divider />
           <CDropdownItem onClick={handleSignOut}>
             <BiLogOut className="mfe-2" />
-            Logout
+            Keluar
           </CDropdownItem>
         </CDropdownMenu>
       </CDropdown>
