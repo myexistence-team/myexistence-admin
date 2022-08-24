@@ -77,7 +77,7 @@ export default function Teachers() {
             actions: (t) => (
               <td className="d-flex justify-content-end">
                 {
-                  selfUser.uid === t.id && (
+                  (profile.role !== "TEACHER" || selfUser.uid === t.id) && (
                     <Link to={`/teachers/${t.id}/edit`}>
                       <CButton
                         color="primary"
