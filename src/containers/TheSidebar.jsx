@@ -20,7 +20,7 @@ import navigation from "./_nav";
 const TheSidebar = () => {
   const dispatch = useDispatch();
   const show = useSelector(state => state.coreUi.sidebarShow);
-  const selfUser = useSelector(state => state.selfUser);
+  const profile = useSelector(state => state.firebase.profile);
 
   return (
     <CSidebar
@@ -30,7 +30,7 @@ const TheSidebar = () => {
     >
       <CSidebarNav>
         <CCreateElement
-          items={navigation()}
+          items={navigation(profile)}
           components={{
             CSidebarNavDivider,
             CSidebarNavDropdown,
