@@ -40,3 +40,19 @@ export function updateSchedule(classId, scheduleId, schedule) {
       })
   }
 }
+
+export function deleteSchedule(classId, scheduleId) {
+  return async (dispatch, getState, { getFirestore, getFirebase }) => {
+    const firestore = getFirestore();
+    const profile = getState().firebase.profile;
+
+    firestore
+      .collection("schools")
+      .doc(profile.schoolId)
+      .collection("classes")
+      .doc(classId)
+      .collection("schedules")
+      .doc(scheduleId)
+      .delete()
+  }
+}

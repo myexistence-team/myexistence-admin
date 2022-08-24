@@ -11,7 +11,7 @@ import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { DAY_NUMBERS, SCHEDULE_START_DATE_MS } from 'src/constants';
-import { createSchedule, updateSchedule } from 'src/store/actions/scheduleActions';
+import { createSchedule, deleteSchedule, updateSchedule } from 'src/store/actions/scheduleActions';
 import { useDispatch } from 'react-redux';
 import { MdArrowLeft, MdArrowRight } from 'react-icons/md';
 import { ENROLLMENT_ACTIONS, updateClassStudent, updateClassStudents } from 'src/store/actions/classActions';
@@ -22,6 +22,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import METextField from 'src/components/METextField';
 import MENativeSelect from 'src/components/MENativeSelect';
+import meConfirm from 'src/components/meConfirm';
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
 
@@ -240,6 +241,18 @@ export function ClassSchedule({ classId }) {
     setSelectedEvent(null);
   }
 
+  function handleDeleteEvent() {
+    meConfirm({
+      onConfirm: () => {
+        dispatch(deleteSchedule(classId, selectedEvent.id))
+          .finally(() => {
+            setSelectedEvent(null);
+          })
+      },
+      confirmButtonColor: "danger"
+    })
+  }
+
   return (
     <>
       <CModal 
@@ -248,8 +261,15 @@ export function ClassSchedule({ classId }) {
         onClose={handleCancelEventEdit}
       >
         <CForm onSubmit={handleSubmit(onSubmitEvent)}>
-          <CModalHeader>
+          <CModalHeader className="d-flex justify-content-between">
             <h4>Edit Jadwal</h4>
+            <CButton
+              variant="outline"
+              color="danger"
+              onClick={handleDeleteEvent}
+            >
+              Hapus
+            </CButton>
           </CModalHeader>
           <CModalBody>
             {
