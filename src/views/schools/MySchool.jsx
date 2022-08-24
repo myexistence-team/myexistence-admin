@@ -5,6 +5,7 @@ import { isLoaded, useFirestoreConnect } from 'react-redux-firebase';
 import { Link } from 'react-router-dom';
 import MESpinner from 'src/components/MESpinner';
 import { SCHOOL_TYPES } from 'src/enums';
+import { useGetProfile } from 'src/hooks/getters';
 
 export default function MySchool() {
   const profile = useSelector((state) => state.firebase.profile);
@@ -16,16 +17,20 @@ export default function MySchool() {
     <CCard>
       <CCardHeader className="d-flex justify-content-between">
         <h3>Sekolahku</h3>
-        <div>
-          <CButton
-            is={Link}
-            to="/my-school/edit"
-            color="primary"
-            variant="outline"
-          >
-            Edit
-          </CButton>
-        </div>
+        {
+          profile.role !== "TEACHER" && (
+            <div>
+              <CButton
+                is={Link}
+                to="/my-school/edit"
+                color="primary"
+                variant="outline"
+              >
+                Edit
+              </CButton>
+            </div>
+          )
+        }
       </CCardHeader>
       <CCardBody>
         {

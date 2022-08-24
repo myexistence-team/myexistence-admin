@@ -3,6 +3,7 @@ import React from 'react'
 import { Helmet } from 'react-helmet';
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
+import { useGetProfile } from 'src/hooks/getters';
 import { useFirestorePagination } from 'src/hooks/useFirestorePagination';
 import useQueryString from 'src/hooks/useQueryString';
 import { number, object } from 'yup';
@@ -20,6 +21,8 @@ export default function Classes() {
     page,
   } = useFirestorePagination("classes", query)
 
+  const profile = useGetProfile();
+
   return (
     <CCard>
       <Helmet>
@@ -27,14 +30,18 @@ export default function Classes() {
       </Helmet>
       <CCardHeader className="d-flex justify-content-between">
         <h3>Kelas</h3>
-        <Link to="/classes/add">
-          <CButton
-            variant="outline"
-            color="primary"
-          >
-            + Tambahkan Kelas
-          </CButton>
-        </Link>
+        {
+          profile.role !== "TEACHER" && (
+            <Link to="/classes/add">
+              <CButton
+                variant="outline"
+                color="primary"
+              >
+                + Tambahkan Kelas
+              </CButton>
+            </Link>
+          )
+        }
       </CCardHeader>
       <CCardBody>
         <CDataTable
@@ -43,7 +50,7 @@ export default function Classes() {
             { key: "name", label: "Nama" },
             { key: "description", label: "Deskripsi" },
             { key: "studentCount", label: "Jumlah Pelajar" },
-            { key: "actions", label: "" },
+            ...profile.role !== "TEACHER" ? [{ key: "actions", label: "" }] : [],
           ]}
           scopedSlots={{
             studentCount: (c) => (

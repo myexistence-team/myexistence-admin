@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import { MdCheck } from 'react-icons/md'
 import { isLoaded } from 'react-redux-firebase'
 import { Link } from 'react-router-dom'
-import { useGetSchoolId } from 'src/hooks/getters'
+import { useGetAuth, useGetProfile, useGetSchoolId } from 'src/hooks/getters'
 import { useFirestorePagination } from 'src/hooks/useFirestorePagination'
 import useQueryString from 'src/hooks/useQueryString'
 import { number } from 'yup'
@@ -21,6 +21,8 @@ export default function Teachers() {
   }), watch);
 
   const schoolId = useGetSchoolId();
+  const selfUser = useGetAuth();
+  const profile = useGetProfile();
 
   const { 
     list: teachers, 
@@ -39,14 +41,18 @@ export default function Teachers() {
       </Helmet>
       <CCardHeader className="d-flex justify-content-between">
         <h3>Pengajar</h3>
-        <Link to="/teachers/add">
-          <CButton
-            color="primary"
-            variant="outline"
-          >
-            + Tambahkan Pengajar
-          </CButton>
-        </Link>
+        {
+          profile.role !== "TEACHER" && (
+            <Link to="/teachers/add">
+              <CButton
+                color="primary"
+                variant="outline"
+              >
+                + Tambahkan Pengajar
+              </CButton>
+            </Link>
+          )
+        }
       </CCardHeader>
       <CCardBody>
         <CDataTable
@@ -70,14 +76,18 @@ export default function Teachers() {
             ),
             actions: (t) => (
               <td className="d-flex justify-content-end">
-                <Link to={`/teachers/${t.id}/edit`}>
-                  <CButton
-                    color="primary"
-                    variant="outline"
-                  >
-                    Edit
-                  </CButton>
-                </Link>
+                {
+                  selfUser.uid === t.id && (
+                    <Link to={`/teachers/${t.id}/edit`}>
+                      <CButton
+                        color="primary"
+                        variant="outline"
+                      >
+                        Edit
+                      </CButton>
+                    </Link>
+                  )
+                }
               </td>
             ),
             hasRegistered: (t) => (
