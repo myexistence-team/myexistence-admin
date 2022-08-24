@@ -22,6 +22,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import METextField from 'src/components/METextField';
 import MENativeSelect from 'src/components/MENativeSelect';
 import meConfirm from 'src/components/meConfirm';
+import { Helmet } from 'react-helmet';
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
 
@@ -383,6 +384,9 @@ export default function ClassDetails() {
 
   return (
     <CCard>
+      <Helmet>
+        <title>{classObj?.name} - Detail Kelas</title>
+      </Helmet>
       {
         classObj && isLoaded(classObj) ?  (
           <>

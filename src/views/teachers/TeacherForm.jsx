@@ -74,7 +74,7 @@ export default function TeacherForm() {
         ) : (
           <CForm onSubmit={handleSubmit(onSubmit)}>
             <Helmet>
-              <title>{editMode ? `Edit Guru - ${teacher.displayName}` : "Tambahkan Guru"}</title>
+              <title>{editMode ? `${teacher.displayName} - Edit Guru` : "Tambahkan Guru"}</title>
             </Helmet>
             <CCardHeader>
               <h3>{editMode ? "Edit Guru" : "Tambahkan Guru"}</h3>

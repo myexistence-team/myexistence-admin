@@ -1,5 +1,6 @@
 import { CButton, CCard, CCardBody, CCardHeader, CDataTable, CPagination } from '@coreui/react'
 import React from 'react'
+import { Helmet } from 'react-helmet';
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { useFirestorePagination } from 'src/hooks/useFirestorePagination';
@@ -21,6 +22,9 @@ export default function Classes() {
 
   return (
     <CCard>
+      <Helmet>
+        <title>Kelas</title>
+      </Helmet>
       <CCardHeader className="d-flex justify-content-between">
         <h3>Kelas</h3>
         <Link to="/classes/add">

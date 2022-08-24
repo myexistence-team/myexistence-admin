@@ -1,6 +1,7 @@
 import { CButton, CCard, CCardBody, CCardHeader, CDataTable, CPagination } from '@coreui/react'
 import moment from 'moment'
 import React, { useMemo } from 'react'
+import { Helmet } from 'react-helmet'
 import { useForm } from 'react-hook-form'
 import { MdCheck } from 'react-icons/md'
 import { isLoaded } from 'react-redux-firebase'
@@ -32,6 +33,9 @@ export default function Teachers() {
 
   return (
     <CCard>
+      <Helmet>
+        <title>Pengajar</title>
+      </Helmet>
       <CCardHeader className="d-flex justify-content-between">
         <h3>Pengajar</h3>
         <Link to="/teachers/add">

@@ -1,5 +1,6 @@
 import { CButton, CCard, CCardBody, CCardHeader, CDataTable, CPagination } from '@coreui/react'
 import React from 'react'
+import { Helmet } from 'react-helmet';
 import { useForm } from 'react-hook-form';
 import { MdCheck } from 'react-icons/md';
 import { isLoaded } from 'react-redux-firebase';
@@ -27,6 +28,9 @@ export default function Students() {
 
   return (
     <CCard>
+      <Helmet>
+        <title>Pelajar</title>
+      </Helmet>
       <CCardHeader className="d-flex justify-content-between">
         <h3>Pelajar</h3>
         <Link to="/students/add">

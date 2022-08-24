@@ -65,7 +65,7 @@ export default function AdminForm() {
         ) : (
           <CForm onSubmit={handleSubmit(onSubmit)}>
               <Helmet>
-                <title>{editMode ? `Edit Admin - ${admin.displayName}` : "Tambahkan Admin"}</title>
+                <title>{editMode ? `${admin.displayName} - Edit Admin` : "Tambahkan Admin"}</title>
               </Helmet>
             <CCardHeader>
               <h3>{editMode ? "Edit Admin" : "Tambahkan Admin"}</h3>

@@ -1,6 +1,7 @@
 import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CRow } from '@coreui/react';
 import moment from 'moment';
 import React from 'react'
+import { Helmet } from 'react-helmet';
 import { useFirestore, useFirestoreConnect } from 'react-redux-firebase';
 import { Link, useParams } from 'react-router-dom'
 import MESpinner from 'src/components/MESpinner';
@@ -27,6 +28,9 @@ export default function StudentDetails() {
 
   return (
     <CCard>
+    <Helmet>
+      <title>{student?.displayName} - Detail Pelajar</title>
+    </Helmet>
     {
       !student ? (
         <MESpinner/>
