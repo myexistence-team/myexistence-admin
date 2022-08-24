@@ -60,7 +60,7 @@ export default function RegisterAccount() {
         <CCard>
           <CCardBody>
             <CForm onSubmit={handleSubmit(onSchoolSubmit)}>
-              <h4>Seperti nya Anda belum terdaftar. Mohon daftar terlebih dahulu</h4>
+              <h4>Seperti nya Anda belum terdaftar. Mohon tanyakan Administrator menganai kode sekolah</h4>
               <METextField
                 { ...register("schoolId", { required: true }) }
               />
