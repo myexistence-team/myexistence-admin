@@ -1,20 +1,16 @@
+import { CButton, CCol, CLabel, CModal, CModalBody, CModalHeader, CRow } from '@coreui/react';
 import moment from 'moment';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import { Helmet } from 'react-helmet';
-import { useForm } from 'react-hook-form';
 import { useFirestore, useFirestoreConnect } from 'react-redux-firebase';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import MESpinner from 'src/components/MESpinner';
-import { SCHEDULE_START_DATE_MS } from 'src/constants';
-import { useGetData, useGetOrdered, useGetProfile, useGetSchoolId } from 'src/hooks/getters';
-import { useFirestorePagination } from 'src/hooks/useFirestorePagination';
-import useQueryString from 'src/hooks/useQueryString';
-import { number, object } from 'yup';
+import { DAY_NUMBERS, SCHEDULE_START_DATE_MS } from 'src/constants';
+import { useGetData, useGetProfile, useGetSchoolId } from 'src/hooks/getters';
 const localizer = momentLocalizer(moment);
 
 export default function MySchedule() {
-  const history = useHistory();
   const firestore = useFirestore();
   const profile = useGetProfile();
 
@@ -30,10 +26,7 @@ export default function MySchedule() {
         where: [[firestore.FieldPath.documentId(), "in", profile?.classIds || []]],
       }],
       storeAs: "classes"
-    }
-  ])
-
-  useFirestoreConnect([
+    },
     {
       collectionGroup: "schedules",
       where: [["classId", "in", profile.classIds]]
@@ -48,9 +41,15 @@ export default function MySchedule() {
     end: schedules[sId].end.toDate(),
     title: classes?.[schedules[sId].classId]?.name,
   })) : [];
+  
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   function handleEventClick(event) {
-    history.push(`/classes/${event.classId}`);
+    setSelectedEvent(event);
+  }
+
+  function handleCancelEventEdit() {
+    setSelectedEvent(null);
   }
 
   const calendarProps = {
@@ -61,7 +60,7 @@ export default function MySchedule() {
     ],
     defaultView: "week",
     localizer,
-    style: { height: "500px" },
+    style: { height: "100%" },
     events: schedulesOrdered,
     components: {
       week: {
@@ -73,6 +72,45 @@ export default function MySchedule() {
 
   return (
     <div>
+      <CModal 
+        centered 
+        show={Boolean(selectedEvent)}
+        onClose={handleCancelEventEdit}
+      >
+        <CModalHeader className="d-flex justify-content-between">
+          <h4>Detail Jadwal</h4>
+        </CModalHeader>
+        <CModalBody>
+          {
+            selectedEvent && (
+              <CRow>
+                <CCol xs={12}>
+                  <CLabel>Kelas</CLabel>
+                  <Link to={`/classes/${selectedEvent.classId}`}>
+                    <h5>{classes?.[selectedEvent.classId]?.name}</h5>
+                  </Link>
+                </CCol>
+                <CCol xs={12}>
+                  <CLabel>Hari</CLabel>
+                  <h5>{DAY_NUMBERS[selectedEvent.day]}</h5>
+                </CCol>
+                <CCol xs={6}>
+                  <CLabel>Jam Mulai</CLabel>
+                  <h5>{moment(selectedEvent.start).format("HH:mm")}</h5>
+                </CCol>
+                <CCol xs={6}>
+                  <CLabel>Jam Selesai</CLabel>
+                  <h5>{moment(selectedEvent.end).format("HH:mm")}</h5>
+                </CCol>
+                <CCol xs={12}>
+                  <CLabel>Toleransi</CLabel>
+                  <h5>{selectedEvent.tolerance} menit</h5>
+                </CCol>
+              </CRow>
+            )
+          }
+        </CModalBody>
+      </CModal>
       <Helmet>
         <title>Jadwal</title>
       </Helmet>
