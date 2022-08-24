@@ -6,7 +6,7 @@ import { MdCheck } from 'react-icons/md';
 import { isLoaded } from 'react-redux-firebase';
 import { Link } from 'react-router-dom';
 import { ROLE_TYPES } from 'src/enums';
-import { useGetSchoolId } from 'src/hooks/getters';
+import { useGetAuth, useGetProfile, useGetSchoolId } from 'src/hooks/getters';
 import { useFirestorePagination } from 'src/hooks/useFirestorePagination';
 import useQueryString from 'src/hooks/useQueryString'
 import { number } from 'yup';
@@ -29,6 +29,9 @@ export default function Admins() {
     ["role", "in", ["ADMIN", "SUPER_ADMIN"]],
     ["schoolId", "==", schoolId]
   ]); 
+
+  const auth = useGetAuth();
+  const profile = useGetProfile();
 
   return (
     <CCard>
@@ -64,14 +67,17 @@ export default function Admins() {
             ),
             actions: (t) => (
               <td className="d-flex justify-content-end">
-                <Link to={`/admins/${t.id}/edit`}>
-                  <CButton
-                    color="primary"
-                    variant="outline"
-                  >
-                    Edit
-                  </CButton>
-                </Link>
+                {
+                  (profile.role === "SUPER_ADMIN" || (profile.role === "ADMIN" && auth.uid === t.id)) && 
+                  <Link to={`/admins/${t.id}/edit`}>
+                    <CButton
+                      color="primary"
+                      variant="outline"
+                    >
+                      Edit
+                    </CButton>
+                  </Link>
+                }
               </td>
             ),
             hasRegistered: (t) => (

@@ -9,7 +9,7 @@ import meToaster from 'src/components/toaster';
 import METextField from 'src/components/METextField';
 import { createAdmin, updateAdmin } from 'src/store/actions/adminActions';
 import { object, string } from 'yup';
-import { useGetData } from 'src/hooks/getters';
+import { useGetAuth, useGetData, useGetProfile } from 'src/hooks/getters';
 import { isLoaded } from 'react-redux-firebase';
 import MESpinner from 'src/components/MESpinner';
 import { Helmet } from 'react-helmet';
@@ -49,11 +49,21 @@ export default function AdminForm() {
       }
     })
   }
+
+  const auth = useGetAuth();
+  const profile = useGetProfile();
   
   return (
     <CCard>
       {
-        editMode && !isLoaded(admin) ? (
+        profile.role === "ADMIN" && auth.uid !== adminId ? (
+          <CCardBody>
+            <Helmet>
+              <title>Tidak Dapat Izin</title>
+            </Helmet>
+            <h3>Anda tidak diizinkan untuk mengedit administrator lain.</h3>
+          </CCardBody>
+        ) : editMode && !isLoaded(admin) ? (
           <MESpinner/>
         ) : editMode && !admin ? (
           <CCardBody>
