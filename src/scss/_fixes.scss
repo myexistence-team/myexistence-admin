@@ -18,10 +18,37 @@ a {
   background-color: #F0F0F0;
 }
 
+$calendarBorder: #333;
+
 // todo: temp c-dark-theme plumbing for select option
-.c-dark-theme option {
-  background-color: #34343b;
-  border: 1px solid #23282c;
+.c-dark-theme {
+  option {
+    background-color: #34343b;
+    border: 1px solid #23282c;
+  }
+
+  .rbc-time-view {
+    border: 1px solid $calendarBorder !important;
+  }
+
+  .rbc-time-content {
+    border-top: 2px solid $calendarBorder !important;
+
+  }
+
+  .rbc-time-header.rbc-overflowing {
+    border-right: 1px solid $calendarBorder !important;
+  }
+
+  .rbc-header, .rbc-timeslot-group {
+    border-bottom: 1px solid $calendarBorder !important;
+  }
+
+  .rbc-time-content > * + * > *,
+  .rbc-time-header-content,
+  .rbc-header + .rbc-header {
+    border-left: 1px solid $calendarBorder !important;
+  }
 }
 
 // todo: brand button icon margin
