@@ -422,8 +422,9 @@ export default function ClassDetails() {
   const [teachers] = useGetOrdered("users", classObj?.teacherIds);
 
   
+  const auth = useGetAuth();
   const profile = useGetProfile();
-  console.log(profile, classObj, teachers);
+  const isOwnClassOrAdmin = classObj?.teacherIds?.includes(auth.uid) || profile.role !== "TEACHER";
 
   return (
     <CCard>
@@ -436,7 +437,7 @@ export default function ClassDetails() {
             <CCardHeader className="d-flex justify-content-between">
               <h3>Detail Kelas</h3>
               {
-                profile.role !== "TEACHER" && (
+                isOwnClassOrAdmin && (
                   <Link to={`/classes/${classId}/edit`}>
                     <CButton
                       color="primary"

@@ -12,7 +12,7 @@ import MESpinner from 'src/components/MESpinner';
 import METextArea from 'src/components/METextArea';
 import METextField from 'src/components/METextField';
 import meToaster from 'src/components/toaster';
-import { useGetData, useGetSchoolId } from 'src/hooks/getters';
+import { useGetAuth, useGetData, useGetProfile, useGetSchoolId } from 'src/hooks/getters';
 import { createClass, updateClass } from 'src/store/actions/classActions';
 import { array, object, string } from 'yup';
 
@@ -68,10 +68,21 @@ export default function ClassForm(props) {
     })
   }
 
+  const auth = useGetAuth();
+  const profile = useGetProfile();
+  const isOwnClassOrAdmin = classObj?.teacherIds?.includes(auth.uid) || profile.role !== "TEACHER";
+
   return (
     <CCard>
       {
-        editMode && !isLoaded(classObj) ? (
+        !isOwnClassOrAdmin ? (
+          <CCardBody>
+            <Helmet>
+              <title>Tidak Dapat Izin</title>
+            </Helmet>
+            <h3>Anda tidak diizinkan untuk mengedit kelas yang bukan milik Anda. Mohon hubungi Administrator.</h3>
+          </CCardBody>
+        ) : editMode && !isLoaded(classObj) ? (
           <MESpinner/>
         ) : editMode && !classObj ? (
           <CCardBody>

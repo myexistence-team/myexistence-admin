@@ -10,7 +10,7 @@ import meConfirm from 'src/components/meConfirm'
 import MESpinner from 'src/components/MESpinner'
 import METextField from 'src/components/METextField'
 import meToaster from 'src/components/toaster'
-import { useGetData } from 'src/hooks/getters'
+import { useGetAuth, useGetData, useGetProfile } from 'src/hooks/getters'
 import { createTeacher, updateTeacher } from 'src/store/actions/teacherActions'
 import { getProfile } from 'src/utils/getters'
 import { string } from 'yup'
@@ -59,10 +59,20 @@ export default function TeacherForm() {
     })
   }
 
+  const auth = useGetAuth();
+  const profile = useGetProfile();
+
   return (
     <CCard>
       {
-        editMode && !isLoaded(teacher) ? (
+        profile.role === "TEACHER" && auth.uid !== teacherId ? (
+          <CCardBody>
+            <Helmet>
+              <title>Tidak Dapat Izin</title>
+            </Helmet>
+            <h3>Anda tidak diizinkan untuk mengedit pengajar lain.</h3>
+          </CCardBody>
+        ) : editMode && !isLoaded(teacher) ? (
           <MESpinner/>
         ) : editMode && !teacher ? (
           <CCardBody>
