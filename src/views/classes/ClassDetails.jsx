@@ -461,7 +461,7 @@ export default function ClassDetails() {
                   <h5>{classObj?.description}</h5>
                 </CCol>
                 {
-                  teachers?.length && (
+                  teachers?.length ? (
                     <CCol xs={12}>
                       <label>Pengajar</label>
                       {
@@ -472,7 +472,7 @@ export default function ClassDetails() {
                         ))
                       }
                     </CCol>
-                  )
+                  ) : null
                 }
               </CRow>
               <CTabs activeTab="schedule">
