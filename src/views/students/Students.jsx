@@ -19,6 +19,7 @@ export default function Students() {
   const schoolId = useGetSchoolId();
   const {
     list: students,
+    isLoading,
     handlePageChange,
     page,
   } = useFirestorePagination("users", query, [
@@ -77,7 +78,7 @@ export default function Students() {
               </td>
             ),
           }}
-          loading={!isLoaded(students)}
+          loading={isLoading}
         />
         {
           students.length > 5 &&

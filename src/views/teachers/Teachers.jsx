@@ -24,6 +24,7 @@ export default function Teachers() {
 
   const { 
     list: teachers, 
+    isLoading,
     handlePageChange, 
     page, 
   } = useFirestorePagination("users", query, [
@@ -50,7 +51,7 @@ export default function Teachers() {
       <CCardBody>
         <CDataTable
           items={teachers}
-          loading={!isLoaded(teachers)}
+          loading={isLoading}
           fields={[
             { key: "displayName", label: "Nama Lengkap" },
             "idNumber",

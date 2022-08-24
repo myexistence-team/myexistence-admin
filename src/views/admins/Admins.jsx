@@ -22,6 +22,7 @@ export default function Admins() {
 
   const { 
     list: admins, 
+    isLoading,
     handlePageChange, 
     page, 
   } = useFirestorePagination("users", query, [
@@ -86,7 +87,7 @@ export default function Admins() {
               </td>
             ),
           }}
-          loading={!isLoaded(admins)}
+          loading={isLoading}
         />
         {
           admins.length > 5 &&
