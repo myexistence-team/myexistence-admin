@@ -29,7 +29,7 @@ export default function TeacherDetails() {
   return (
     <CCard>
       <Helmet>
-        <title>{teacher?.displayName} - Detail Pengajar</title>
+        <title>{teacher?.displayName || "Loading..."} - Detail Pengajar</title>
       </Helmet>
       {
         !teacher ? (

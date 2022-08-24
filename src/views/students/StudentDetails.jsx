@@ -41,7 +41,7 @@ export default function StudentDetails() {
   return (
     <CCard>
     <Helmet>
-      <title>{student?.displayName} - Detail Pelajar</title>
+      <title>{student?.displayName || "Loading..."} - Detail Pelajar</title>
     </Helmet>
     {
       !student ? (
