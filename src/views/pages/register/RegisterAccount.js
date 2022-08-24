@@ -6,13 +6,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import meColors from 'src/components/meColors';
 import meConfirm from 'src/components/meConfirm';
-import METextField from 'src/components/METextField';
+import MEFirestoreSelect from 'src/components/MEFirestoreSelect';
 import meToaster from 'src/components/toaster';
 import { signUpForAccount } from 'src/store/actions/authActions';
-import { checkSchoolExistance, checkSchoolExistanceThunk } from 'src/utils/checksFunctions';
+import { checkSchoolExistanceThunk } from 'src/utils/checksFunctions';
 
 export default function RegisterAccount() {
-  const { register, handleSubmit } = useForm();
+  const { control, handleSubmit } = useForm();
   const firebase = useSelector(state => state.firebase);
   const profile = firebase.profile;
   const history = useHistory();
@@ -25,7 +25,6 @@ export default function RegisterAccount() {
   const [confirmedSchoolId, setConfirmedSchoolId] = useState(null);
 
   function onSchoolSubmit(data) {
-    console.log(data)
     dispatch(checkSchoolExistanceThunk(data.schoolId))
       .then(() => {
         // setConfirmedSchoolId(data.schoolId);
@@ -61,8 +60,13 @@ export default function RegisterAccount() {
           <CCardBody>
             <CForm onSubmit={handleSubmit(onSchoolSubmit)}>
               <h4>Seperti nya Anda belum terdaftar. Mohon tanyakan Administrator menganai kode sekolah</h4>
-              <METextField
-                { ...register("schoolId", { required: true }) }
+              <MEFirestoreSelect
+                control={control}
+                name="schoolId"
+                listName="schools"
+                label={false}
+                labelKey="name"
+                placeholder="Cari Sekolah"
               />
               <CButton
                 type="submit"
