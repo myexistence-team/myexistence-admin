@@ -62,13 +62,6 @@ export default function Admins() {
                 {ROLE_TYPES[t.role]}
               </td>
             ),
-            displayName: (t) => (
-              <td>
-                <Link to={`/admins/${t.id}`}>
-                  {t.displayName}
-                </Link>
-              </td>
-            ),
             actions: (t) => (
               <td className="d-flex justify-content-end">
                 <Link to={`/admins/${t.id}/edit`}>
