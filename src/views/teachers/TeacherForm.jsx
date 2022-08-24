@@ -74,10 +74,10 @@ export default function TeacherForm() {
         ) : (
           <CForm onSubmit={handleSubmit(onSubmit)}>
             <Helmet>
-              <title>{editMode ? `${teacher.displayName || "Loading..."} - Edit Guru` : "Tambahkan Guru"}</title>
+              <title>{editMode ? `${teacher.displayName || "Loading..."} - Edit Pengajar` : "Tambahkan Pengajar"}</title>
             </Helmet>
             <CCardHeader>
-              <h3>{editMode ? "Edit Guru" : "Tambahkan Guru"}</h3>
+              <h3>{editMode ? "Edit Pengajar" : "Tambahkan Pengajar"}</h3>
             </CCardHeader>
             <CCardBody>
               <METextField
