@@ -28,6 +28,14 @@ const TheSidebar = () => {
       unfoldable
       onShowChange={val => dispatch({ type: "coreUi/set", sidebarShow: val })}
     >
+      <CSidebarBrand className="d-md-down-none mr-auto w-100" to="/">
+        <div className="c-sidebar-brand-full h-100 w-100">
+          <div className="hadir-sidebar-brand" />
+        </div>
+        <div className="c-sidebar-brand-minimized h-100 w-100 px-3">
+          <div className="hadir-sidebar-brand-minimized" />
+        </div>
+      </CSidebarBrand>
       <CSidebarNav>
         <CCreateElement
           items={navigation(profile)}

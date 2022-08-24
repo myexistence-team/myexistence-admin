@@ -33,11 +33,19 @@ h1, h2, h3, h4, h5, h6 {
 //   color: theme-color(primary) !important;
 // }
 
-.me-sidebar-brand {
-  // background-image: url(../images/me-logo.png);
+.hadir-sidebar-brand {
+  background-image: url(../images/hadir-logo.png);
   background-repeat: no-repeat;
   background-position: center center;
-  background-size: 75%;
+  background-size: 50%;
+  height: 100%;
+}
+
+.hadir-sidebar-brand-minimized {
+  background-image: url(../images/hadir-logo-icon.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
   height: 100%;
 }
 
