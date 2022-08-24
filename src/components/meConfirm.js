@@ -38,7 +38,7 @@ export default function meConfirm(props) {
           <CModalBody>
             {typeof props.message === "function"
               ? props.message()
-              : props.message || "Are you sure?"}
+              : props.message || "Apakah Anda yakin?"}
           </CModalBody>
           <CModalFooter>
             <CButton
@@ -55,7 +55,7 @@ export default function meConfirm(props) {
                   : confirmProps.onClose
               }
             >
-              {props.cancelButtonLabel || "Cancel"}
+              {props.cancelButtonLabel || "Batal"}
             </CButton>
             <CButton
               color={props.confirmButtonColor || props.buttonColor || "primary"}
@@ -69,7 +69,7 @@ export default function meConfirm(props) {
                   : confirmProps.onClose
               }
             >
-              {props.confirmButtonLabel || "Yes"}
+              {props.confirmButtonLabel || "Ya"}
             </CButton>
           </CModalFooter>
         </CModal>
