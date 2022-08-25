@@ -13,7 +13,8 @@ export default function ScheduleCalendar(props) {
     events,
     style = {},
     onSelectEvent,
-    loading = false
+    loading = false,
+    className
   } = props;
 
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -46,7 +47,7 @@ export default function ScheduleCalendar(props) {
   }
 
   return (
-    <>
+    <div className={className}>
       <CModal
         centered 
         show={Boolean(selectedEvent)}
@@ -95,6 +96,6 @@ export default function ScheduleCalendar(props) {
           />
         )
       }
-    </>
+    </div>
   )
 }
