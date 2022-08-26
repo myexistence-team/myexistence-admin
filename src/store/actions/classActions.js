@@ -98,7 +98,7 @@ export function updateClassStudent(action, classId, studentId) {
       .update({ 
         studentIds: action === ENROLLMENT_ACTIONS.ENROLL 
           ? firestore.FieldValue.arrayUnion(studentId) 
-          : firestore.FieldValue.arrayUnion(studentId), 
+          : firestore.FieldValue.arrayRemove(studentId), 
         updatedBy: auth.uid,
         updatedAt: new Date()
       });
