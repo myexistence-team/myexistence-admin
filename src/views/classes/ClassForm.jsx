@@ -72,8 +72,6 @@ export default function ClassForm(props) {
   const profile = useGetProfile();
   const isOwnClassOrAdmin = classObj?.teacherIds?.includes(auth.uid) || profile.role !== "TEACHER";
 
-  console.log(classLoading, classObj)
-
   return (
     <CCard>
       {
