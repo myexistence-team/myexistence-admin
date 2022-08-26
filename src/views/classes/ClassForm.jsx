@@ -115,7 +115,7 @@ export default function ClassForm(props) {
               />
               <MEFirestoreSelect
                 control={control}
-                defaultValue={classObj.teacherIds}
+                defaultValue={classObj?.teacherIds}
                 name="teacherIds"
                 listName="users"
                 label="Pengajar"
