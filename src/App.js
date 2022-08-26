@@ -12,7 +12,7 @@ const loading = (
   >
     <div>
       <h3 className="mb-3 text-center text-primary">
-        HADIR
+        Hadir
         <br />
         <strong>Web App</strong>
       </h3>

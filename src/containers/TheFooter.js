@@ -6,7 +6,7 @@ const TheFooter = () => {
   return (
     <CFooter fixed={false}>
       <div>
-        HADIR Web App
+        Hadir Web App
         <span className="ml-1">
           &copy; {moment().format("YYYY")}{" "}
         </span>
