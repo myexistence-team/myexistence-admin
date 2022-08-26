@@ -30,8 +30,8 @@ const TheLayout = () => {
 
   return (
     <div className={classes}>
-      <Helmet titleTemplate="%s - HADIR Admin">
-        <title>HADIR Admin</title>
+      <Helmet titleTemplate="%s - HADIR Web App">
+        <title>HADIR Web App</title>
       </Helmet>
       {
         profile && profile.isLoaded ? (
