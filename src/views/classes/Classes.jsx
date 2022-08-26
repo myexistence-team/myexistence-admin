@@ -80,15 +80,12 @@ export default function Classes() {
           }}
           loading={isLoading}
         />
-        {
-          classes.length > 5 &&
-          <CPagination
-            activePage={page + 1}
-            onActivePageChange={(newPage) => handlePageChange(Math.max(0, newPage - 1))}
-            pages={0}
-            align="end"
-          />
-        }
+        <CPagination
+          activePage={page + 1}
+          onActivePageChange={(newPage) => handlePageChange(Math.max(0, newPage - 1))}
+          pages={0}
+          align="end"
+        />
       </CCardBody>
     </CCard>
   )
