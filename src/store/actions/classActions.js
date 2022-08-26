@@ -79,6 +79,13 @@ export function updateClassStudent(action, classId, studentId) {
     const auth = getState().firebase.auth;
     const profile = getState().firebase.profile;
 
+    const classRef = firestore
+      .collection("schools")
+      .doc(profile.schoolId)
+      .collection("classes")
+      .doc(classId);
+    const studentRef = firestore.collection("users").doc(studentId)
+
     await firestore
       .collection("users")
       .doc(studentId)
@@ -86,6 +93,9 @@ export function updateClassStudent(action, classId, studentId) {
         classIds: action === ENROLLMENT_ACTIONS.ENROLL 
           ? firestore.FieldValue.arrayUnion(classId)
           : firestore.FieldValue.arrayRemove(classId),
+        classes: action === ENROLLMENT_ACTIONS.ENROLL 
+          ? firestore.FieldValue.arrayUnion(classRef)
+          : firestore.FieldValue.arrayRemove(classRef),
         updatedBy: auth.uid,
         updatedAt: new Date()
       });
@@ -99,6 +109,9 @@ export function updateClassStudent(action, classId, studentId) {
         studentIds: action === ENROLLMENT_ACTIONS.ENROLL 
           ? firestore.FieldValue.arrayUnion(studentId) 
           : firestore.FieldValue.arrayRemove(studentId), 
+        students: action === ENROLLMENT_ACTIONS.ENROLL 
+          ? firestore.FieldValue.arrayUnion(studentRef) 
+          : firestore.FieldValue.arrayRemove(studentRef), 
         updatedBy: auth.uid,
         updatedAt: new Date()
       });
