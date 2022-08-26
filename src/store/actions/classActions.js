@@ -30,21 +30,28 @@ export function updateClass(classId, newClass) {
     const profile = getState().firebase.profile;
     const batch = firestore.batch();
 
-    const classRef = await firestore
+    const classRef = firestore
       .collection("schools")
       .doc(profile.schoolId)
       .collection("classes")
       .doc(classId)
-      .get()
-    const exClass = classRef.data();
+    const classSnapshot = await classRef.get();
+    const exClass = classSnapshot.data();
     const removedTeacherIds = exClass.teacherIds.filter((tId) => !newClass.teacherIds.includes(tId));
+
+    var teachersRef = [];
+    if (newClass.teacherIds.length) {
+      teachersRef = await firestore.collection("users").where(firestore.FieldPath.documentId(), "in", newClass.teacherIds).get();
+      teachersRef = teachersRef.docs.map((d) => d.ref)
+    }
     
     removedTeacherIds.forEach(teacherId => {        
       batch.update(
         firestore
         .collection("users")
         .doc(teacherId), {
-          classIds: firestore.FieldValue.arrayRemove(classId)
+          classIds: firestore.FieldValue.arrayRemove(classId),
+          classes: firestore.FieldValue.arrayRemove(classRef),
         }
       )
     });
@@ -54,7 +61,8 @@ export function updateClass(classId, newClass) {
         firestore
         .collection("users")
         .doc(teacherId), {
-          classIds: firestore.FieldValue.arrayUnion(classId)
+          classIds: firestore.FieldValue.arrayUnion(classId),
+          classes: firestore.FieldValue.arrayUnion(classRef),
         }
       )
     });
@@ -67,6 +75,7 @@ export function updateClass(classId, newClass) {
       .doc(classId)
       .update({ 
         ...newClass, 
+        teachers: teachersRef,
         updatedBy: auth.uid,
         updatedAt: new Date()
       });
@@ -84,7 +93,8 @@ export function updateClassStudent(action, classId, studentId) {
       .doc(profile.schoolId)
       .collection("classes")
       .doc(classId);
-    const studentRef = firestore.collection("users").doc(studentId)
+    const studentRef = firestore.collection("users").doc(studentId);
+
 
     await firestore
       .collection("users")
