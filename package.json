@@ -92,6 +92,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "firebase-deploy": "firebase deploy",
     "test": "react-scripts test",
     "clearCache": "jest --clearCache",
     "test:cov": "npm test -- --coverage --watchAll=false",
