@@ -4,6 +4,12 @@ export function createSchedule(classId, schedule) {
     const auth = getState().firebase.auth;
     const profile = getState().firebase.profile;
 
+    const classRef = firestore
+    .collection("schools")
+    .doc(profile.schoolId)
+    .collection("class")
+    .doc(classId);
+
     firestore
       .collection("schools")
       .doc(profile.schoolId)
@@ -12,6 +18,8 @@ export function createSchedule(classId, schedule) {
       .collection("schedules")
       .add({
         ...schedule,
+        class: classRef,
+        classId,
         createdBy: auth.uid,
         createdAt: new Date(),
         updatedBy: auth.uid,
@@ -26,6 +34,12 @@ export function updateSchedule(classId, scheduleId, schedule) {
     const auth = getState().firebase.auth;
     const profile = getState().firebase.profile;
 
+    const classRef = firestore
+      .collection("schools")
+      .doc(profile.schoolId)
+      .collection("class")
+      .doc(classId);
+
     firestore
       .collection("schools")
       .doc(profile.schoolId)
@@ -35,6 +49,8 @@ export function updateSchedule(classId, scheduleId, schedule) {
       .doc(scheduleId)
       .update({
         ...schedule,
+        class: classRef,
+        classId,
         updatedBy: auth.uid,
         updatedAt: new Date(),
       })

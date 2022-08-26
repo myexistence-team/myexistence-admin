@@ -17,8 +17,9 @@ export const signOut = () => {
 }
 
 export const signUp = (newUser) => {
-  return async (dispatch, getState, {getFirebase}) => {
+  return async (dispatch, getState, {getFirebase, getFirestore}) => {
     const firebase = getFirebase();
+    const firestore = getFirestore();
     const profile = getState().firebase.profile;
 
     firebase.createUser({
@@ -28,7 +29,8 @@ export const signUp = (newUser) => {
     }, {
       displayName: newUser.displayName,
       role: newUser.role,
-      schoolId: profile.schoolId
+      schoolId: profile.schoolId,
+      school: firestore.collection("schools").doc(profile.schoolId),
     })
   }
 }
@@ -54,6 +56,7 @@ export const signUpForAccount = (data) => {
     const newUser = {
       ...oldUser,
       schoolId: data.schoolId,
+      school: firestore.collection("schools").doc(data.schoolId),
       createdBy: auth.uid,
       createdAt: new Date(),
       updatedBy: auth.uid,

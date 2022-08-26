@@ -7,9 +7,8 @@ export function createSchool(school) {
 
     firestore.collection("schools").add({
       ...school,
-      adminIds: [
-        auth.uid
-      ]
+      superAdminId: auth.uid,
+      superAdmin: firestore.collection("users").doc(auth.uid),
     });
   }
 }
@@ -24,14 +23,8 @@ export function createAdminAndTeacher(admin, school) {
       throw Error("Admin dengan email tersebut sudah ada")
     }
 
-    const schoolRef = firestore.collection("schools");
-    const newSchoolId = schoolRef.doc().id;
-
-    await schoolRef.doc(newSchoolId).set({
-      ...school,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
+    const schoolsRef = firestore.collection("schools");
+    const newSchoolId = schoolsRef.doc().id;
 
     const adminCopy = { ...admin };
     delete adminCopy.password;
@@ -46,7 +39,8 @@ export function createAdminAndTeacher(admin, school) {
         role: "SUPER_ADMIN",
         createdAt: new Date(),
         updatedAt: new Date(),
-        schoolId: newSchoolId
+        schoolId: newSchoolId,
+        school: schoolsRef.doc(newSchoolId),
       });
     
     const newlyCreatedUser = await firestore
@@ -54,10 +48,13 @@ export function createAdminAndTeacher(admin, school) {
       .where("email", "==", admin.email)
       .get()
     
-    await schoolRef.doc(newSchoolId)
-      .update({
+    await schoolsRef.doc(newSchoolId)
+      .set({
+        ...school,
         createdBy: newlyCreatedUser.docs[0].id,
         updatedBy: newlyCreatedUser.docs[0].id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       })
     
   }
@@ -70,18 +67,12 @@ export function editSchool(newSchool) {
     const schoolId = profile.schoolId;
     const auth = getState().firebase.auth;
 
-    var existingSchool = await firestore
-      .collection("schools")
-      .doc(schoolId)
-      .get();
-
-    existingSchool = existingSchool.data()
-
     await firestore.collection("schools")
       .doc(schoolId)
-      .set({
-        ...existingSchool,
+      .update({
         ...newSchool,
+        updatedAt: new Date(),
+        updatedBy: auth.uid,
       });
   }
 }

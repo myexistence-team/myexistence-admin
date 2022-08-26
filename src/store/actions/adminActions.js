@@ -21,7 +21,8 @@ export function createAdmin(admin) {
         createdAt: new Date(),
         updatedBy: auth.uid,
         updatedAt: new Date(),
-        schoolId: profile.schoolId
+        schoolId: profile.schoolId,
+        school: firestore.collection("schools").doc(profile.schoolId),
       });
   }
 }
@@ -30,6 +31,7 @@ export function updateAdmin(adminId, newAdmin) {
   return async (dispatch, getState, { getFirestore }) => {
     const firestore = getFirestore();
     const auth = getState().firebase.auth;
+    const profile = getState().firebase.profile;
     
     firestore
       .collection("users")
@@ -37,17 +39,10 @@ export function updateAdmin(adminId, newAdmin) {
       .update({ 
         ...newAdmin, 
         updatedBy: auth.uid,
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        schoolId: profile.schoolId,
+        school: firestore.collection("schools").doc(profile.schoolId),
       });
-  }
-}
-
-export function signUpAsAdminWithGoogle(admin) {
-  return async (dispatch, getState, { getFirebase, getFirestore }) => {
-    const firebase = getFirebase();
-    const firestore = getFirestore();
-
-
   }
 }
 
@@ -85,6 +80,7 @@ export function signUpAsAdmin(admin) {
           signIn: false,
         }, {
           ...exAdmin,
+          school: schoolRef,
           role: "ADMIN",
           schoolId: admin.schoolId,
           hasRegistered: true,
