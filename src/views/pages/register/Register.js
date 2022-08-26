@@ -290,7 +290,7 @@ export default function Register() {
     meConfirm({
       onConfirm: () => {
         setIsSubmitting(true);
-        dispatch(createAdminAndTeacher(adminData, { ...data, schoolId: getValues("schoolId") }))
+        dispatch(createAdminAndTeacher(adminData, data))
           .catch((e) => {
             meToaster.warning(e.message);
           })
