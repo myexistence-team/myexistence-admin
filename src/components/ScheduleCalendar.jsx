@@ -6,6 +6,11 @@ import { Link } from 'react-router-dom';
 import { DAY_NUMBERS, SCHEDULE_START_DATE_MS } from 'src/constants';
 import { useGetData } from 'src/hooks/getters';
 import MESpinner from './MESpinner';
+moment.locale('id', {
+  week: {
+    dow: 1
+  }
+})
 const localizer = momentLocalizer(moment);
 
 export default function ScheduleCalendar(props) {

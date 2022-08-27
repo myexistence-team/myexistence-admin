@@ -1,4 +1,4 @@
-export const SCHEDULE_START_DATE_MS = 259200000;
+export const SCHEDULE_START_DATE_MS = 259200000 + 86400000;
 export const DAY_NUMBERS = {
   0: "Minggu",
   1: "Senin",

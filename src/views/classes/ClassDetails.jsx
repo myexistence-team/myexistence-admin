@@ -23,6 +23,11 @@ import METextField from 'src/components/METextField';
 import MENativeSelect from 'src/components/MENativeSelect';
 import meConfirm from 'src/components/meConfirm';
 import { Helmet } from 'react-helmet';
+moment.locale('id', {
+  week: {
+    dow: 1
+  }
+})
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
 
