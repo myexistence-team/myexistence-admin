@@ -107,6 +107,13 @@ export function ClassStudents(props) {
                       <MdArrowRight/>
                     </CButton>
                   </td>
+                ),
+                displayName: (s) => (
+                  <td>
+                    <Link to={`/students/${s.id}`}>
+                      {s.displayName}
+                    </Link>
+                  </td>
                 )
               }}
             />
@@ -120,7 +127,7 @@ export function ClassStudents(props) {
           items={enrolledStudents}
           loading={updatingStudents || !isLoaded(students)}
           fields={[
-            { key: "unenroll", label: "" },
+            ...isOwnClassOrAdmin ? [{ key: "unenroll", label: "" }] : [],
             { key: "displayName", label: "Nama" },
           ]}
           tableFilter
@@ -134,6 +141,13 @@ export function ClassStudents(props) {
                 >
                   <MdArrowLeft/>
                 </CButton>
+              </td>
+            ),
+            displayName: (s) => (
+              <td>
+                <Link to={`/students/${s.id}`}>
+                  {s.displayName}
+                </Link>
               </td>
             )
           }}
