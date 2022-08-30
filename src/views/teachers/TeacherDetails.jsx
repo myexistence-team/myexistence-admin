@@ -12,7 +12,7 @@ export default function TeacherDetails() {
   const { teacherId } = useParams();
 
   const firestore = useFirestore();
-  const [teacher] = useGetData("users", teacherId);
+  const [teacher, teacherLoading] = useGetData("users", teacherId);
   const schoolId = useGetSchoolId();
   useFirestoreConnect([
     {
@@ -63,7 +63,7 @@ export default function TeacherDetails() {
         <title>{teacher?.displayName || "Loading..."} - Detail Pengajar</title>
       </Helmet>
       {
-        !teacher ? (
+        teacherLoading || !teacher ? (
           <MESpinner/>
         ) : (
           <>
@@ -106,6 +106,10 @@ export default function TeacherDetails() {
                       <CCol xs={12} md={6}>
                         <label>Nomor ID</label>
                         <h5>{teacher?.idNumber}</h5>
+                      </CCol>
+                      <CCol xs={12}>
+                        <label>Deskripsi</label>
+                        <h5>{teacher?.description}</h5>
                       </CCol>
                     </CRow>
                   </CTabPane>

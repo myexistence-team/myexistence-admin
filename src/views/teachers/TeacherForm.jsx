@@ -8,6 +8,7 @@ import { isLoaded, useFirebase, useFirestore, useFirestoreConnect } from 'react-
 import { Link, useHistory, useParams } from 'react-router-dom'
 import meConfirm from 'src/components/meConfirm'
 import MESpinner from 'src/components/MESpinner'
+import METextArea from 'src/components/METextArea'
 import METextField from 'src/components/METextField'
 import meToaster from 'src/components/toaster'
 import { useGetAuth, useGetData, useGetProfile } from 'src/hooks/getters'
@@ -26,6 +27,7 @@ export default function TeacherForm() {
 
   const teacherSchema = object().shape({
     displayName: string().required().strict(),
+    description: string(),
     idNumber: string().required().strict(),
     email: string().required().strict()
   })
@@ -38,7 +40,7 @@ export default function TeacherForm() {
     doc: teacherId,
   })
 
-  const [teacher] = useGetData("users", teacherId);
+  const [teacher, teacherLoading] = useGetData("users", teacherId);
 
   function onSubmit(data) {
     meConfirm({
@@ -72,7 +74,7 @@ export default function TeacherForm() {
             </Helmet>
             <h3>Anda tidak diizinkan untuk mengedit pengajar lain.</h3>
           </CCardBody>
-        ) : editMode && !isLoaded(teacher) ? (
+        ) : editMode && teacherLoading ? (
           <MESpinner/>
         ) : editMode && !teacher ? (
           <CCardBody>
@@ -99,6 +101,12 @@ export default function TeacherForm() {
                 { ...register("displayName") }
                 errors={errors}
                 defaultValue={teacher?.displayName}
+              />
+              <METextArea
+                { ...register("description") }
+                errors={errors}
+                rows={3}
+                defaultValue={teacher?.description}
               />
               <METextField
                 { ...register("idNumber") }

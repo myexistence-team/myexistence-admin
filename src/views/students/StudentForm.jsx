@@ -8,6 +8,7 @@ import { isLoaded } from 'react-redux-firebase';
 import { Link, useHistory, useParams } from 'react-router-dom'
 import meConfirm from 'src/components/meConfirm';
 import MESpinner from 'src/components/MESpinner';
+import METextArea from 'src/components/METextArea';
 import METextField from 'src/components/METextField';
 import meToaster from 'src/components/toaster';
 import { useGetData } from 'src/hooks/getters';
@@ -25,6 +26,7 @@ export default function StudentForm() {
 
   const studentSchema = object().shape({
     displayName: string().required().strict(),
+    description: string(),
     email: string().email().required().strict(),
   })
   const { register, handleSubmit, formState: { errors } } = useForm({
@@ -73,6 +75,12 @@ export default function StudentForm() {
               <METextField
                 { ...register("displayName") }
                 defaultValue={student?.displayName}
+                errors={errors}
+              />
+              <METextArea
+                { ...register("description") }
+                rows={3}
+                defaultValue={student?.description}
                 errors={errors}
               />
               <METextField

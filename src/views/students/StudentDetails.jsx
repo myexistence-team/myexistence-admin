@@ -17,7 +17,7 @@ export default function StudentDetails() {
   })
 
   const firestore = useFirestore();
-  const [student] = useGetData("users", studentId);
+  const [student, studentLoading] = useGetData("users", studentId);
   const schoolId = useGetSchoolId();
   useFirestoreConnect(student && [
     {
@@ -61,7 +61,7 @@ export default function StudentDetails() {
       <title>{student?.displayName || "Loading..."} - Detail Pelajar</title>
     </Helmet>
     {
-      !student ? (
+      studentLoading || !student ? (
         <MESpinner/>
       ) : (
         <>
@@ -104,6 +104,10 @@ export default function StudentDetails() {
                   <CCol xs={12} md={6}>
                     <label>Email</label>
                     <h5>{student?.email}</h5>
+                  </CCol>
+                  <CCol xs={12}>
+                    <label>Deskripsi</label>
+                    <h5>{student?.description}</h5>
                   </CCol>
                   <CCol xs={12}>
                     <label className="mt-3">Kelas</label>
