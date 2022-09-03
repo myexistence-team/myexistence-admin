@@ -3,7 +3,7 @@ import moment from 'moment';
 import React, { useEffect, useState } from 'react'
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import { Helmet } from 'react-helmet';
-import { useFirestore, useFirestoreConnect } from 'react-redux-firebase';
+import { firestoreConnect, useFirestore, useFirestoreConnect } from 'react-redux-firebase';
 import { Link, useHistory } from 'react-router-dom';
 import MESpinner from 'src/components/MESpinner';
 import ScheduleCalendar from 'src/components/ScheduleCalendar';
@@ -28,11 +28,22 @@ export default function MySchedule() {
       }],
       storeAs: "classes"
     },
-    {
+  ])
+
+  function handleGetSchedules() {
+    firestore.get({
       collectionGroup: "schedules",
       where: [["classId", "in", profile.classIds]]
-    }
-  ])
+    })
+  }
+
+  function handleRefresh() {
+    handleGetSchedules();
+  }
+
+  useEffect(() => {
+    handleGetSchedules();
+  }, [])
 
   const [schedules, schedulesLoading] = useGetData("schedules");
   const schedulesOrdered = schedules ? Object.keys(schedules).map((sId) => ({ 
@@ -53,6 +64,7 @@ export default function MySchedule() {
           <ScheduleCalendar
             events={schedulesOrdered}
             loading={schedulesLoading}
+            onRefresh={handleRefresh}
           />
         </CCardBody>
       </CCard>

@@ -15,7 +15,8 @@ export default function ScheduleQRCode(props) {
   const {
     classId,
     scheduleId,
-    schedule
+    schedule,
+    onRefresh
   } = props;
 
   const [isClosing, setIsClosing] = useState(true);
@@ -28,6 +29,7 @@ export default function ScheduleQRCode(props) {
         dispatch(closeSchedule(classId, scheduleId, schedule))
           .finally(() => {
             setIsClosing(false)
+            onRefresh !== undefined && onRefresh();
           })
       }
     })
