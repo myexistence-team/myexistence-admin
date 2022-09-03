@@ -11,7 +11,7 @@ import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { DAY_NUMBERS, SCHEDULE_START_DATE_MS } from 'src/constants';
-import { createSchedule, deleteSchedule, updateSchedule } from 'src/store/actions/scheduleActions';
+import { createSchedule, deleteSchedule, openSchedule, updateSchedule } from 'src/store/actions/scheduleActions';
 import { useDispatch } from 'react-redux';
 import { MdArrowLeft, MdArrowRight } from 'react-icons/md';
 import { ENROLLMENT_ACTIONS, updateClassStudent } from 'src/store/actions/classActions';
@@ -23,6 +23,8 @@ import METextField from 'src/components/METextField';
 import MENativeSelect from 'src/components/MENativeSelect';
 import meConfirm from 'src/components/meConfirm';
 import { Helmet } from 'react-helmet';
+import ScheduleQRCode from 'src/components/ScheduleQRCode';
+import { getCurrentScheduleTime } from 'src/utils/getters';
 moment.locale('id', {
   week: {
     dow: 1
@@ -187,6 +189,13 @@ export function ClassSchedule({ classId }) {
     end: s.end.toDate(),
   }))
 
+  useEffect(() => {
+    if (selectedEvent) {
+      const selectedSchedule = schedulesForCalendar?.find((s) => s.id === selectedEvent.id);
+      setSelectedEvent(selectedSchedule)
+    }
+  }, [schedules])
+
   function handleEventDrop(slot) {
     const { start, end, event } = slot;
     const payload = {
@@ -317,6 +326,32 @@ export function ClassSchedule({ classId }) {
   }
 
   const isOwnClassOrAdmin = classObj?.teacherIds?.includes(auth.uid) || profile.role !== "TEACHER";
+  const isTeacherAndOwnClass = profile.role === "TEACHER" && classObj?.teacherIds?.includes(auth.uid);
+
+  function handleOpenSchedule() {
+    const currentScheduleTime = getCurrentScheduleTime();
+    const startDiffInMs = selectedEvent.start.getTime() - currentScheduleTime.getTime();
+    const startDiffToNowInMins = Math.floor(startDiffInMs/60000);
+
+    const endDiffInMs = selectedEvent.end.getTime() - currentScheduleTime.getTime();
+    const endDiffToNowInMins = Math.floor(endDiffInMs/60000);
+
+    if (startDiffToNowInMins > 10) {
+      meToaster.warning("Anda belum bisa buka kelas ini karena waktu mulai masih lebih dari 10 menit")
+    } else if (endDiffToNowInMins < 0) {
+      meToaster.warning("Anda tidak bisa buka kelas ini karena jadwal sudah selesai")
+    } else {
+      meConfirm({
+        onConfirm: () => {
+          dispatch(openSchedule(classId, selectedEvent.id))
+            .catch((e) => {
+              meToaster.danger(e.message);
+              console.log(e.message);
+            })
+        }
+      })
+    }
+  }
 
   return (
     <>
@@ -344,40 +379,64 @@ export function ClassSchedule({ classId }) {
             {
               Boolean(selectedEvent) && (
                 <>
-                  <MENativeSelect
-                    { ...register("day") }
-                    options={DAY_NUMBERS}
-                    errors={errors}
-                    label="Hari"
-                    disabled={!isOwnClassOrAdmin}
-                  />
-                  <METextField
-                    { ...register("start") }
-                    errors={errors}
-                    type="time"
-                    label="Jam Mulai"
-                    disabled={!isOwnClassOrAdmin}
-                  />
-                  <METextField
-                    { ...register("end") }
-                    errors={errors}
-                    type="time"
-                    label="Jam Selesai"
-                    disabled={!isOwnClassOrAdmin}
-                  />
-                  <METextField
-                    { ...register("tolerance") }
-                    errors={errors}
-                    type="number"
-                    label="Toleransi (dalam menit)"
-                    disabled={!isOwnClassOrAdmin}
-                  />
+                  {
+                    selectedEvent.status !== "OPENED" ? (
+                      <>
+                        <MENativeSelect
+                          { ...register("day") }
+                          options={DAY_NUMBERS}
+                          errors={errors}
+                          label="Hari"
+                          disabled={!isOwnClassOrAdmin}
+                        />
+                        <METextField
+                          { ...register("start") }
+                          errors={errors}
+                          type="time"
+                          label="Jam Mulai"
+                          disabled={!isOwnClassOrAdmin}
+                        />
+                        <METextField
+                          { ...register("end") }
+                          errors={errors}
+                          type="time"
+                          label="Jam Selesai"
+                          disabled={!isOwnClassOrAdmin}
+                        />
+                        <METextField
+                          { ...register("tolerance") }
+                          errors={errors}
+                          type="number"
+                          label="Toleransi (dalam menit)"
+                          disabled={!isOwnClassOrAdmin}
+                        />
+                        {
+                          isTeacherAndOwnClass && (
+                            <CButton 
+                              color="primary" 
+                              size="lg" 
+                              className="w-100"
+                              onClick={handleOpenSchedule}
+                            >
+                              Buka Kelas
+                            </CButton>
+                          )
+                        }
+                      </>
+                    ) : (
+                      <ScheduleQRCode
+                        classId={classId}
+                        scheduleId={selectedEvent.id}
+                        schedule={selectedEvent}
+                      />
+                    )
+                  }
                 </>
               )
             }
           </CModalBody>
           {
-            isOwnClassOrAdmin && (
+            Boolean(selectedEvent) && selectedEvent.status !== "OPENED" && isOwnClassOrAdmin && (
               <CModalFooter className="d-flex justify-content-end">
                 <CButton
                   color="primary"
