@@ -5,7 +5,7 @@ import { Calendar, momentLocalizer } from 'react-big-calendar';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { DAY_NUMBERS, SCHEDULE_START_DATE_MS } from 'src/constants';
-import { useGetData } from 'src/hooks/getters';
+import { useGetAuth, useGetData, useGetProfile } from 'src/hooks/getters';
 import { openSchedule } from 'src/store/actions/scheduleActions';
 import { getCurrentScheduleTime } from 'src/utils/getters';
 import meConfirm from './meConfirm';
@@ -94,6 +94,10 @@ export default function ScheduleCalendar(props) {
     }
   }
 
+  const profile = useGetProfile();
+  const auth = useGetAuth();
+  const isTeacherAndOwnClass = selectedEvent && profile.role === "TEACHER" && classes?.[selectedEvent.classId]?.teacherIds?.includes(auth.uid);
+
   return (
     <div className={className}>
       <CModal
@@ -133,16 +137,20 @@ export default function ScheduleCalendar(props) {
                         <CLabel>Toleransi</CLabel>
                         <h5>{selectedEvent.tolerance} menit</h5>
                       </CCol>
-                      <CCol xs={12}>
-                        <CButton
-                          color="primary" 
-                          size="lg" 
-                          className="w-100"
-                          onClick={handleOpenSchedule}
-                        >
-                          Buka Kelas
-                        </CButton>
-                      </CCol>
+                      {
+                        isTeacherAndOwnClass && (
+                          <CCol xs={12}>
+                            <CButton
+                              color="primary" 
+                              size="lg" 
+                              className="w-100"
+                              onClick={handleOpenSchedule}
+                            >
+                              Buka Kelas
+                            </CButton>
+                          </CCol>
+                        )
+                      }
                     </CRow>
                   ) : (
                     <ScheduleQRCode
