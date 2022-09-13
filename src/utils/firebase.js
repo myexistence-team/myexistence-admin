@@ -13,6 +13,7 @@ import firebase from "firebase/compat/app";
 const firebaseConfig = {
   apiKey: "AIzaSyCvh8vdcmswRQEDSWTdPWwhx_AexJfMDsg",
   authDomain: "myexistance-c4881.firebaseapp.com",
+  databaseURL: "https://myexistance-c4881-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "myexistance-c4881",
   storageBucket: "myexistance-c4881.appspot.com",
   messagingSenderId: "279276711391",

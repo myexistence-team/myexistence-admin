@@ -17,6 +17,7 @@ import rootReducer from "./store/reducers/rootReducer";
 import thunk from "redux-thunk";
 import { firebase } from './utils/firebase';
 import moment from "moment";
+import 'firebase/compat/storage';
 
 React.icons = icons;
 
