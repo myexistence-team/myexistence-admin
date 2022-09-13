@@ -1,5 +1,4 @@
-import { store } from "src";
-
+import { store } from "src/store/reducers/rootReducer";
 
 export function getOrdered(stateName, ids) {
   return store.getState().firestore.ordered[stateName];

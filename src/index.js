@@ -10,31 +10,17 @@ import * as serviceWorker from "./serviceWorker";
 import { icons } from "./assets/icons";
 
 import { Provider, useSelector } from "react-redux";
-import { applyMiddleware, compose, createStore } from "redux";
-import { createFirestoreInstance, getFirestore } from 'redux-firestore';
-import { getFirebase, isLoaded, ReactReduxFirebaseProvider } from 'react-redux-firebase';
-import rootReducer from "./store/reducers/rootReducer";
-import thunk from "redux-thunk";
+import { createFirestoreInstance } from 'redux-firestore';
+import { isLoaded, ReactReduxFirebaseProvider } from 'react-redux-firebase';
+import { persistor, store } from "./store/reducers/rootReducer";
 import { firebase } from './utils/firebase';
 import moment from "moment";
 import 'firebase/compat/storage';
+import { PersistGate } from "redux-persist/integration/react";
 
 React.icons = icons;
 
 moment.locale("id");
-
-export const store = createStore(
-  rootReducer,
-  compose(
-    applyMiddleware(
-      thunk.withExtraArgument({
-        getFirebase, 
-        getFirestore
-      })
-    ),
-    window.__REDUX_DEVTOOLS_EXTENSION__ ? window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__() : f => f
-  ),
-);
 
 const profileConfig = {
   userProfile: 'users',
@@ -65,11 +51,13 @@ function AuthReady(props) {
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <ReactReduxFirebaseProvider { ...rrfProps }>
-        <AuthReady>
-          <App />
-        </AuthReady>
-      </ReactReduxFirebaseProvider>
+      <PersistGate persistor={persistor}>
+        <ReactReduxFirebaseProvider { ...rrfProps }>
+          <AuthReady>
+            <App />
+          </AuthReady>
+        </ReactReduxFirebaseProvider>
+      </PersistGate>
     </Provider>
   </React.StrictMode>,
   document.getElementById("root")
