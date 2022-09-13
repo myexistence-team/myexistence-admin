@@ -20,7 +20,7 @@ a {
 
 $calendarBorder: #333;
 
-.c-app {
+.c-app:not(.c-dark-theme) {
   background-color: #EDF2F5;
 
   .c-footer {
