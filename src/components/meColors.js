@@ -10,7 +10,12 @@ let meColors = {
     main: "#185A9D",
     dark: "#102D4F",
     light: "#ADCEEA",
-    lighter: "#EAF2F9"
+    lighter: "#EAF2F9",
+    0: "#EAF2F9",
+    1: "#EAF2F9",
+    2: "#EAF2F9",
+    3: "#EAF2F9",
+    4: "#EAF2F9",
   },
   secondary: {
     main: "#43CEA2",

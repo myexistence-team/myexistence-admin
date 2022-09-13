@@ -23,10 +23,10 @@ function MEDropzone(props) {
               transition: "150ms",
               border: error && `1px solid ${meColors.primary.main}`,
               background: dz.isDragReject
-                ? meColors.primary[4]
+                ? meColors.danger
                 : !dz.isDragActive && !dz.isFileDialogActive
                 ? meColors.white1
-                : meColors.secondary[4]
+                : meColors.primary[4]
             }}
           >
             <div
