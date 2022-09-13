@@ -4,6 +4,7 @@ import { ENROLLMENT_ACTIONS } from "./classActions";
 export function createStudent(student) {
   return async (dispatch, getState, { getFirestore, getFirebase }) => {
     const firestore = getFirestore();
+    const firebase = getFirebase();
     const auth = getState().firebase.auth;
     const profile = getState().firebase.profile;
 
@@ -12,10 +13,23 @@ export function createStudent(student) {
       throw Error("Pengguna dengan email tersebut sudah ada")
     }
 
+    var photoUrl = null;
+    if (student.profileImage) {
+      const uploadRes = await firebase.uploadFile(
+        "studentPhotos", 
+        student.profileImage, 
+        undefined, 
+        { name: `STUDENT-${student.email}` }
+      )
+      photoUrl = await uploadRes.uploadTaskSnapshot.ref.getDownloadURL();
+      delete student.profileImage;
+    } 
+
     firestore
     .collection("users")
     .add({ 
       ...student, 
+      photoUrl,
       role: "STUDENT",
       hasRegistered: false,
       createdBy: auth.uid,
@@ -28,15 +42,29 @@ export function createStudent(student) {
 }
 
 export function updateStudent(studentId, student) {
-  return async (dispatch, getState, { getFirestore }) => {
+  return async (dispatch, getState, { getFirestore, getFirebase }) => {
     const firestore = getFirestore();
+    const firebase = getFirebase();
     const auth = getState().firebase.auth;
+
+    var photoUrl = null;
+    if (student.profileImage) {
+      const uploadRes = await firebase.uploadFile(
+        "studentPhotos", 
+        student.profileImage, 
+        undefined, 
+        { name: `STUDENT-${student.email}` }
+      )
+      photoUrl = await uploadRes.uploadTaskSnapshot.ref.getDownloadURL();
+      delete student.profileImage;
+    } 
     
     firestore
       .collection("users")
       .doc(studentId)
       .update({ 
         ...student, 
+        photoUrl,
         updatedBy: auth.uid,
         updatedAt: new Date()
       });

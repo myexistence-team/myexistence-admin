@@ -97,39 +97,52 @@ export default function StudentDetails() {
             <CTabContent>
               <CTabPane data-tab="details">
                 <CRow className="mt-3">
-                  <CCol xs={12} md={6}>
-                    <label>Nama Lengkap</label>
-                    <h5>{student?.displayName}</h5>
-                  </CCol>
-                  <CCol xs={12} md={6}>
-                    <label>Email</label>
-                    <h5>{student?.email}</h5>
-                  </CCol>
-                  <CCol xs={12}>
-                    <label>Deskripsi</label>
-                    <h5>{student?.description}</h5>
-                  </CCol>
-                  <CCol xs={12}>
-                    <label className="mt-3">Kelas</label>
-                    <CDataTable
-                      items={classes}
-                      fields={[
-                        { key: "name", label: "Nama" },
-                        { key: "description", label: "Deskripsi" },
-                      ]}
-                      scopedSlots={{
-                        name: (c) => (
-                          <td>
-                            <Link to={`/classes/${c.id}`}>
-                              {c.name}
-                            </Link>
-                          </td>
-                        ),
-                      }}
-                      loading={classesLoading}
-                    />
+                  {
+                    student.photoUrl && (
+                      <CCol xs={12} md={3}>
+                        <img
+                          src={student.photoUrl}
+                          alt={student.displayName}
+                          width="100%"
+                        />
+                      </CCol>
+                    )
+                  }
+                  <CCol xs={12} md={student.photoUrl ? 9 : 12}>
+                    <CRow>
+                      <CCol xs={12} md={6}>
+                        <label>Nama Lengkap</label>
+                        <h5>{student?.displayName}</h5>
+                      </CCol>
+                      <CCol xs={12} md={6}>
+                        <label>Email</label>
+                        <h5>{student?.email}</h5>
+                      </CCol>
+                      <CCol xs={12}>
+                        <label>Deskripsi</label>
+                        <h5>{student?.description}</h5>
+                      </CCol>
+                    </CRow>
                   </CCol>
                 </CRow>
+                <label className="mt-3">Kelas</label>
+                <CDataTable
+                  items={classes}
+                  fields={[
+                    { key: "name", label: "Nama" },
+                    { key: "description", label: "Deskripsi" },
+                  ]}
+                  scopedSlots={{
+                    name: (c) => (
+                      <td>
+                        <Link to={`/classes/${c.id}`}>
+                          {c.name}
+                        </Link>
+                      </td>
+                    ),
+                  }}
+                  loading={classesLoading}
+                />
               </CTabPane>
               <CTabPane data-tab="schedule">
                 <ScheduleCalendar
