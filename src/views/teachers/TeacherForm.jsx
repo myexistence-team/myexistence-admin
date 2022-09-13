@@ -1,19 +1,20 @@
-import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CForm } from '@coreui/react'
+import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CLabel, CRow } from '@coreui/react'
 import { yupResolver } from '@hookform/resolvers/yup'
 import React, { useState } from 'react'
+import { useEffect } from 'react'
 import { Helmet } from 'react-helmet'
 import { useForm } from 'react-hook-form'
 import { useDispatch } from 'react-redux'
 import { isLoaded, useFirebase, useFirestore, useFirestoreConnect } from 'react-redux-firebase'
 import { Link, useHistory, useParams } from 'react-router-dom'
 import meConfirm from 'src/components/meConfirm'
+import MEDropzone from 'src/components/MEDropzone'
 import MESpinner from 'src/components/MESpinner'
 import METextArea from 'src/components/METextArea'
 import METextField from 'src/components/METextField'
 import meToaster from 'src/components/toaster'
 import { useGetAuth, useGetData, useGetProfile } from 'src/hooks/getters'
 import { createTeacher, updateTeacher } from 'src/store/actions/teacherActions'
-import { getProfile } from 'src/utils/getters'
 import { string } from 'yup'
 import { object } from 'yup'
 
@@ -23,7 +24,8 @@ export default function TeacherForm() {
   const history = useHistory();
   const editMode = Boolean(teacherId);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const schoolId = getProfile().schoolId;
+  const [profileImage, setProfileImage] = useState(null);
+  const [profileImageUrl, setProfileImageUrl] = useState(null);
 
   const teacherSchema = object().shape({
     displayName: string().required().strict(),
@@ -42,11 +44,18 @@ export default function TeacherForm() {
 
   const [teacher, teacherLoading] = useGetData("users", teacherId);
 
+  useEffect(() => {
+    if (teacher) {
+      setProfileImageUrl(teacher.photoUrl);
+    }
+  }, [teacher])
+
   function onSubmit(data) {
     meConfirm({
       onConfirm: () => {
         setIsSubmitting(true);
-        dispatch(editMode ? updateTeacher(teacherId, data) : createTeacher(data))
+        const payload = { ...data, profileImage, photoUrl: profileImageUrl };
+        dispatch(editMode ? updateTeacher(teacherId, payload) : createTeacher(payload))
           .then(() => {
             history.push("/teachers")
           })
@@ -63,6 +72,16 @@ export default function TeacherForm() {
 
   const auth = useGetAuth();
   const profile = useGetProfile();
+
+  function handleFileDrop(files) {
+    setProfileImage(files[0])
+    setProfileImageUrl(URL.createObjectURL(files[0]));
+  }
+
+  function handleDeleteProfileImage() {
+    setProfileImage(null)
+    setProfileImageUrl(null);
+  }
 
   return (
     <CCard>
@@ -92,6 +111,44 @@ export default function TeacherForm() {
               <h3>{editMode ? "Edit Pengajar" : "Tambahkan Pengajar"}</h3>
             </CCardHeader>
             <CCardBody>
+              <div className="mb-3">
+                <CLabel>Foto Profil</CLabel>
+                <CRow>
+                  {
+                    profileImageUrl && (
+                      <CCol xs={4}>
+                        <img
+                          src={profileImageUrl}
+                          alt="Profile Preview"
+                          height="100%"
+                          width="100%"
+                        />
+                      </CCol>
+                    )
+                  }
+                  <CCol xs={profileImageUrl ? 8 : 12}>
+                    <MEDropzone
+                      inputProps={{
+                        accept: ["image/*"],
+                        multiple: false
+                      }}
+                      onDrop={handleFileDrop}
+                    />
+                    {
+                      profileImageUrl && (
+                        <CButton
+                          color="warning"
+                          variant="outline"
+                          className="mt-2"
+                          onClick={handleDeleteProfileImage}
+                        >
+                          Hapus Gambar Profil
+                        </CButton>
+                      )
+                    }
+                  </CCol>
+                </CRow>
+              </div>
               <METextField
                 { ...register("email") }
                 errors={errors}

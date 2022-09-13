@@ -99,17 +99,32 @@ export default function TeacherDetails() {
                 <CTabContent>
                   <CTabPane data-tab="details">
                     <CRow className="mt-3">
-                      <CCol xs={12} md={6}>
-                        <label>Nama Lengkap</label>
-                        <h5>{teacher?.displayName}</h5>
-                      </CCol>
-                      <CCol xs={12} md={6}>
-                        <label>Nomor ID</label>
-                        <h5>{teacher?.idNumber}</h5>
-                      </CCol>
-                      <CCol xs={12}>
-                        <label>Deskripsi</label>
-                        <h5>{teacher?.description}</h5>
+                      {
+                        teacher.photoUrl && (
+                          <CCol xs={12} md={3}>
+                            <img
+                              src={teacher.photoUrl}
+                              alt={teacher.displayName}
+                              width="100%"
+                            />
+                          </CCol>
+                        )
+                      }
+                      <CCol xs={12} md={teacher.photoUrl ? 9 : 12}>                        
+                        <CRow>                        
+                          <CCol xs={12} md={6}>
+                            <label>Nama Lengkap</label>
+                            <h5>{teacher?.displayName}</h5>
+                          </CCol>
+                          <CCol xs={12} md={6}>
+                            <label>Nomor ID</label>
+                            <h5>{teacher?.idNumber}</h5>
+                          </CCol>
+                          <CCol xs={12}>
+                            <label>Deskripsi</label>
+                            <h5>{teacher?.description}</h5>
+                          </CCol>
+                        </CRow>
                       </CCol>
                     </CRow>
                   </CTabPane>

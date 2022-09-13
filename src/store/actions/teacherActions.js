@@ -1,8 +1,9 @@
 import { checkEmailAvailability } from "src/utils/checksFunctions";
 
 export function createTeacher(newTeacher) {
-  return async (dispatch, getState, { getFirestore }) => {
+  return async (dispatch, getState, { getFirestore, getFirebase }) => {
     const firestore = getFirestore();
+    const firebase = getFirebase();
     const auth = getState().firebase.auth;
     const profile = getState().firebase.profile;
 
@@ -10,11 +11,24 @@ export function createTeacher(newTeacher) {
     if (!emailAvailable) {
       throw Error("Pengajar dengan email tersebut sudah ada")
     }
+
+    var photoUrl = null;
+    if (newTeacher.profileImage) {
+      const uploadRes = await firebase.uploadFile(
+        "teacherPhotos", 
+        newTeacher.profileImage, 
+        undefined, 
+        { name: `TEACHER-${newTeacher.email}` }
+      )
+      photoUrl = await uploadRes.uploadTaskSnapshot.ref.getDownloadURL();
+      delete newTeacher.profileImage;
+    } 
     
     firestore
       .collection("users")
       .add({ 
         ...newTeacher, 
+        photoUrl,
         role: "TEACHER",
         hasRegistered: false,
         createdBy: auth.uid,
@@ -27,18 +41,32 @@ export function createTeacher(newTeacher) {
 }
 
 export function updateTeacher(teacherId, newTeacher) {
-  return async (dispatch, getState, { getFirestore }) => {
+  return async (dispatch, getState, { getFirestore, getFirebase }) => {
     const firestore = getFirestore();
+    const firebase = getFirebase();
     const auth = getState().firebase.auth;
-    
-    firestore
+    const teacherRef = firestore
       .collection("users")
-      .doc(teacherId)
-      .update({ 
-        ...newTeacher, 
-        updatedBy: auth.uid,
-        updatedAt: new Date()
-      });
+      .doc(teacherId);
+
+    var photoUrl = null;
+    if (newTeacher.profileImage) {
+      const uploadRes = await firebase.uploadFile(
+        "teacherPhotos", 
+        newTeacher.profileImage, 
+        undefined, 
+        { name: `TEACHER-${newTeacher.email}` }
+      )
+      photoUrl = await uploadRes.uploadTaskSnapshot.ref.getDownloadURL();
+      delete newTeacher.profileImage;
+    } 
+
+    teacherRef.update({ 
+      ...newTeacher, 
+      photoUrl,
+      updatedBy: auth.uid,
+      updatedAt: new Date()
+    });
   }
 }
 
