@@ -33,7 +33,7 @@ const TheHeaderDropdown = () => {
             <Avatar
               className="c-avatar-img"
               name={profile.displayName}
-              src={auth?.photoUrl}
+              src={profile?.photoUrl}
               size="36"
             />
           </div>
