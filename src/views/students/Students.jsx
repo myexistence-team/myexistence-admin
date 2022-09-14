@@ -1,5 +1,6 @@
 import { CButton, CCard, CCardBody, CCardHeader, CDataTable, CPagination } from '@coreui/react'
 import React from 'react'
+import Avatar from 'react-avatar';
 import { Helmet } from 'react-helmet';
 import { useForm } from 'react-hook-form';
 import { MdCheck } from 'react-icons/md';
@@ -53,12 +54,27 @@ export default function Students() {
       <CDataTable
           items={students}
           fields={[
+            { key: "profilePicture", label: "" },
             { key: "displayName", label: "Nama Lengkap" },
             "email",
             { key: "hasRegistered", label: "Terdaftar" },
             ...profile.role !== "TEACHER" ? [{ key: "actions", label: "" }] : [],
           ]}
           scopedSlots={{
+            profilePicture: (t) => (
+              <td style={{ width: "40px" }}>
+                {
+                  t.photoUrl && (
+                    <Avatar
+                      className="c-avatar-img"
+                      name={t.displayName}
+                      src={t?.photoUrl}
+                      size="36"
+                    />
+                  )
+                }
+              </td>
+            ),
             displayName: (t) => (
               <td>
                 <Link to={`/students/${t.id}`}>

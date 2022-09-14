@@ -1,6 +1,7 @@
 import { CButton, CCard, CCardBody, CCardHeader, CDataTable, CPagination } from '@coreui/react'
 import moment from 'moment'
 import React, { useMemo } from 'react'
+import Avatar from 'react-avatar'
 import { Helmet } from 'react-helmet'
 import { useForm } from 'react-hook-form'
 import { MdCheck } from 'react-icons/md'
@@ -59,6 +60,7 @@ export default function Teachers() {
           items={teachers}
           loading={isLoading}
           fields={[
+            { key: "profilePicture", label: "" },
             { key: "displayName", label: "Nama Lengkap" },
             "idNumber",
             "email",
@@ -67,6 +69,20 @@ export default function Teachers() {
             { key: "actions", label: "" },
           ]}
           scopedSlots={{
+            profilePicture: (t) => (
+              <td style={{ width: "40px" }}>
+                {
+                  t.photoUrl && (
+                    <Avatar
+                      className="c-avatar-img"
+                      name={t.displayName}
+                      src={t?.photoUrl}
+                      size="36"
+                    />
+                  )
+                }
+              </td>
+            ),
             displayName: (t) => (
               <td>
                 <Link to={`/teachers/${t.id}`}>
@@ -104,9 +120,11 @@ export default function Teachers() {
         />
         <CPagination
           activePage={page + 1}
+          doubleArrows={false}
           onActivePageChange={(newPage) => handlePageChange(Math.max(0, newPage - 1))}
           pages={0}
           align="end"
+          oncha
         />
       </CCardBody>
     </CCard>
