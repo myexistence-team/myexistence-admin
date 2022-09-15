@@ -93,14 +93,14 @@ export default function AdminForm() {
               />
             </CCardBody>
             <CCardFooter className="d-flex justify-content-end">
-              <CButton
-                color="primary"
-                variant="outline"
-                is={Link}
-                to="/admins"
-              >
-                Batal
-              </CButton>
+              <Link to="/admins">
+                <CButton
+                  color="primary"
+                  variant="outline"
+                >
+                  Batal
+                </CButton>
+              </Link>
               <CButton
                 color="primary"
                 type="submit"

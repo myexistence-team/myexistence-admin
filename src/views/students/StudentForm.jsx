@@ -153,14 +153,14 @@ export default function StudentForm() {
             />
           </CCardBody>
           <CCardFooter className="d-flex justify-content-end">
-            <CButton
-              color="primary"
-              variant="outline"
-              is={Link}
-              to="/students"
-            >
-              Batal
-            </CButton>
+            <Link to="/students">
+              <CButton
+                color="primary"
+                variant="outline"
+              >
+                Batal
+              </CButton>
+            </Link>
             <CButton
               color="primary"
               type="submit"

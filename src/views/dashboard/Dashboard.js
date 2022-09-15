@@ -105,7 +105,7 @@ const Dashboard = () => {
           <h3 className="mb-3">Menu</h3>
           <CRow>
             {menus.map(menu => (
-              <CCol xs={6} sm={4} md={4} className="mb-4">
+              <CCol md={6} lg={4} className="mb-4">
                 <DashboardMenu
                   logo={menu.logo}
                   title={menu.title}

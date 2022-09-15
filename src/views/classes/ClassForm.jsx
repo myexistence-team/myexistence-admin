@@ -130,14 +130,14 @@ export default function ClassForm(props) {
               />
             </CCardBody>
             <CCardFooter className="d-flex justify-content-end">
-              <CButton
-                color="primary"
-                variant="outline"
-                is={Link}
-                to="/classes"
-              >
-                Batal
-              </CButton>
+              <Link to="/classes">
+                <CButton
+                  color="primary"
+                  variant="outline"
+                >
+                  Batal
+                </CButton>
+              </Link>
               <CButton
                 color="primary"
                 type="submit"
