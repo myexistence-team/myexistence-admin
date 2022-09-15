@@ -353,6 +353,10 @@ export function ClassSchedule({ classId }) {
     }
   }
 
+  function handleStudentCallouts() {
+    
+  }
+
   return (
     <>
       <CModal 
@@ -412,14 +416,24 @@ export function ClassSchedule({ classId }) {
                         />
                         {
                           isTeacherAndOwnClass && (
-                            <CButton 
-                              color="primary" 
-                              size="lg" 
-                              className="w-100"
-                              onClick={handleOpenSchedule}
-                            >
-                              Buka Kelas
-                            </CButton>
+                            <>
+                              <CButton 
+                                color="primary" 
+                                size="lg" 
+                                className="w-100"
+                                onClick={handleOpenSchedule}
+                              >
+                                Buka Kelas
+                              </CButton>
+                              <CButton 
+                                color="primary" 
+                                size="lg" 
+                                className="w-100"
+                                onClick={handleStudentCallouts}
+                              >
+                                Panggil Pelajar
+                              </CButton>
+                            </>
                           )
                         }
                       </>

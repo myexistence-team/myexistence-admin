@@ -22,6 +22,8 @@ import { MdClass, MdVerifiedUser } from "react-icons/md";
 import { AiFillCalendar } from "react-icons/ai";
 import { useGetProfile } from "src/hooks/getters.js";
 import { Link } from "react-router-dom";
+import { CChart } from "@coreui/react-chartjs";
+import AttendancePieChart from "./AttendancePieChart.jsx";
 
 const WidgetsDropdown = lazy(() => import("../widgets/WidgetsDropdown.js"));
 const WidgetsBrand = lazy(() => import("../widgets/WidgetsBrand.js"));
@@ -93,21 +95,34 @@ const Dashboard = () => {
   ]
 
   return (
-    <>
+    <div className="pb-5">
       <Helmet>
         <title>Dashboard</title>
       </Helmet>
 
       <CRow>
-        {menus.map(menu => (
-          <CCol xs={6} md={3} className="mb-4">
-            <DashboardMenu
-              logo={menu.logo}
-              title={menu.title}
-              path={menu.path}
-            />
-          </CCol>
-        ))}
+        <CCol xs={12} sm={6}>
+          <h3 className="mb-3">Menu</h3>
+          <CRow>
+            {menus.map(menu => (
+              <CCol xs={6} sm={4} md={4} className="mb-4">
+                <DashboardMenu
+                  logo={menu.logo}
+                  title={menu.title}
+                  path={menu.path}
+                />
+              </CCol>
+            ))}
+          </CRow>
+        </CCol>
+        <CCol xs={12} sm={6}>
+          <h3 className="my-3">Ringkasan</h3>
+          <CRow>
+            <CCol xs={12}>
+              <AttendancePieChart/>
+            </CCol>
+          </CRow>
+        </CCol>
       </CRow>
 
       {/* <WidgetsDropdown />
@@ -788,7 +803,7 @@ const Dashboard = () => {
           </CCard>
         </CCol>
       </CRow> */}
-    </>
+    </div>
   );
 };
 
