@@ -25,6 +25,11 @@ import meConfirm from 'src/components/meConfirm';
 import { Helmet } from 'react-helmet';
 import ScheduleQRCode from 'src/components/ScheduleQRCode';
 import { getCurrentScheduleTime } from 'src/utils/getters';
+import { ATTENDANCE_STATUS_ENUM } from 'src/enums';
+import { getAttendanceStatusColor } from 'src/utils/utilFunctions';
+import meColors from 'src/components/meColors';
+import { CChart } from '@coreui/react-chartjs';
+import MESelect from 'src/components/MESelect';
 moment.locale('id', {
   week: {
     dow: 1
@@ -489,6 +494,120 @@ export function ClassSchedule({ classId }) {
   )
 }
 
+export function ClassAttendances(props) {
+  const { classId } = props;
+
+  const schoolId = useGetSchoolId();
+
+  useFirestoreConnect([
+    {
+      collection: "schools",
+      doc: schoolId,
+      subcollections: [{
+        collection: "logs",
+        where: [["classId", "==", classId]],
+        orderBy: ["time", "desc"],
+
+      }],
+      storeAs: "logs"
+    }, {
+      collection: "users",
+      where: [["role", "==", "STUDENT"]],
+      storeAs: "students"
+    }
+  ])
+
+  const [students] = useGetData("students");
+  const [logs, logsLoading] = useGetOrdered("logs");
+  const modifiedLogs = logs?.map((l) => ({ ...l, studentName: students?.[l.studentId]?.displayName }));
+
+  const presentCount = logs?.filter((l) => l?.status === "PRESENT")?.length;
+  const lateCount = logs?.filter((l) => l?.status === "LATE")?.length;
+  const excusedCount = logs?.filter((l) => l?.status === "EXCUSED")?.length;
+  const absentCount = logs?.filter((l) => l?.status === "ABSENT")?.length;
+
+  const labels = [
+    "Hadir",
+    "Terlambat",
+    "Izin",
+    "Absen",
+  ]
+  const donutData = [
+    {
+      data: [presentCount, lateCount, excusedCount, absentCount],
+      backgroundColor: [
+        meColors.success.main,
+        meColors.orange,
+        meColors.yellow,
+        meColors.danger,
+      ],
+    }
+  ]
+
+  const [status, setStatus] = useState("");
+
+  return (
+    <CRow className="mt-3">
+      <CCol xs={12} sm={6}>
+        <CDataTable
+          items={modifiedLogs}
+          pagination={true}
+          itemsPerPage={10}
+          columnFilter
+          columnFilterValue={{
+            status
+          }}
+          columnFilterSlot={{
+            status: (
+              <MESelect
+                name="status"
+                options={ATTENDANCE_STATUS_ENUM}
+                onChange={(v) => setStatus(v || "")}
+                value={status}
+              />
+            ),
+            time: <></>
+          }}
+          loading={logsLoading}
+          fields={[
+            { key: "studentName", label: "Nama Pelajar" },
+            { key: "time", label: "Tanggal & Waktu Kehadiran" },
+            { key: "status", label: "Status" },
+          ]}
+          scopedSlots={{
+            studentName: (l) => (
+              <td>
+                <Link to={`/students/${l.studentId}`}>
+                  {l.studentName}
+                </Link>
+              </td>
+            ),
+            status: (l) => (
+              <td style={{ color: getAttendanceStatusColor(l.status) }}>
+                <strong>
+                  {ATTENDANCE_STATUS_ENUM[l.status]}
+                </strong>
+              </td>
+            ),
+            time: (l) => (
+              <td>
+                {moment(l.time.toDate()).format("LLL")}
+              </td>
+            ),
+          }}
+        />
+      </CCol>
+      <CCol xs={12} sm={6}>
+        <CChart
+          type="doughnut"
+          datasets={donutData}
+          labels={labels}
+        />
+      </CCol>
+    </CRow>
+  )
+}
+
 export default function ClassDetails() {
   const firestore = useFirestore();
   const { classId } = useParams();
@@ -565,6 +684,11 @@ export default function ClassDetails() {
                       Pelajar
                     </CNavLink>
                   </CNavItem>
+                  <CNavItem>
+                    <CNavLink data-tab="attendances">
+                      Kehadiran Kelas
+                    </CNavLink>
+                  </CNavItem>
                 </CNav>
                 <CTabContent>
                   <CTabPane data-tab="details">
@@ -602,6 +726,9 @@ export default function ClassDetails() {
                   </CTabPane>
                   <CTabPane data-tab="students">
                     <ClassStudents classId={classId}/>
+                  </CTabPane>
+                  <CTabPane data-tab="attendances">
+                    <ClassAttendances classId={classId}/>
                   </CTabPane>
                 </CTabContent>
               </CTabs>

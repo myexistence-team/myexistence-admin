@@ -1,5 +1,3 @@
-import { getCurrentScheduleTime } from "src/utils/getters";
-
 export function createSchedule(classId, schedule) {
   return async (dispatch, getState, { getFirestore, getFirebase }) => {
     const firestore = getFirestore();
@@ -100,16 +98,56 @@ export function closeSchedule(classId, scheduleId) {
       .collection("schools")
       .doc(profile.schoolId)
       .collection("logs")
+    const classRef = firestore
+      .collection("schools")
+      .doc(profile.schoolId)
+      .collection("classes")
+      .doc(classId)
 
     const qrCodesSnap = await qrCodesRef.get();
     const studentLogsSnap = await studentLogsRef.get();
+    const classSnap = await classRef.get();
+
     qrCodesSnap.docs.forEach((doc) => {
       batch.delete(doc.ref);
     });
+
+    const presentStudentIds = [];
+    const classStudentIds = classSnap.data().studentIds;
+
     studentLogsSnap.docs.forEach((doc) => {
+      presentStudentIds.push(doc.data().studentId);
       batch.set(logsRef.doc(), doc.data());
       batch.delete(doc.ref);
     });
+
+    console.log("CLASS ID", classId)
+    console.log("PRESENT IDS", presentStudentIds);
+    const absentStudentIds = classStudentIds.filter((sId) => !presentStudentIds.includes(sId));
+    console.log("ABSENT IDS", absentStudentIds)
+
+    if (absentStudentIds.length) {
+      const scheduleSnap = await scheduleRef.get();
+      const schedule = scheduleSnap.data();
+      absentStudentIds.forEach((studentId) => {
+        console.log(schedule, studentId);
+        batch.set(
+          logsRef.doc(), {
+            schedule: {
+              start: schedule.start,
+              end: schedule.end,
+              tolerance: schedule.tolerance,
+              openedAt: schedule.openedAt,
+            },
+            studentId,
+            classId,
+            teacherId: schedule.openedBy,
+            status: "ABSENT",
+            time: schedule.start
+          }
+        )
+      })
+    }
     await batch.commit();
     await scheduleRef.update({
       status: "CLOSED",

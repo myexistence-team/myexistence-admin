@@ -12,3 +12,10 @@ export const ROLE_TYPES = {
   TEACHER: "Pengajar",
   STUDENT: "Pelajar"
 }
+
+export const ATTENDANCE_STATUS_ENUM = {
+  PRESENT: "Hadir",
+  LATE: "Terlambat",
+  EXCUSED: "Izin",
+  ABSENT: "Absen"
+}
