@@ -121,16 +121,12 @@ export function closeSchedule(classId, scheduleId) {
       batch.delete(doc.ref);
     });
 
-    console.log("CLASS ID", classId)
-    console.log("PRESENT IDS", presentStudentIds);
     const absentStudentIds = classStudentIds.filter((sId) => !presentStudentIds.includes(sId));
-    console.log("ABSENT IDS", absentStudentIds)
 
     if (absentStudentIds.length) {
       const scheduleSnap = await scheduleRef.get();
       const schedule = scheduleSnap.data();
       absentStudentIds.forEach((studentId) => {
-        console.log(schedule, studentId);
         batch.set(
           logsRef.doc(), {
             schedule: {
@@ -143,7 +139,7 @@ export function closeSchedule(classId, scheduleId) {
             classId,
             teacherId: schedule.openedBy,
             status: "ABSENT",
-            time: schedule.start
+            time: new Date()
           }
         )
       })
