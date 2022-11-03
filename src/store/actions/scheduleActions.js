@@ -81,8 +81,12 @@ export function closeSchedule(classId, scheduleId) {
   return async (dispatch, getState, { getFirestore, getFirebase }) => {
     const firestore = getFirestore();
     const profile = getState().firebase.profile;
+    const auth = getState().firebase.auth;
     const batch = firestore.batch();
 
+    const userRef = firestore
+      .collection("users")
+      .doc(auth.uid);
     const scheduleRef = firestore
       .collection("schools")
       .doc(profile.schoolId)
@@ -135,6 +139,7 @@ export function closeSchedule(classId, scheduleId) {
               tolerance: schedule.tolerance,
               openedAt: schedule.openedAt,
             },
+            scheduleId: scheduleSnap.id,
             studentId,
             classId,
             teacherId: schedule.openedBy,
@@ -145,6 +150,9 @@ export function closeSchedule(classId, scheduleId) {
       })
     }
     await batch.commit();
+    await userRef.update({
+      currentScheduleId: null
+    });
     await scheduleRef.update({
       status: "CLOSED",
     })
@@ -158,6 +166,9 @@ export function openSchedule(classId, scheduleId) {
     const profile = getState().firebase.profile;
     const batch = firestore.batch();
 
+    const userRef = firestore
+      .collection("users")
+      .doc(auth.uid)
     const classRef = firestore
       .collection("schools")
       .doc(profile.schoolId)
@@ -183,7 +194,10 @@ export function openSchedule(classId, scheduleId) {
     })
 
     await batch.commit();
-    scheduleRef.update({
+    await userRef.update({
+      currentScheduleId: scheduleId
+    })
+    await scheduleRef.update({
         status: "OPENED",
         openedBy: auth.uid,
         openedAt: new Date(),

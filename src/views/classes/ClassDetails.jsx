@@ -341,10 +341,12 @@ export function ClassSchedule({ classId }) {
     const endDiffInMs = selectedEvent.end.getTime() - currentScheduleTime.getTime();
     const endDiffToNowInMins = Math.floor(endDiffInMs/60000);
 
-    if (startDiffToNowInMins > 10) {
-      meToaster.warning("Anda belum bisa buka kelas ini karena waktu mulai masih lebih dari 10 menit")
+    if (profile.currentScheduleId) {
+      meToaster.warning("Anda masih menjalankan kelas. Mohon tutup kelas sebelumnya terlebih dahulu.");
+    } else if (startDiffToNowInMins > 10) {
+      meToaster.warning("Anda belum bisa buka kelas ini karena waktu mulai masih lebih dari 10 menit");
     } else if (endDiffToNowInMins < 0) {
-      meToaster.warning("Anda tidak bisa buka kelas ini karena jadwal sudah selesai")
+      meToaster.warning("Anda tidak bisa buka kelas ini karena jadwal sudah selesai");
     } else {
       meConfirm({
         onConfirm: () => {
@@ -368,6 +370,7 @@ export function ClassSchedule({ classId }) {
         centered 
         show={Boolean(selectedEvent)}
         onClose={handleCancelEventEdit}
+        size={selectedEvent?.status === "OPENED" && "lg"}
       >
         <CForm onSubmit={handleSubmit(onSubmitEvent)}>
           <CModalHeader className="d-flex justify-content-between">
@@ -433,7 +436,7 @@ export function ClassSchedule({ classId }) {
                               <CButton 
                                 color="primary" 
                                 size="lg" 
-                                className="w-100"
+                                className="w-100 mt-3"
                                 onClick={handleStudentCallouts}
                               >
                                 Panggil Pelajar
@@ -706,8 +709,8 @@ export default function ClassDetails() {
                           <CCol xs={12}>
                             <label>Pengajar</label>
                             {
-                              teachers?.map((t) => (
-                                <Link to={`/teachers/${t.id}`}>
+                              teachers?.map((t, idx) => (
+                                <Link key={idx} to={`/teachers/${t.id}`}>
                                   <h5>{t.displayName}</h5>
                                 </Link>
                               ))
