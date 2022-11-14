@@ -333,6 +333,9 @@ export function ClassSchedule({ classId }) {
   const isOwnClassOrAdmin = classObj?.teacherIds?.includes(auth.uid) || profile.role !== "TEACHER";
   const isTeacherAndOwnClass = profile.role === "TEACHER" && classObj?.teacherIds?.includes(auth.uid);
 
+  const firestore = useFirestore();
+  const [statusLoading, setStatusLoading] = useState(false);
+
   function handleOpenSchedule() {
     const currentScheduleTime = getCurrentScheduleTime();
     const startDiffInMs = selectedEvent.start.getTime() - currentScheduleTime.getTime();
@@ -350,11 +353,28 @@ export function ClassSchedule({ classId }) {
     } else {
       meConfirm({
         onConfirm: () => {
-          dispatch(openSchedule(classId, selectedEvent.id))
-            .catch((e) => {
-              meToaster.danger(e.message);
-              console.log(e.message);
-            })
+          if (navigator.geolocation) {
+            setStatusLoading(true);
+            navigator.geolocation.getCurrentPosition(
+              ({ coords }) => {
+                const location = new firestore.GeoPoint(coords.latitude, coords.longitude);
+                dispatch(openSchedule(classId, selectedEvent.id, location))
+                  .then(() => {
+                    setStatusLoading(false);
+                  })
+                  .catch((e) => {
+                    setStatusLoading(false);
+                    meToaster.danger(e.message);
+                    console.error(e.message);
+                  })
+              },
+              (positionError) => {
+                alert(positionError.message);
+              }
+            );
+          } else {
+            alert("Browser Anda tidak men-support lokasi. Mohon buka menggunakan aplikasi Hadir")
+          }
         }
       })
     }
@@ -430,6 +450,7 @@ export function ClassSchedule({ classId }) {
                                 size="lg" 
                                 className="w-100"
                                 onClick={handleOpenSchedule}
+                                disabled={statusLoading}
                               >
                                 Buka Kelas
                               </CButton>

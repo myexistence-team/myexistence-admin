@@ -3,6 +3,7 @@ import moment from 'moment';
 import React, { useEffect, useState } from 'react'
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import { useDispatch } from 'react-redux';
+import { useFirestore } from 'react-redux-firebase';
 import { Link } from 'react-router-dom';
 import { DAY_NUMBERS, SCHEDULE_START_DATE_MS } from 'src/constants';
 import { useGetAuth, useGetData, useGetProfile } from 'src/hooks/getters';
@@ -66,29 +67,49 @@ export default function ScheduleCalendar(props) {
     onSelectEvent: onSelectEvent || handleEventClick,
   }
 
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(false);
+
+  const firestore = useFirestore();
   function handleOpenSchedule() {
     const currentScheduleTime = getCurrentScheduleTime();
     const startDiffInMs = selectedEvent.start.getTime() - currentScheduleTime.getTime();
     const startDiffToNowInMins = Math.floor(startDiffInMs/60000);
-
+    
     const endDiffInMs = selectedEvent.end.getTime() - currentScheduleTime.getTime();
     const endDiffToNowInMins = Math.floor(endDiffInMs/60000);
-
-    if (startDiffToNowInMins > 10) {
-      meToaster.warning("Anda belum bisa buka kelas ini karena waktu mulai masih lebih dari 10 menit")
+    
+    if (profile.currentScheduleId) {
+      meToaster.warning("Anda masih menjalankan kelas. Mohon tutup kelas sebelumnya terlebih dahulu.");
+    } else if (startDiffToNowInMins > 10) {
+      meToaster.warning("Anda belum bisa buka kelas ini karena waktu mulai masih lebih dari 10 menit");
     } else if (endDiffToNowInMins < 0) {
-      meToaster.warning("Anda tidak bisa buka kelas ini karena jadwal sudah selesai")
+      meToaster.warning("Anda tidak bisa buka kelas ini karena jadwal sudah selesai");
     } else {
       meConfirm({
         onConfirm: () => {
-          dispatch(openSchedule(selectedEvent.classId, selectedEvent.id))
-            .catch((e) => {
-              meToaster.danger(e.message);
-              console.log(e.message);
-            })
-            .finally(() => {
-              onRefresh !== undefined && onRefresh();
-            })
+          if (navigator.geolocation) {
+            setStatusLoading(true);
+            navigator.geolocation.getCurrentPosition(
+              ({ coords }) => {
+                const location = new firestore.GeoPoint(coords.latitude, coords.longitude);
+                dispatch(openSchedule(selectedEvent.classId, selectedEvent.id, location))
+                  .then(() => {
+                    setStatusLoading(false);
+                  })
+                  .catch((e) => {
+                    setStatusLoading(false);
+                    meToaster.danger(e.message);
+                    console.error(e.message);
+                  })
+                  .finally(() => {
+                    onRefresh !== undefined && onRefresh();
+                  })
+              }
+            );
+          } else {
+            alert("Browser Anda tidak men-support lokasi. Mohon buka menggunakan aplikasi Hadir")
+          }
         }
       })
     }
