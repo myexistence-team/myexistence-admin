@@ -1,4 +1,4 @@
-import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CDataTable, CForm, CModal, CModalBody, CModalFooter, CModalHeader, CNav, CNavItem, CNavLink, CRow, CTabContent, CTabPane, CTabs } from '@coreui/react';
+import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CDataTable, CNav, CNavItem, CNavLink, CRow, CTabContent, CTabPane, CTabs } from '@coreui/react';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
@@ -10,26 +10,19 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { DAY_NUMBERS, SCHEDULE_START_DATE_MS } from 'src/constants';
-import { createSchedule, deleteSchedule, openSchedule, updateSchedule } from 'src/store/actions/scheduleActions';
+import { SCHEDULE_START_DATE_MS } from 'src/constants';
+import { createSchedule, updateSchedule } from 'src/store/actions/scheduleActions';
 import { useDispatch } from 'react-redux';
 import { MdArrowLeft, MdArrowRight } from 'react-icons/md';
 import { ENROLLMENT_ACTIONS, updateClassStudent } from 'src/store/actions/classActions';
 import meToaster from 'src/components/toaster';
-import { object, string } from 'yup';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import METextField from 'src/components/METextField';
-import MENativeSelect from 'src/components/MENativeSelect';
-import meConfirm from 'src/components/meConfirm';
 import { Helmet } from 'react-helmet';
-import ScheduleQRCode from 'src/components/ScheduleQRCode';
-import { getCurrentScheduleTime } from 'src/utils/getters';
 import { ATTENDANCE_STATUS_ENUM } from 'src/enums';
 import { getAttendanceStatusColor } from 'src/utils/utilFunctions';
 import meColors from 'src/components/meColors';
 import { CChart } from '@coreui/react-chartjs';
 import MESelect from 'src/components/MESelect';
+import ScheduleModal from 'src/components/ScheduleModal';
 moment.locale('id', {
   week: {
     dow: 1
@@ -181,11 +174,10 @@ export function ClassSchedule({ classId }) {
         }
       ],
       storeAs: "schedules"
-    }
+    },
   ])
   const [schedules, schedulesLoading] = useGetOrdered("schedules");
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const schedulesForCalendar = schedules?.map((s) => ({
     ...s,
@@ -229,77 +221,6 @@ export function ClassSchedule({ classId }) {
     dispatch(createSchedule(classId, payload));
   }
 
-  const scheduleSchema = object().shape({
-    start: string().required().strict(),
-    end: string().required().strict(),
-    day: string().required().strict(),
-    tolerance: string().required().strict().default("15")
-  })
-  const { register, watch, handleSubmit, setValue, formState: { errors } } = useForm({
-    resolver: yupResolver(scheduleSchema),
-  })
-
-  useEffect(() => {
-    if (selectedEvent) {
-      setValue("day", selectedEvent.day.toString());
-      setValue("tolerance", selectedEvent.tolerance.toString());
-      setValue("start", moment(selectedEvent.start).format("HH:mm"));
-      setValue("end", moment(selectedEvent.end).format("HH:mm"));
-    }
-  }, [selectedEvent])
-
-  function onSubmitEvent(data) {
-    var startMoment = moment(selectedEvent.start);
-    const startSplit = data.start.split(":");
-
-    var endMoment = moment(selectedEvent.end);
-    const endSplit = data.end.split(":");
-
-    const payload = {
-      day: parseInt(data.day),
-      tolerance: parseInt(data.tolerance),
-      start: (startMoment).set({
-        day: parseInt(data.day),
-        h: parseInt(startSplit[0]), 
-        m: parseInt(startSplit[1])
-      }).toDate(),
-      end: (endMoment).set({
-        day: parseInt(data.day),
-        h: parseInt(endSplit[0]), 
-        m: parseInt(endSplit[1])
-      }).toDate(),
-      classId
-    }
-
-    setIsSubmitting(true);
-    dispatch(updateSchedule(classId, selectedEvent.id, payload))
-      .then(() => {
-        setSelectedEvent(null);
-      })
-      .catch((e) => {
-        meToaster.danger(e.message)
-      })
-      .finally(() => {
-        setIsSubmitting(false)
-      })
-  }
-
-  function handleCancelEventEdit() {
-    setSelectedEvent(null);
-  }
-
-  function handleDeleteEvent() {
-    meConfirm({
-      onConfirm: () => {
-        dispatch(deleteSchedule(classId, selectedEvent.id))
-          .finally(() => {
-            setSelectedEvent(null);
-          })
-      },
-      confirmButtonColor: "danger"
-    })
-  }
-
   const profile = useGetProfile();
   const auth = useGetAuth();
   const classObj = useSelector((state) => state.firestore.data[`class/${classId}`]);
@@ -333,173 +254,15 @@ export function ClassSchedule({ classId }) {
   const isOwnClassOrAdmin = classObj?.teacherIds?.includes(auth.uid) || profile.role !== "TEACHER";
   const isTeacherAndOwnClass = profile.role === "TEACHER" && classObj?.teacherIds?.includes(auth.uid);
 
-  const firestore = useFirestore();
-  const [statusLoading, setStatusLoading] = useState(false);
-
-  function handleOpenSchedule() {
-    const currentScheduleTime = getCurrentScheduleTime();
-    const startDiffInMs = selectedEvent.start.getTime() - currentScheduleTime.getTime();
-    const startDiffToNowInMins = Math.floor(startDiffInMs/60000);
-
-    const endDiffInMs = selectedEvent.end.getTime() - currentScheduleTime.getTime();
-    const endDiffToNowInMins = Math.floor(endDiffInMs/60000);
-
-    if (profile.currentScheduleId) {
-      meToaster.warning("Anda masih menjalankan kelas. Mohon tutup kelas sebelumnya terlebih dahulu.");
-    } else if (startDiffToNowInMins > 10) {
-      meToaster.warning("Anda belum bisa buka kelas ini karena waktu mulai masih lebih dari 10 menit");
-    } else if (endDiffToNowInMins < 0) {
-      meToaster.warning("Anda tidak bisa buka kelas ini karena jadwal sudah selesai");
-    } else {
-      meConfirm({
-        onConfirm: () => {
-          if (navigator.geolocation) {
-            setStatusLoading(true);
-            navigator.geolocation.getCurrentPosition(
-              ({ coords }) => {
-                const location = new firestore.GeoPoint(coords.latitude, coords.longitude);
-                dispatch(openSchedule(classId, selectedEvent.id, location))
-                  .then(() => {
-                    setStatusLoading(false);
-                  })
-                  .catch((e) => {
-                    setStatusLoading(false);
-                    meToaster.danger(e.message);
-                    console.error(e.message);
-                  })
-              },
-              (positionError) => {
-                alert(positionError.message);
-              }
-            );
-          } else {
-            alert("Browser Anda tidak men-support lokasi. Mohon buka menggunakan aplikasi Hadir")
-          }
-        }
-      })
-    }
-  }
-
-  function handleStudentCallouts() {
-    
-  }
-
   return (
     <>
-      <CModal 
-        centered 
-        show={Boolean(selectedEvent)}
-        onClose={handleCancelEventEdit}
-        size={selectedEvent?.status === "OPENED" && "lg"}
-      >
-        <CForm onSubmit={handleSubmit(onSubmitEvent)}>
-          <CModalHeader className="d-flex justify-content-between">
-            <h4>{isOwnClassOrAdmin ? "Edit Jadwal" : "Detail Jadwal"}</h4>
-            {
-              isOwnClassOrAdmin && (
-                <CButton
-                  variant="outline"
-                  color="danger"
-                  onClick={handleDeleteEvent}
-                >
-                  Hapus
-                </CButton>
-              )
-            }
-          </CModalHeader>
-          <CModalBody>
-            {
-              Boolean(selectedEvent) && (
-                <>
-                  {
-                    selectedEvent.status !== "OPENED" ? (
-                      <>
-                        <MENativeSelect
-                          { ...register("day") }
-                          options={DAY_NUMBERS}
-                          errors={errors}
-                          label="Hari"
-                          disabled={!isOwnClassOrAdmin}
-                        />
-                        <METextField
-                          { ...register("start") }
-                          errors={errors}
-                          type="time"
-                          label="Jam Mulai"
-                          disabled={!isOwnClassOrAdmin}
-                        />
-                        <METextField
-                          { ...register("end") }
-                          errors={errors}
-                          type="time"
-                          label="Jam Selesai"
-                          disabled={!isOwnClassOrAdmin}
-                        />
-                        <METextField
-                          { ...register("tolerance") }
-                          errors={errors}
-                          type="number"
-                          label="Toleransi (dalam menit)"
-                          disabled={!isOwnClassOrAdmin}
-                        />
-                        {
-                          isTeacherAndOwnClass && (
-                            <>
-                              <CButton 
-                                color="primary" 
-                                size="lg" 
-                                className="w-100"
-                                onClick={handleOpenSchedule}
-                                disabled={statusLoading}
-                              >
-                                Buka Kelas
-                              </CButton>
-                              <CButton 
-                                color="primary" 
-                                size="lg" 
-                                className="w-100 mt-3"
-                                onClick={handleStudentCallouts}
-                              >
-                                Panggil Pelajar
-                              </CButton>
-                            </>
-                          )
-                        }
-                      </>
-                    ) : (
-                      <ScheduleQRCode
-                        classId={classId}
-                        scheduleId={selectedEvent.id}
-                        schedule={selectedEvent}
-                      />
-                    )
-                  }
-                </>
-              )
-            }
-          </CModalBody>
-          {
-            Boolean(selectedEvent) && selectedEvent.status !== "OPENED" && isOwnClassOrAdmin && (
-              <CModalFooter className="d-flex justify-content-end">
-                <CButton
-                  color="primary"
-                  variant="outline"
-                  onClick={handleCancelEventEdit}
-                >
-                  Batal
-                </CButton>
-                <CButton
-                  color="primary"
-                  type="submit"
-                  className="ml-3"
-                >
-                  Simpan
-                </CButton>
-              </CModalFooter>
-            )
-          }
-        </CForm>
-      </CModal>
+      <ScheduleModal
+        selectedEvent={selectedEvent}
+        setSelectedEvent={setSelectedEvent}
+        isTeacherAndOwnClass={isTeacherAndOwnClass}
+        isOwnClassOrAdmin={isOwnClassOrAdmin}
+        classId={classId}
+      />
       {
         schedulesLoading ? (
           <MESpinner/>
