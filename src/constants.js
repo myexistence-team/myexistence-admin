@@ -17,3 +17,15 @@ export const DAYS_ARRAY = [
   "Jumat",
   "Sabtu",
 ]
+
+export const SCHEDULE_OPEN_METHODS = {
+  QR_CODE: "QR_CODE",
+  CALLOUT: "CALLOUT",
+}
+
+export const PRESENCE_STATUSES = {
+  PRESENT: "PRESENT",
+  LATE: "LATE",
+  EXCUSED: "EXCUSED",
+  ABSENT: "ABSENT",
+}
