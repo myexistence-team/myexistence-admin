@@ -30,28 +30,37 @@ function ScheduleModal({
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const dispatch = useDispatch();
-  const [statusLoading, setStatusLoading] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(null);
   const profile = useGetProfile();
   const firestore = useFirestore();
 
   const [classObj] = useGetData("classes", classId);
 
-  useFirestoreConnect([{
-    collection: "schools",
-    doc: profile.schoolId,
-    subcollections: [{
-      collection: "classes",
-      doc: classId,
+  useFirestoreConnect([
+    {
+      collection: "schools",
+      doc: profile.schoolId,
       subcollections: [{
-        collection: "schedules",
-        doc: schedule.id,
+        collection: "classes",
+        doc: classId,
         subcollections: [{
-          collection: "studentLogs"
+          collection: "schedules",
+          doc: schedule.id,
+          subcollections: [{
+            collection: "studentLogs"
+          }]
         }]
-      }]
-    }],
-    storeAs: "studentLogs"
-  }])
+      }],
+      storeAs: "studentLogs"
+    }, {
+      collection: "users",
+      where: [
+        ["role", "==", "STUDENT"],
+        ["classIds", "array-contains", classId],
+      ],
+      storeAs: "students"
+    }
+  ])
 
   const scheduleSchema = object().shape({
     start: string().required().strict(),
@@ -85,7 +94,7 @@ function ScheduleModal({
     })
   }
 
-  function handleOpenSchedule() {
+  function handleOpenSchedule(openMethod) {
     const currentScheduleTime = getCurrentScheduleTime();
     const startDiffInMs = schedule.start.getTime() - currentScheduleTime.getTime();
     const startDiffToNowInMins = Math.floor(startDiffInMs/60000);
@@ -102,45 +111,60 @@ function ScheduleModal({
     } else {
       meConfirm({
         onConfirm: () => {
-          if (navigator.geolocation) {
-            setStatusLoading(true);
-            navigator.geolocation.getCurrentPosition(
-              ({ coords }) => {
-                const location = new firestore.GeoPoint(coords.latitude, coords.longitude);
-                dispatch(openSchedule(classId, schedule.id, location))
-                  .then(() => {
-                    setStatusLoading(false);
-                  })
-                  .catch((e) => {
-                    setStatusLoading(false);
-                    meToaster.danger(e.message);
-                    console.error(e.message);
-                  })
-              },
-              (positionError) => {
-                alert(positionError.message);
-              }
-            );
-          } else {
-            alert("Browser Anda tidak men-support lokasi. Mohon buka menggunakan aplikasi Hadir");
-            setStatusLoading(true);
-          }
+          handleOpenScheduleByMethod(openMethod)
         }
       })
     }
   }
 
-  const [calloutLoading, setCalloutLoading] = useState(false);
-  function handleStudentCallouts() {
-    meConfirm({
-      onConfirm: () => {
-        setCalloutLoading(true);
-        dispatch(openSchedule(classId, schedule.id))
-          .then(() => {
-            onRefresh();
-          })
+  function handleOpenScheduleByMethod(openMethod) {
+    if (openMethod === SCHEDULE_OPEN_METHODS.GEOLOCATION) {
+      if (navigator.geolocation) {
+        setStatusLoading(openMethod);
+        navigator.geolocation.getCurrentPosition(
+          ({ coords }) => {
+            const location = new firestore.GeoPoint(coords.latitude, coords.longitude);
+            dispatch(openSchedule({ 
+              classId, 
+              scheduleId: schedule.id, 
+              location,
+              openMethod
+            }))
+              .then(() => {
+                setStatusLoading(null);
+                onRefresh();
+              })
+              .catch((e) => {
+                setStatusLoading(null);
+                meToaster.danger(e.message);
+                console.error(e.message);
+              })
+          },
+          (positionError) => {
+            alert(positionError.message);
+          }
+        );
+      } else {
+        alert("Browser Anda tidak men-support lokasi. Mohon buka menggunakan aplikasi Hadir untuk membuka sesi kelas dengan geolocation");
+        setStatusLoading(null);
       }
-    })
+    } else {
+      dispatch(openSchedule({
+        classId, 
+        scheduleId: schedule.id, 
+        location: null,
+        openMethod,
+      }))
+      .then(() => {
+        setStatusLoading(null);
+        onRefresh();
+      })
+      .catch((e) => {
+        setStatusLoading(null);
+        meToaster.danger(e.message);
+        console.error(e.message);
+      })
+    }
   }
 
   const [isClosing, setIsClosing] = useState(false);
@@ -202,7 +226,7 @@ function ScheduleModal({
       centered 
       show={Boolean(schedule)}
       onClose={() => setSelectedEvent(null)}
-      size={schedule?.status === "OPENED" && "lg"}
+      size={schedule?.status === "OPENED" && schedule?.openMethod !== SCHEDULE_OPEN_METHODS.GEOLOCATION && "lg"}
     >
       <CForm onSubmit={handleSubmit(onSubmitEvent)}>
         <CModalHeader className="d-flex justify-content-between">
@@ -276,20 +300,35 @@ function ScheduleModal({
                       {
                         isTeacherAndOwnClass && !profile?.currentScheduleId && (
                           <>
+                            <div className="text-center mb-3">Buka sesi kelas menggunakan</div>
+                            {
+                              navigator.geolocation && (
+                                <CButton 
+                                  color="primary" 
+                                  size="lg" 
+                                  className="w-100 mb-3"
+                                  onClick={() => handleOpenSchedule(SCHEDULE_OPEN_METHODS.GEOLOCATION)}
+                                  disabled={statusLoading === SCHEDULE_OPEN_METHODS.GEOLOCATION}
+                                >
+                                  Deteksi Lokasi
+                                </CButton>
+                              )
+                            }
                             <CButton 
                               color="primary" 
                               size="lg" 
-                              className="w-100"
-                              onClick={handleOpenSchedule}
-                              disabled={statusLoading}
+                              className="w-100 mb-3"
+                              onClick={() => handleOpenSchedule(SCHEDULE_OPEN_METHODS.QR_CODE)}
+                              disabled={statusLoading === SCHEDULE_OPEN_METHODS.QR_CODE}
                             >
-                              Buka Kelas
+                              QR Code
                             </CButton>
                             <CButton 
                               color="primary" 
                               size="lg" 
-                              className="w-100 mt-3"
-                              onClick={handleStudentCallouts}
+                              className="w-100"
+                              onClick={() => handleOpenSchedule(SCHEDULE_OPEN_METHODS.CALLOUT)}
+                              disabled={statusLoading === SCHEDULE_OPEN_METHODS.CALLOUT}
                             >
                               Panggil Pelajar
                             </CButton>

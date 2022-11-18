@@ -19,7 +19,7 @@ export default function ScheduleStudentLogs({
       {
         students?.length === 0 ? (
           <>Kelas ini tidak memiliki pelajar.</>
-        ) : students.map((student, sIdx) => {
+        ) : students?.map((student, sIdx) => {
           const studentLog = studentLogs?.find((sl) => sl.studentId === student.id);
           return (
             <CCard

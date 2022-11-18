@@ -1,19 +1,10 @@
-import { CButton, CCol, CLabel, CModal, CModalBody, CModalHeader, CRow } from '@coreui/react';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react'
 import { Calendar, momentLocalizer } from 'react-big-calendar';
-import { useDispatch } from 'react-redux';
-import { useFirestore } from 'react-redux-firebase';
-import { Link } from 'react-router-dom';
-import { DAY_NUMBERS, SCHEDULE_START_DATE_MS } from 'src/constants';
+import { SCHEDULE_START_DATE_MS } from 'src/constants';
 import { useGetAuth, useGetData, useGetProfile } from 'src/hooks/getters';
-import { openSchedule } from 'src/store/actions/scheduleActions';
-import { getCurrentScheduleTime } from 'src/utils/getters';
-import meConfirm from './meConfirm';
 import MESpinner from './MESpinner';
 import ScheduleModal from './ScheduleModal';
-import ScheduleQRCode from './ScheduleQRCode';
-import meToaster from './toaster';
 moment.locale('id', {
   week: {
     dow: 1
@@ -35,16 +26,11 @@ export default function ScheduleCalendar(props) {
     onRefresh && onRefresh();
   }
 
-  const dispatch = useDispatch();
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [classes] = useGetData("classes");
 
   function handleEventClick(event) {
     setSelectedEvent(event);
-  }
-
-  function handleCancelEventEdit() {
-    setSelectedEvent(null);
   }
 
   useEffect(() => {

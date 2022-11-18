@@ -161,8 +161,8 @@ export function closeSchedule(classId, scheduleId) {
   }
 }
 
-export function openSchedule(classId, scheduleId, location = null) {
-  return async (dispatch, getState, { getFirestore, getFirebase }) => {
+export function openSchedule({ classId, scheduleId, location = null, openMethod }) {
+  return async (dispatch, getState, { getFirestore }) => {
     const firestore = getFirestore();
     const auth = getState().firebase.auth;
     const profile = getState().firebase.profile;
@@ -203,7 +203,7 @@ export function openSchedule(classId, scheduleId, location = null) {
       status: "OPENED",
       openedBy: auth.uid,
       openedAt: new Date(),
-      openMethod: location ? SCHEDULE_OPEN_METHODS.QR_CODE : SCHEDULE_OPEN_METHODS.CALLOUT,
+      openMethod: openMethod,
       location
     })
   }
