@@ -18,7 +18,6 @@ export default function ScheduleQRCode({
   schedule,
   onRefresh
 }) {
-  const [isClosing, setIsClosing] = useState(false);
   const dispatch = useDispatch();
 
   function handleCheckScheduleIsOpen() {
@@ -26,11 +25,7 @@ export default function ScheduleQRCode({
     const endDiffInMs = schedule.end.getTime() - currentScheduleTime.getTime();
     const endDiffToNowInMins = Math.floor(endDiffInMs/60000);
     if (endDiffToNowInMins < 0) {
-      setIsClosing(true)
       dispatch(closeSchedule(classId, scheduleId, schedule))
-        .finally(() => {
-          setIsClosing(false)
-        })
     }
   }
 

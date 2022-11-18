@@ -1,5 +1,3 @@
-import { SCHEDULE_OPEN_METHODS } from "src/constants";
-
 export function createSchedule(classId, schedule) {
   return async (dispatch, getState, { getFirestore, getFirebase }) => {
     const firestore = getFirestore();
@@ -206,5 +204,26 @@ export function openSchedule({ classId, scheduleId, location = null, openMethod 
       openMethod: openMethod,
       location
     })
+  }
+}
+
+export function changeExcuseStatus({ classId, scheduleId, studentLogId, excuseStatus }) {
+  return async (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore();
+    const profile = getState().firebase.profile;
+
+    const studentLogRef = firestore
+      .collection("schools")
+      .doc(profile.schoolId)
+      .collection("classes")
+      .doc(classId)
+      .collection("schedules")
+      .doc(scheduleId)
+      .collection("studentLogs")
+      .doc(studentLogId);
+
+    await studentLogRef.update({
+      excuseStatus
+    });
   }
 }

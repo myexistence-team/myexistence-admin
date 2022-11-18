@@ -18,6 +18,7 @@ import { getCurrentScheduleTime } from 'src/utils/getters';
 import { useGetData, useGetProfile } from 'src/hooks/getters';
 import ScheduleStudentLogs from './ScheduleStudentLogs';
 import { Link } from 'react-router-dom';
+import { SCHEDULE_OPEN_METHODS_ENUM } from 'src/enums';
 
 function ScheduleModal({
   schedule,
@@ -230,7 +231,13 @@ function ScheduleModal({
     >
       <CForm onSubmit={handleSubmit(onSubmitEvent)}>
         <CModalHeader className="d-flex justify-content-between">
-          <h4>{isOwnClassOrAdmin ? "Edit Jadwal" : "Detail Jadwal"}</h4>
+          {
+            schedule.status === "CLOSED" ? (
+              <h4>{isOwnClassOrAdmin ? "Edit Jadwal" : "Detail Jadwal"}</h4>
+            ) : (
+              <h4>Sesi Jadwal ({SCHEDULE_OPEN_METHODS_ENUM[schedule.openMethod]})</h4>
+            )
+          }
           {
             schedule?.status === "OPENED" ? (
               <CButton

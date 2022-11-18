@@ -30,3 +30,8 @@ export const PRESENCE_STATUSES = {
   EXCUSED: "EXCUSED",
   ABSENT: "ABSENT",
 }
+
+export const EXCUSE_STATUSES = {
+  ACCEPTED: "ACCEPTED",
+  REJECTED: "REJECTED",
+}

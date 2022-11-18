@@ -19,3 +19,14 @@ export const ATTENDANCE_STATUS_ENUM = {
   EXCUSED: "Izin",
   ABSENT: "Absen"
 }
+
+export const EXCUSE_TYPE_ENUM = {
+  SICK: "Sakit",
+  OTHER: "Lainnya",
+}
+
+export const SCHEDULE_OPEN_METHODS_ENUM = {
+  QR_CODE: "QR Code",
+  CALLOUT: "Panggil Pelajar",
+  GEOLOCATION: "Deteksi Lokasi",
+}
