@@ -256,13 +256,17 @@ export function ClassSchedule({ classId }) {
 
   return (
     <>
-      <ScheduleModal
-        selectedEvent={selectedEvent}
-        setSelectedEvent={setSelectedEvent}
-        isTeacherAndOwnClass={isTeacherAndOwnClass}
-        isOwnClassOrAdmin={isOwnClassOrAdmin}
-        classId={classId}
-      />
+      {
+        selectedEvent && (
+          <ScheduleModal
+            schedule={selectedEvent}
+            setSelectedEvent={setSelectedEvent}
+            isTeacherAndOwnClass={isTeacherAndOwnClass}
+            isOwnClassOrAdmin={isOwnClassOrAdmin}
+            classId={classId}
+          />
+        )
+      }
       {
         schedulesLoading ? (
           <MESpinner/>

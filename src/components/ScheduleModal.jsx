@@ -1,34 +1,57 @@
 import React, { useEffect, useState } from 'react'
-import { CButton, CForm, CModal, CModalBody, CModalFooter, CModalHeader } from '@coreui/react';
+import { CButton, CForm, CLabel, CModal, CModalBody, CModalFooter, CModalHeader } from '@coreui/react';
 import MENativeSelect from './MENativeSelect';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { object, string } from 'yup';
 import { useForm } from 'react-hook-form';
 import meConfirm from './meConfirm';
 import { useDispatch } from 'react-redux';
-import { deleteSchedule, openSchedule, updateSchedule } from 'src/store/actions/scheduleActions';
+import { closeSchedule, deleteSchedule, openSchedule, updateSchedule } from 'src/store/actions/scheduleActions';
 import moment from 'moment';
 import meToaster from './toaster';
 import { DAY_NUMBERS, SCHEDULE_OPEN_METHODS } from 'src/constants';
 import METextField from './METextField';
-import { useFirestore } from 'react-redux-firebase';
+import { useFirestore, useFirestoreConnect } from 'react-redux-firebase';
 import ScheduleQRCode from './ScheduleQRCode';
 import ScheduleCallout from './ScheduleCallout';
 import { getCurrentScheduleTime } from 'src/utils/getters';
-import { useGetProfile } from 'src/hooks/getters';
+import { useGetData, useGetProfile } from 'src/hooks/getters';
+import ScheduleStudentLogs from './ScheduleStudentLogs';
+import { Link } from 'react-router-dom';
 
 function ScheduleModal({
-  selectedEvent,
+  schedule,
   setSelectedEvent,
   isTeacherAndOwnClass,
   isOwnClassOrAdmin,
   classId,
+  onRefresh,
+  showClassName = false,
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const dispatch = useDispatch();
   const [statusLoading, setStatusLoading] = useState(false);
   const profile = useGetProfile();
   const firestore = useFirestore();
+
+  const [classObj] = useGetData("classes", classId);
+
+  useFirestoreConnect([{
+    collection: "schools",
+    doc: profile.schoolId,
+    subcollections: [{
+      collection: "classes",
+      doc: classId,
+      subcollections: [{
+        collection: "schedules",
+        doc: schedule.id,
+        subcollections: [{
+          collection: "studentLogs"
+        }]
+      }]
+    }],
+    storeAs: "studentLogs"
+  }])
 
   const scheduleSchema = object().shape({
     start: string().required().strict(),
@@ -41,19 +64,20 @@ function ScheduleModal({
   })
 
   useEffect(() => {
-    if (selectedEvent) {
-      setValue("day", selectedEvent.day.toString());
-      setValue("tolerance", selectedEvent.tolerance.toString());
-      setValue("start", moment(selectedEvent.start).format("HH:mm"));
-      setValue("end", moment(selectedEvent.end).format("HH:mm"));
+    if (schedule) {
+      setValue("day", schedule.day.toString());
+      setValue("tolerance", schedule.tolerance.toString());
+      setValue("start", moment(schedule.start).format("HH:mm"));
+      setValue("end", moment(schedule.end).format("HH:mm"));
     }
-  }, [selectedEvent])
+  }, [schedule])
 
   function handleDeleteEvent() {
     meConfirm({
       onConfirm: () => {
-        dispatch(deleteSchedule(classId, selectedEvent.id))
+        dispatch(deleteSchedule(classId, schedule.id))
           .finally(() => {
+            onRefresh();
             setSelectedEvent(null);
           })
       },
@@ -63,10 +87,10 @@ function ScheduleModal({
 
   function handleOpenSchedule() {
     const currentScheduleTime = getCurrentScheduleTime();
-    const startDiffInMs = selectedEvent.start.getTime() - currentScheduleTime.getTime();
+    const startDiffInMs = schedule.start.getTime() - currentScheduleTime.getTime();
     const startDiffToNowInMins = Math.floor(startDiffInMs/60000);
 
-    const endDiffInMs = selectedEvent.end.getTime() - currentScheduleTime.getTime();
+    const endDiffInMs = schedule.end.getTime() - currentScheduleTime.getTime();
     const endDiffToNowInMins = Math.floor(endDiffInMs/60000);
 
     if (profile.currentScheduleId) {
@@ -83,7 +107,7 @@ function ScheduleModal({
             navigator.geolocation.getCurrentPosition(
               ({ coords }) => {
                 const location = new firestore.GeoPoint(coords.latitude, coords.longitude);
-                dispatch(openSchedule(classId, selectedEvent.id, location))
+                dispatch(openSchedule(classId, schedule.id, location))
                   .then(() => {
                     setStatusLoading(false);
                   })
@@ -111,19 +135,36 @@ function ScheduleModal({
     meConfirm({
       onConfirm: () => {
         setCalloutLoading(true);
-        dispatch(openSchedule(classId, selectedEvent.id))
+        dispatch(openSchedule(classId, schedule.id))
           .then(() => {
-            
+            onRefresh();
           })
       }
     })
   }
 
+  const [isClosing, setIsClosing] = useState(false);
+  function handleCloseSchedule() {
+    if (schedule && schedule.status === "OPENED") {
+      meConfirm({
+        confirmButtonColor: "danger",
+        onConfirm: () => {
+          setIsClosing(true)
+          dispatch(closeSchedule(classId, schedule.id, schedule))
+            .finally(() => {
+              onRefresh();
+              setIsClosing(false);
+            })
+        }
+      })
+    }
+  }
+
   function onSubmitEvent(data) {
-    var startMoment = moment(selectedEvent.start);
+    var startMoment = moment(schedule.start);
     const startSplit = data.start.split(":");
 
-    var endMoment = moment(selectedEvent.end);
+    var endMoment = moment(schedule.end);
     const endSplit = data.end.split(":");
 
     const payload = {
@@ -143,9 +184,10 @@ function ScheduleModal({
     }
 
     setIsSubmitting(true);
-    dispatch(updateSchedule(classId, selectedEvent.id, payload))
+    dispatch(updateSchedule(classId, schedule.id, payload))
       .then(() => {
         setSelectedEvent(null);
+        onRefresh();
       })
       .catch((e) => {
         meToaster.danger(e.message)
@@ -158,15 +200,24 @@ function ScheduleModal({
   return (
     <CModal
       centered 
-      show={Boolean(selectedEvent)}
+      show={Boolean(schedule)}
       onClose={() => setSelectedEvent(null)}
-      size={selectedEvent?.status === "OPENED" && "lg"}
+      size={schedule?.status === "OPENED" && "lg"}
     >
       <CForm onSubmit={handleSubmit(onSubmitEvent)}>
         <CModalHeader className="d-flex justify-content-between">
           <h4>{isOwnClassOrAdmin ? "Edit Jadwal" : "Detail Jadwal"}</h4>
           {
-            isOwnClassOrAdmin && (
+            schedule?.status === "OPENED" ? (
+              <CButton
+                variant="outline"
+                color="danger"
+                onClick={handleCloseSchedule}
+                disabled={isClosing}
+              >
+                Tutup Sesi
+              </CButton>
+            ) : isOwnClassOrAdmin ? (
               <CButton
                 variant="outline"
                 color="danger"
@@ -174,16 +225,26 @@ function ScheduleModal({
               >
                 Hapus
               </CButton>
-            )
+            ) : null
           }
         </CModalHeader>
         <CModalBody>
           {
-            Boolean(selectedEvent) && (
+            Boolean(schedule) && (
               <>
                 {
-                  selectedEvent.status !== "OPENED" ? (
+                  schedule.status !== "OPENED" ? (
                     <>
+                      {
+                        showClassName && (
+                          <>
+                            <CLabel>Kelas</CLabel>
+                            <Link to={`/classes/${classId}`}>
+                              <h5>{classObj?.name}</h5>
+                            </Link>
+                          </>
+                        )
+                      }
                       <MENativeSelect
                         { ...register("day") }
                         options={DAY_NUMBERS}
@@ -213,7 +274,7 @@ function ScheduleModal({
                         disabled={!isOwnClassOrAdmin}
                       />
                       {
-                        isTeacherAndOwnClass && (
+                        isTeacherAndOwnClass && !profile?.currentScheduleId && (
                           <>
                             <CButton 
                               color="primary" 
@@ -236,17 +297,22 @@ function ScheduleModal({
                         )
                       }
                     </>
-                  ) : selectedEvent.openMethod === SCHEDULE_OPEN_METHODS.QR_CODE ? (
+                  ) : schedule.openMethod === SCHEDULE_OPEN_METHODS.QR_CODE ? (
                     <ScheduleQRCode
                       classId={classId}
-                      scheduleId={selectedEvent.id}
-                      schedule={selectedEvent}
+                      scheduleId={schedule.id}
+                      schedule={schedule}
                     />
-                  ) : (
+                  ) : schedule.openMethod === SCHEDULE_OPEN_METHODS.CALLOUT ? (
                     <ScheduleCallout
                       classId={classId}
-                      scheduleId={selectedEvent.id}
-                      schedule={selectedEvent}
+                      scheduleId={schedule.id}
+                      schedule={schedule}
+                    />
+                  ) : (
+                    <ScheduleStudentLogs
+                      classId={classId}
+                      scheduleId={schedule.id}
                     />
                   )
                 }
@@ -255,7 +321,7 @@ function ScheduleModal({
           }
         </CModalBody>
         {
-          Boolean(selectedEvent) && selectedEvent.status !== "OPENED" && isOwnClassOrAdmin && (
+          Boolean(schedule) && schedule.status !== "OPENED" && isOwnClassOrAdmin && (
             <CModalFooter className="d-flex justify-content-end">
               <CButton
                 color="primary"
@@ -268,6 +334,7 @@ function ScheduleModal({
                 color="primary"
                 type="submit"
                 className="ml-3"
+                disabled={isSubmitting}
               >
                 Simpan
               </CButton>

@@ -11,6 +11,7 @@ import { openSchedule } from 'src/store/actions/scheduleActions';
 import { getCurrentScheduleTime } from 'src/utils/getters';
 import meConfirm from './meConfirm';
 import MESpinner from './MESpinner';
+import ScheduleModal from './ScheduleModal';
 import ScheduleQRCode from './ScheduleQRCode';
 import meToaster from './toaster';
 moment.locale('id', {
@@ -29,6 +30,10 @@ export default function ScheduleCalendar(props) {
     className,
     onRefresh
   } = props;
+
+  function handleRefresh() {
+    onRefresh && onRefresh();
+  }
 
   const dispatch = useDispatch();
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -67,126 +72,25 @@ export default function ScheduleCalendar(props) {
     onSelectEvent: onSelectEvent || handleEventClick,
   }
 
-  const [locationLoading, setLocationLoading] = useState(false);
-  const [statusLoading, setStatusLoading] = useState(false);
-
-  const firestore = useFirestore();
-  function handleOpenSchedule() {
-    const currentScheduleTime = getCurrentScheduleTime();
-    const startDiffInMs = selectedEvent.start.getTime() - currentScheduleTime.getTime();
-    const startDiffToNowInMins = Math.floor(startDiffInMs/60000);
-    
-    const endDiffInMs = selectedEvent.end.getTime() - currentScheduleTime.getTime();
-    const endDiffToNowInMins = Math.floor(endDiffInMs/60000);
-    
-    if (profile.currentScheduleId) {
-      meToaster.warning("Anda masih menjalankan kelas. Mohon tutup kelas sebelumnya terlebih dahulu.");
-    } else if (startDiffToNowInMins > 10) {
-      meToaster.warning("Anda belum bisa buka kelas ini karena waktu mulai masih lebih dari 10 menit");
-    } else if (endDiffToNowInMins < 0) {
-      meToaster.warning("Anda tidak bisa buka kelas ini karena jadwal sudah selesai");
-    } else {
-      meConfirm({
-        onConfirm: () => {
-          if (navigator.geolocation) {
-            setStatusLoading(true);
-            navigator.geolocation.getCurrentPosition(
-              ({ coords }) => {
-                const location = new firestore.GeoPoint(coords.latitude, coords.longitude);
-                dispatch(openSchedule(selectedEvent.classId, selectedEvent.id, location))
-                  .then(() => {
-                    setStatusLoading(false);
-                  })
-                  .catch((e) => {
-                    setStatusLoading(false);
-                    meToaster.danger(e.message);
-                    console.error(e.message);
-                  })
-                  .finally(() => {
-                    onRefresh !== undefined && onRefresh();
-                  })
-              }
-            );
-          } else {
-            alert("Browser Anda tidak men-support lokasi. Mohon buka menggunakan aplikasi Hadir")
-          }
-        }
-      })
-    }
-  }
-
   const profile = useGetProfile();
   const auth = useGetAuth();
   const isTeacherAndOwnClass = selectedEvent && profile.role === "TEACHER" && classes?.[selectedEvent.classId]?.teacherIds?.includes(auth.uid);
 
   return (
     <div className={className}>
-      <CModal
-        centered 
-        show={Boolean(selectedEvent)}
-        onClose={handleCancelEventEdit}
-      >
-        <CModalHeader className="d-flex justify-content-between">
-          <h4>Detail Jadwal</h4>
-        </CModalHeader>
-        <CModalBody>
-          {
-            Boolean(selectedEvent) && (
-              <>
-                {
-                  selectedEvent.status !== "OPENED" ? (
-                    <CRow>
-                      <CCol xs={12}>
-                        <CLabel>Kelas</CLabel>
-                        <Link to={`/classes/${selectedEvent.classId}`}>
-                          <h5>{classes?.[selectedEvent.classId]?.name}</h5>
-                        </Link>
-                      </CCol>
-                      <CCol xs={12}>
-                        <CLabel>Hari</CLabel>
-                        <h5>{DAY_NUMBERS[selectedEvent.day]}</h5>
-                      </CCol>
-                      <CCol xs={6}>
-                        <CLabel>Jam Mulai</CLabel>
-                        <h5>{moment(selectedEvent.start).format("HH:mm")}</h5>
-                      </CCol>
-                      <CCol xs={6}>
-                        <CLabel>Jam Selesai</CLabel>
-                        <h5>{moment(selectedEvent.end).format("HH:mm")}</h5>
-                      </CCol>
-                      <CCol xs={12}>
-                        <CLabel>Toleransi</CLabel>
-                        <h5>{selectedEvent.tolerance} menit</h5>
-                      </CCol>
-                      {
-                        isTeacherAndOwnClass && (
-                          <CCol xs={12}>
-                            <CButton
-                              color="primary" 
-                              size="lg" 
-                              className="w-100"
-                              onClick={handleOpenSchedule}
-                            >
-                              Buka Kelas
-                            </CButton>
-                          </CCol>
-                        )
-                      }
-                    </CRow>
-                  ) : (
-                    <ScheduleQRCode
-                      classId={selectedEvent.classId}
-                      scheduleId={selectedEvent.id}
-                      schedule={selectedEvent}
-                      onRefresh={onRefresh}
-                    />
-                  )
-                }
-              </>
-            )
-          }
-        </CModalBody>
-      </CModal>
+      {
+        selectedEvent && (
+          <ScheduleModal
+            schedule={selectedEvent}
+            setSelectedEvent={setSelectedEvent}
+            isTeacherAndOwnClass={isTeacherAndOwnClass}
+            isOwnClassOrAdmin={true}
+            showClassName={true}
+            classId={selectedEvent?.classId}
+            onRefresh={handleRefresh}
+          />
+        )
+      }
       {
         loading ? (
           <MESpinner/>

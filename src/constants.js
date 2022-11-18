@@ -21,6 +21,7 @@ export const DAYS_ARRAY = [
 export const SCHEDULE_OPEN_METHODS = {
   QR_CODE: "QR_CODE",
   CALLOUT: "CALLOUT",
+  GEOLOCATION: "GEOLOCATION",
 }
 
 export const PRESENCE_STATUSES = {
