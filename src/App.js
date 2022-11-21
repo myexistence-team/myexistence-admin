@@ -4,6 +4,7 @@ import KKSpinner from "./components/MESpinner";
 import "./scss/style.scss";
 import "react-markdown-editor-lite/lib/index.css";
 import RegisterAccount from "./views/pages/register/RegisterAccount";
+import NotVerified from "./views/pages/NotVerified";
 
 const loading = (
   <div
@@ -65,6 +66,12 @@ class App extends Component {
               path="/register-account"
               name="Register Account"
               render={props => <RegisterAccount {...props} />}
+            />
+            <Route
+              exact
+              path="/not-verified"
+              name="Belum Terverifikasi"
+              render={props => <NotVerified {...props} />}
             />
             <Route
               exact
