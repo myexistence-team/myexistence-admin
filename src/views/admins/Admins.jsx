@@ -3,12 +3,15 @@ import React from 'react'
 import { Helmet } from 'react-helmet';
 import { useForm } from 'react-hook-form'
 import { MdCheck } from 'react-icons/md';
+import { useDispatch } from 'react-redux';
 import { isLoaded } from 'react-redux-firebase';
 import { Link } from 'react-router-dom';
+import meConfirm from 'src/components/meConfirm';
 import { ROLE_TYPES } from 'src/enums';
 import { useGetAuth, useGetProfile, useGetSchoolId } from 'src/hooks/getters';
 import { useFirestorePagination } from 'src/hooks/useFirestorePagination';
 import useQueryString from 'src/hooks/useQueryString'
+import { deleteAdmin } from 'src/store/actions/adminActions';
 import { number } from 'yup';
 import { object } from 'yup';
 
@@ -32,6 +35,16 @@ export default function Admins() {
 
   const auth = useGetAuth();
   const profile = useGetProfile();
+  const dispatch = useDispatch();
+
+  function handleDelete(adminId) {
+    meConfirm({
+      confirmButtonColor: "danger",
+      onConfirm: () => {
+        dispatch(deleteAdmin(adminId));
+      }
+    })
+  }
 
   return (
     <CCard>
@@ -56,7 +69,7 @@ export default function Admins() {
             { key: "displayName", label: "Nama Lengkap" },
             "email",
             { key: "role", label: "Peran" },
-            { key: "hasRegistered", label: "Terdaftar" },
+            { key: "isVerified", label: "Terverifikasi" },
             { key: "actions", label: "" },
           ]}
           scopedSlots={{
@@ -78,11 +91,23 @@ export default function Admins() {
                     </CButton>
                   </Link>
                 }
+                {
+                  profile.role === "SUPER_ADMIN" && (
+                    <CButton
+                      color="danger"
+                      variant="outline"
+                      className="ml-3"
+                      onClick={() => handleDelete(t.id)}
+                    >
+                      Delete
+                    </CButton>
+                  )
+                }
               </td>
             ),
-            hasRegistered: (t) => (
+            isVerified: (t) => (
               <td>
-                {t.hasRegistered && <MdCheck/>}
+                {t.isVerified && <MdCheck/>}
               </td>
             ),
           }}

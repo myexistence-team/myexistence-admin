@@ -22,7 +22,7 @@ export default function AttendancePieChart() {
     setNow(moment(new Date()).add({days: -(parseInt(watch("timespan")))}).toDate())
   }, [watch("timespan")])
 
-  useFirestoreConnect({
+  useFirestoreConnect( ...schoolId ? [{
     collection: "schools",
     doc: schoolId,
     subcollections: [{
@@ -30,7 +30,7 @@ export default function AttendancePieChart() {
       where: [["time", ">", now]],
     }],
     storeAs: "logs"
-  })
+  }] : [])
 
   const [logs, logsLoading] = useGetOrdered("logs");
 

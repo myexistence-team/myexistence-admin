@@ -1,4 +1,5 @@
 import { CButton, CCard, CCardBody, CContainer, CForm } from '@coreui/react'
+import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useState } from 'react'
 import { Helmet } from 'react-helmet';
 import { useForm } from 'react-hook-form'
@@ -7,19 +8,32 @@ import { useHistory } from 'react-router-dom';
 import meColors from 'src/components/meColors';
 import meConfirm from 'src/components/meConfirm';
 import MEFirestoreSelect from 'src/components/MEFirestoreSelect';
+import MENativeSelect from 'src/components/MENativeSelect';
 import meToaster from 'src/components/toaster';
-import { signUpForAccount } from 'src/store/actions/authActions';
+import { signOut, signUpForAccount } from 'src/store/actions/authActions';
 import { checkSchoolExistanceThunk } from 'src/utils/checksFunctions';
+import { object, string } from 'yup';
 
 export default function RegisterAccount() {
-  const { control, handleSubmit } = useForm();
+  const { register, control, handleSubmit } = useForm({
+    resolver: yupResolver(object().shape({
+      role: string().required(),
+      schoolId: string().required(),
+    }))
+  });
   const firebase = useSelector(state => state.firebase);
   const profile = firebase.profile;
   const history = useHistory();
   const dispatch = useDispatch();
 
-  if (profile?.isLoaded && profile.schoolId) {
+  if (profile?.isLoaded && profile.schoolId && profile.role) {
     history.replace("/")
+  }
+
+  async function handleSignOut() {
+    await dispatch(signOut());
+    await localStorage.clear();
+    history.replace("/");
   }
 
   const [confirmedSchoolId, setConfirmedSchoolId] = useState(null);
@@ -59,12 +73,20 @@ export default function RegisterAccount() {
         <CCard>
           <CCardBody>
             <CForm onSubmit={handleSubmit(onSchoolSubmit)}>
-              <h4>Seperti nya Anda belum terdaftar. Mohon tanyakan Administrator menganai kode sekolah</h4>
+              <h4>Seperti nya Anda belum terdaftar. Mohon pilih sekolah yang Anda ikuti.</h4>
+              <MENativeSelect
+                { ...register("role") }
+                options={[
+                  { value: "TEACHER", label: "Pengajar" },
+                  { value: "ADMIN", label: "Administrator" },
+                ]}
+                required
+              />
               <MEFirestoreSelect
                 control={control}
                 name="schoolId"
+                label={"Sekolah"}
                 listName="schools"
-                label={false}
                 labelKey="name"
                 placeholder="Cari Sekolah"
               />
@@ -74,6 +96,14 @@ export default function RegisterAccount() {
                 className="w-100"
               >
                 Berikutnya
+              </CButton>
+              <CButton
+                variant='outline'
+                color="danger"
+                className="w-100 mt-3"
+                onClick={handleSignOut}
+              >
+                Keluar
               </CButton>
             </CForm>
           </CCardBody>

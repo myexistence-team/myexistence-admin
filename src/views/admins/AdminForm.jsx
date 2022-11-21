@@ -1,4 +1,4 @@
-import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CForm } from '@coreui/react'
+import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CForm, CInputCheckbox, CLabel } from '@coreui/react'
 import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form';
@@ -8,7 +8,7 @@ import meConfirm from 'src/components/meConfirm';
 import meToaster from 'src/components/toaster';
 import METextField from 'src/components/METextField';
 import { createAdmin, updateAdmin } from 'src/store/actions/adminActions';
-import { object, string } from 'yup';
+import { boolean, object, string } from 'yup';
 import { useGetAuth, useGetData, useGetProfile } from 'src/hooks/getters';
 import { isLoaded } from 'react-redux-firebase';
 import MESpinner from 'src/components/MESpinner';
@@ -27,8 +27,9 @@ export default function AdminForm() {
   const adminSchema = object().shape({
     displayName: string().required(),
     email: string().required(),
+    isVerified: boolean()
   })
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm({
     resolver: yupResolver(adminSchema)
   })
 
@@ -91,6 +92,19 @@ export default function AdminForm() {
                 defaultValue={admin?.email}
                 errors={errors}
               />
+              {
+                editMode && (
+                  <div className="form-check">
+                    <CInputCheckbox
+                      id="isVerified"
+                      checked={watch("isVerified")}
+                      onClick={() => setValue("isVerified", !watch("isVerified"))}
+                      defaultChecked={admin?.isVerified}
+                    />
+                    <CLabel htmlFor="isVerified">Terverifikasi</CLabel>
+                  </div>
+                )
+              }
             </CCardBody>
             <CCardFooter className="d-flex justify-content-end">
               <Link to="/admins">

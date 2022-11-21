@@ -1,4 +1,4 @@
-import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CLabel, CRow } from '@coreui/react'
+import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CInputCheckbox, CLabel, CRow } from '@coreui/react'
 import { yupResolver } from '@hookform/resolvers/yup'
 import React, { useState } from 'react'
 import { useEffect } from 'react'
@@ -15,7 +15,7 @@ import METextField from 'src/components/METextField'
 import meToaster from 'src/components/toaster'
 import { useGetAuth, useGetData, useGetProfile } from 'src/hooks/getters'
 import { createTeacher, updateTeacher } from 'src/store/actions/teacherActions'
-import { string } from 'yup'
+import { boolean, string } from 'yup'
 import { object } from 'yup'
 
 export default function TeacherForm() {
@@ -31,9 +31,10 @@ export default function TeacherForm() {
     displayName: string().required().strict(),
     description: string(),
     idNumber: string().required().strict(),
-    email: string().required().strict()
+    email: string().required().strict(),
+    isVerified: boolean()
   })
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm({
     resolver: yupResolver(teacherSchema)
   })
 
@@ -54,7 +55,7 @@ export default function TeacherForm() {
     meConfirm({
       onConfirm: () => {
         setIsSubmitting(true);
-        const payload = { ...data, profileImage, photoUrl: profileImageUrl };
+        const payload = { ...data, profileImage, ...profileImageUrl ? { photoUrl: profileImageUrl } : {} };
         dispatch(editMode ? updateTeacher(teacherId, payload) : createTeacher(payload))
           .then(() => {
             history.push("/teachers")
@@ -170,6 +171,19 @@ export default function TeacherForm() {
                 errors={errors}
                 defaultValue={teacher?.idNumber}
               />
+              {
+                editMode && (
+                  <div className="form-check">
+                    <CInputCheckbox
+                      id="isVerified"
+                      checked={watch("isVerified")}
+                      onClick={() => setValue("isVerified", !watch("isVerified"))}
+                      defaultChecked={teacher?.isVerified}
+                    />
+                    <CLabel htmlFor="isVerified">Terverifikasi</CLabel>
+                  </div>
+                )
+              }
             </CCardBody>
             <CCardFooter className="d-flex justify-content-end">
               <Link

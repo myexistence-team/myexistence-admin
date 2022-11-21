@@ -40,6 +40,7 @@ export function createAdminAndTeacher(admin, school) {
         createdAt: new Date(),
         updatedAt: new Date(),
         schoolId: newSchoolId,
+        isVerified: true,
         school: schoolsRef.doc(newSchoolId),
       });
     

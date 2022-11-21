@@ -1,11 +1,9 @@
 import classNames from "classnames";
-import React, { useEffect } from "react";
+import React from "react";
 import { Helmet } from "react-helmet";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import fromApi from "src/actions/fromApi";
 import MESpinner from "src/components/MESpinner";
-import usePrevious from "src/hooks/usePrevious";
 import { TheContent, TheFooter, TheHeader, TheSidebar } from "./index";
 
 const TheLayout = () => {
@@ -15,8 +13,11 @@ const TheLayout = () => {
   const profile = firebase.profile;
   const auth = firebase.auth;
 
-  if (profile?.isLoaded && profile && !profile.schoolId) {
+  console.log(profile)
+  if (profile && !profile.isEmpty && profile.email && (!profile.role || !profile.schoolId)) {
     history.replace("/register-account")
+  } else if (profile.email && !profile?.isVerified) {
+    history.replace("/not-verified")
   }
   
   if (auth?.isLoaded && auth?.isEmpty) {

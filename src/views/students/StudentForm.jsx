@@ -1,4 +1,4 @@
-import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CLabel, CRow } from '@coreui/react';
+import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CInputCheckbox, CLabel, CRow } from '@coreui/react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet';
@@ -14,7 +14,7 @@ import METextField from 'src/components/METextField';
 import meToaster from 'src/components/toaster';
 import { useGetData } from 'src/hooks/getters';
 import { createStudent, updateStudent } from 'src/store/actions/studentActions';
-import { object, string } from 'yup';
+import { boolean, object, string } from 'yup';
 
 export default function StudentForm() {
   const { studentId } = useParams();
@@ -31,8 +31,9 @@ export default function StudentForm() {
     displayName: string().required().strict(),
     description: string(),
     email: string().email().required().strict(),
+    isVerified: boolean()
   })
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm({
     resolver: yupResolver(studentSchema)
   })
 
@@ -151,6 +152,19 @@ export default function StudentForm() {
               defaultValue={student?.email}
               errors={errors}
             />
+            {
+              editMode && (
+                <div className="form-check">
+                  <CInputCheckbox
+                    id="isVerified"
+                    checked={watch("isVerified")}
+                    onClick={() => setValue("isVerified", !watch("isVerified"))}
+                    defaultChecked={student?.isVerified}
+                  />
+                  <CLabel htmlFor="isVerified">Terverifikasi</CLabel>
+                </div>
+              )
+            }
           </CCardBody>
           <CCardFooter className="d-flex justify-content-end">
             <Link to="/students">

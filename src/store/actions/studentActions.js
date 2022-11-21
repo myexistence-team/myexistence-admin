@@ -31,7 +31,7 @@ export function createStudent(student) {
       ...student, 
       photoUrl,
       role: "STUDENT",
-      hasRegistered: false,
+      isVerified: true,
       createdBy: auth.uid,
       createdAt: new Date(),
       updatedBy: auth.uid,
@@ -68,6 +68,17 @@ export function updateStudent(studentId, student) {
         updatedBy: auth.uid,
         updatedAt: new Date()
       });
+  }
+}
+
+export function deleteStudent(studentId) {
+  return async (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore();
+
+    await firestore
+      .collection("users")
+      .doc(studentId)
+      .delete();
   }
 }
 

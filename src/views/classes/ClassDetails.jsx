@@ -53,7 +53,7 @@ export function ClassStudents(props) {
       where: [
         ["schoolId", "==", schoolId],
         ["role", "==", "STUDENT"],
-        ["hasRegistered", "==", true],
+        ["isVerified", "==", true],
       ],
       storeAs: "students"
     },

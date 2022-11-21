@@ -192,6 +192,7 @@ function RegisterSchool(props) {
 function RegisterTeacher(props) {
   const { onSubmit, onBack, isSubmitting } = props;
   const teacherSchema = object().shape({
+    displayName: string().required().strict(),
     email: string().required().strict(),
     password: string().required().strict(),
   })
@@ -202,6 +203,11 @@ function RegisterTeacher(props) {
   return (
     <CForm onSubmit={handleSubmit(onSubmit)}>
       <h5>Sebagai Pengajar</h5>
+      <METextField
+        label="Nama"
+        { ...register("displayName") }
+        errors={errors}
+      />
       <METextField
         { ...register("email") }
         errors={errors}

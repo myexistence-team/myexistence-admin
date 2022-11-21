@@ -16,7 +16,7 @@ export function createAdmin(admin) {
       .add({ 
         ...admin, 
         role: "ADMIN",
-        hasRegistered: false,
+        isVerified: true,
         createdBy: auth.uid,
         createdAt: new Date(),
         updatedBy: auth.uid,
@@ -46,6 +46,17 @@ export function updateAdmin(adminId, newAdmin) {
   }
 }
 
+export function deleteAdmin(adminId) {
+  return async (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore();
+
+    await firestore
+      .collection("users")
+      .doc(adminId)
+      .delete();
+  }
+}
+
 export function signUpAsAdmin(admin) {
   return async (dispatch, getState, { getFirebase, getFirestore }) => {
     const firebase = getFirebase();
@@ -67,28 +78,27 @@ export function signUpAsAdmin(admin) {
         .where("role", "==", "ADMIN")
         .get()
 
+      var exAdmin = { ...admin };
       if (!existingAdmin.empty) {
-        const exAdmin = { ...existingAdmin.docs[0].data() };
+        exAdmin = { ...existingAdmin.docs[0].data(), ...exAdmin };
         await firestore
           .collection("users")
           .doc(existingAdmin.docs[0].id)
           .delete();
-
-        await firebase.createUser({
-          email: admin.email,
-          password: admin.password,
-          signIn: false,
-        }, {
-          ...exAdmin,
-          school: schoolRef,
-          role: "ADMIN",
-          schoolId: admin.schoolId,
-          hasRegistered: true,
-        })
       } 
-      else {
-        throw Error(`Admin dengan email ${admin.email} tidak ditemukan dalam sekolah ID ${admin.schoolId}`);
-      }
+
+      await firebase.createUser({
+        email: admin.email,
+        password: admin.password,
+        signIn: false,
+      }, {
+        ...exAdmin,
+        school: schoolRef,
+        role: "ADMIN",
+        schoolId: admin.schoolId,
+        isVerified: exAdmin.isVerified || false,
+        createdAt: new Date(),
+      })
     }
   }
 }

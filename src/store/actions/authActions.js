@@ -9,6 +9,18 @@ export const signIn = (credentials) => {
   }
 }
 
+export const signInWithGoogle = () => {
+  return async (dispatch, getState, { getFirebase }) => {
+    const firebase = getFirebase();
+    const newUser = await firebase.login({
+      provider: "google",
+      type: "popup"
+    });
+    console.log("NEW USER", newUser);
+    console.log("NEW USER", newUser.user.uid);
+  }
+}
+
 export const signOut = () => {
   return async (dispatch, getState, { getFirebase }) => {
     const firebase = getFirebase();
@@ -43,7 +55,6 @@ export const signUpForAccount = (data) => {
     const usersRef = firestore.collection("users");
     const oldUsersRef = usersRef
       .where("email", "==", auth.email)
-      .where("schoolId", "==", data.schoolId)
     const oldUsers = await oldUsersRef.get()
 
     if (oldUsers.empty) {
@@ -55,6 +66,9 @@ export const signUpForAccount = (data) => {
 
     const newUser = {
       ...oldUser,
+      role: data.role,
+      isVerified: false,
+      photoUrl: oldUser.avatarUrl,
       schoolId: data.schoolId,
       school: firestore.collection("schools").doc(data.schoolId),
       createdBy: auth.uid,

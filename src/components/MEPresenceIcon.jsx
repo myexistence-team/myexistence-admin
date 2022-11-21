@@ -8,7 +8,6 @@ export default function MEPresenceIcon({ status, size = 24, ...rest }) {
     size,
     ...rest
   }
-  console.log(iconProps);
   switch (status) {
     case PRESENCE_STATUSES.EXCUSED:
       return <FaHandPaper color={meColors.yellows[3]} { ...iconProps }/>

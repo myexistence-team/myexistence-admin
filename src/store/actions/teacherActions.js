@@ -30,7 +30,7 @@ export function createTeacher(newTeacher) {
         ...newTeacher, 
         photoUrl,
         role: "TEACHER",
-        hasRegistered: false,
+        isVerified: true,
         createdBy: auth.uid,
         createdAt: new Date(),
         updatedBy: auth.uid,
@@ -63,10 +63,21 @@ export function updateTeacher(teacherId, newTeacher) {
 
     teacherRef.update({ 
       ...newTeacher, 
-      photoUrl,
+      ...photoUrl ? { photoUrl } : {},
       updatedBy: auth.uid,
       updatedAt: new Date()
     });
+  }
+}
+
+export function deleteTeacher(teacherId) {
+  return async (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore();
+
+    await firestore
+      .collection("users")
+      .doc(teacherId)
+      .delete();
   }
 }
 
@@ -90,28 +101,27 @@ export function signUpAsTeacher(newTeacher) {
         .where("email", "==", newTeacher.email)
         .where("role", "==", "TEACHER")
         .get()
-
+        
+      var exTeacher = { ...newTeacher };
       if (!existingTeacher.empty) {
-        const exTeacher = { ...existingTeacher.docs[0].data() };
+        exTeacher = { ...existingTeacher.docs[0].data(), ...newTeacher };
         await firestore
           .collection("users")
           .doc(existingTeacher.docs[0].id)
           .delete();
-
-        await firebase.createUser({
-          email: newTeacher.email,
-          password: newTeacher.password,
-          signIn: false
-        }, {
-          ...exTeacher,
-          role: "TEACHER",
-          schoolId: newTeacher.schoolId,
-          hasRegistered: true,
-        })
       } 
-      else {
-        throw Error(`Pengajar dengan email ${newTeacher.email} tidak ditemukan dalam sekolah ID ${newTeacher.schoolId}`);
-      }
+
+      await firebase.createUser({
+        email: newTeacher.email,
+        password: newTeacher.password,
+        signIn: false
+      }, {
+        ...exTeacher,
+        role: "TEACHER",
+        schoolId: newTeacher.schoolId,
+        isVerified: exTeacher.isVerified || false,
+        createdAt: new Date(),
+      })
     }
   }
 }

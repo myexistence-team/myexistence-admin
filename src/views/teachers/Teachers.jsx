@@ -5,11 +5,14 @@ import Avatar from 'react-avatar'
 import { Helmet } from 'react-helmet'
 import { useForm } from 'react-hook-form'
 import { MdCheck } from 'react-icons/md'
+import { useDispatch } from 'react-redux'
 import { isLoaded } from 'react-redux-firebase'
 import { Link } from 'react-router-dom'
+import meConfirm from 'src/components/meConfirm'
 import { useGetAuth, useGetProfile, useGetSchoolId } from 'src/hooks/getters'
 import { useFirestorePagination } from 'src/hooks/useFirestorePagination'
 import useQueryString from 'src/hooks/useQueryString'
+import { deleteTeacher } from 'src/store/actions/teacherActions'
 import { number } from 'yup'
 import { object } from 'yup'
 
@@ -34,6 +37,16 @@ export default function Teachers() {
     ["role", "==", "TEACHER"],
     ["schoolId", "==", schoolId]
   ]); 
+
+  const dispatch = useDispatch();
+  function handleDelete(teacherId) {
+    meConfirm({
+      confirmButtonColor: "danger",
+      onConfirm: () => {
+        dispatch(deleteTeacher(teacherId));
+      }
+    })
+  }
 
   return (
     <CCard>
@@ -65,7 +78,7 @@ export default function Teachers() {
             "idNumber",
             "email",
             { key: "createdAt", label: "Tanggal Dibuat" },
-            { key: "hasRegistered", label: "Terdaftar" },
+            { key: "isVerified", label: "Terverifikasi" },
             { key: "actions", label: "" },
           ]}
           scopedSlots={{
@@ -104,11 +117,23 @@ export default function Teachers() {
                     </Link>
                   )
                 }
+                {
+                  profile.role !== "TEACHER" && (
+                    <CButton
+                      color="danger"
+                      variant="outline"
+                      className="ml-3"
+                      onClick={() => handleDelete(t.id)}
+                    >
+                      Delete
+                    </CButton>
+                  )
+                }
               </td>
             ),
-            hasRegistered: (t) => (
+            isVerified: (t) => (
               <td>
-                {t.hasRegistered && <MdCheck/>}
+                {t.isVerified && <MdCheck/>}
               </td>
             ),
             createdAt: (t) => (

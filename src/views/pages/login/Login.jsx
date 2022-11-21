@@ -20,7 +20,7 @@ import meColors from "src/components/meColors";
 import { object, string } from "yup";
 // import loginImg from "src/images/login.png";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { signIn } from "src/store/actions/authActions";
+import { signIn, signInWithGoogle } from "src/store/actions/authActions";
 import METextField from "src/components/METextField";
 import { AiOutlineLock, AiOutlineUser } from "react-icons/ai";
 import { isLoaded, useFirebase, useFirebaseConnect } from "react-redux-firebase";
@@ -94,10 +94,7 @@ const Login = () => {
   };
 
   function loginWithGoogle() {
-    firebaseHook.login({
-      provider: "google",
-      type: "popup"
-    })
+    dispatch(signInWithGoogle());
   }
 
   return (

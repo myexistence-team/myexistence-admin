@@ -4,11 +4,14 @@ import Avatar from 'react-avatar';
 import { Helmet } from 'react-helmet';
 import { useForm } from 'react-hook-form';
 import { MdCheck } from 'react-icons/md';
+import { useDispatch } from 'react-redux';
 import { isLoaded } from 'react-redux-firebase';
 import { Link } from 'react-router-dom'
+import meConfirm from 'src/components/meConfirm';
 import { useGetProfile, useGetSchoolId } from 'src/hooks/getters';
 import { useFirestorePagination } from 'src/hooks/useFirestorePagination';
 import useQueryString from 'src/hooks/useQueryString';
+import { deleteStudent } from 'src/store/actions/studentActions';
 import { number, object } from 'yup';
 
 export default function Students() {
@@ -29,6 +32,16 @@ export default function Students() {
     ["role", "==", "STUDENT"],
     ["schoolId", "==", schoolId]
   ])
+
+  const dispatch = useDispatch();
+  function handleDelete(studentId) {
+    meConfirm({
+      confirmButtonColor: "danger",
+      onConfirm: () => {
+        dispatch(deleteStudent(studentId));
+      }
+    })
+  }
 
   return (
     <CCard>
@@ -57,7 +70,7 @@ export default function Students() {
             { key: "profilePicture", label: "" },
             { key: "displayName", label: "Nama Lengkap" },
             "email",
-            { key: "hasRegistered", label: "Terdaftar" },
+            { key: "isVerified", label: "Terverifikasi" },
             ...profile.role !== "TEACHER" ? [{ key: "actions", label: "" }] : [],
           ]}
           scopedSlots={{
@@ -84,19 +97,33 @@ export default function Students() {
             ),
             actions: (t) => (
               <td className="d-flex justify-content-end">
-                <Link to={`/students/${t.id}/edit`}>
-                  <CButton
-                    color="primary"
-                    variant="outline"
-                  >
-                    Edit
-                  </CButton>
-                </Link>
+                {
+                  profile.role !== "TEACHER" && (
+                    <>
+                      <Link to={`/students/${t.id}/edit`}>
+                        <CButton
+                          color="primary"
+                          variant="outline"
+                        >
+                          Edit
+                        </CButton>
+                      </Link>
+                      <CButton
+                        color="danger"
+                        variant="outline"
+                        className="ml-3"
+                        onClick={() => handleDelete(t.id)}
+                      >
+                        Delete
+                      </CButton>
+                    </>
+                  )
+                }
               </td>
             ),
-            hasRegistered: (t) => (
+            isVerified: (t) => (
               <td>
-                {t.hasRegistered && <MdCheck/>}
+                {t.isVerified && <MdCheck/>}
               </td>
             ),
           }}
