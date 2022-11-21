@@ -82,6 +82,17 @@ export function updateClass(classId, newClass) {
   }
 }
 
+export function deleteClass(classId) {
+  return async (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore();
+
+    await firestore
+      .collection("users")
+      .doc(classId)
+      .delete();
+  }
+}
+
 export function updateClassStudent(action, classId, studentId) {
   return async (dispatch, getState, { getFirestore }) => {
     const firestore = getFirestore();

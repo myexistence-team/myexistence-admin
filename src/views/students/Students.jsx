@@ -3,9 +3,9 @@ import React from 'react'
 import Avatar from 'react-avatar';
 import { Helmet } from 'react-helmet';
 import { useForm } from 'react-hook-form';
+import { FaEdit, FaTrash } from 'react-icons/fa';
 import { MdCheck } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
-import { isLoaded } from 'react-redux-firebase';
 import { Link } from 'react-router-dom'
 import meConfirm from 'src/components/meConfirm';
 import { useGetProfile, useGetSchoolId } from 'src/hooks/getters';
@@ -100,22 +100,22 @@ export default function Students() {
                 {
                   profile.role !== "TEACHER" && (
                     <>
+                      <CButton
+                        color="danger"
+                        variant="outline"
+                        className="mr-3"
+                        onClick={() => handleDelete(t.id)}
+                      >
+                        <FaTrash/>
+                      </CButton>
                       <Link to={`/students/${t.id}/edit`}>
                         <CButton
                           color="primary"
                           variant="outline"
                         >
-                          Edit
+                          <FaEdit/>
                         </CButton>
                       </Link>
-                      <CButton
-                        color="danger"
-                        variant="outline"
-                        className="ml-3"
-                        onClick={() => handleDelete(t.id)}
-                      >
-                        Delete
-                      </CButton>
                     </>
                   )
                 }

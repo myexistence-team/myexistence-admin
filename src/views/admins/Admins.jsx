@@ -2,6 +2,7 @@ import { CButton, CCard, CCardBody, CCardHeader, CDataTable, CPagination } from 
 import React from 'react'
 import { Helmet } from 'react-helmet';
 import { useForm } from 'react-hook-form'
+import { FaEdit, FaTrash } from 'react-icons/fa';
 import { MdCheck } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
 import { isLoaded } from 'react-redux-firebase';
@@ -81,27 +82,27 @@ export default function Admins() {
             actions: (t) => (
               <td className="d-flex justify-content-end">
                 {
+                  profile.role === "SUPER_ADMIN" && (
+                    <CButton
+                      color="danger"
+                      variant="outline"
+                      className="mr-3"
+                      onClick={() => handleDelete(t.id)}
+                    >
+                      <FaTrash/>
+                    </CButton>
+                  )
+                }
+                {
                   (profile.role === "SUPER_ADMIN" || (profile.role === "ADMIN" && auth.uid === t.id)) && 
                   <Link to={`/admins/${t.id}/edit`}>
                     <CButton
                       color="primary"
                       variant="outline"
                     >
-                      Edit
+                      <FaEdit/>
                     </CButton>
                   </Link>
-                }
-                {
-                  profile.role === "SUPER_ADMIN" && (
-                    <CButton
-                      color="danger"
-                      variant="outline"
-                      className="ml-3"
-                      onClick={() => handleDelete(t.id)}
-                    >
-                      Delete
-                    </CButton>
-                  )
                 }
               </td>
             ),

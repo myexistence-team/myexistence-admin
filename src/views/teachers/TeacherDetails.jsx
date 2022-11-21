@@ -2,11 +2,14 @@ import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CNav, CNavIt
 import moment from 'moment';
 import React from 'react'
 import { Helmet } from 'react-helmet';
+import { useDispatch } from 'react-redux';
 import { useFirestore, useFirestoreConnect } from 'react-redux-firebase';
 import { Link, useParams } from 'react-router-dom'
+import meConfirm from 'src/components/meConfirm';
 import MESpinner from 'src/components/MESpinner';
 import ScheduleCalendar from 'src/components/ScheduleCalendar';
 import { useGetAuth, useGetData, useGetOrdered, useGetProfile, useGetSchoolId } from 'src/hooks/getters';
+import { deleteTeacher } from 'src/store/actions/teacherActions';
 
 export default function TeacherDetails() {
   const { teacherId } = useParams();
@@ -57,6 +60,16 @@ export default function TeacherDetails() {
     title: classes?.find(({ id }) => id === schedules[sId].classId)?.name,
   })) : [];
 
+  const dispatch = useDispatch();
+  function handleDelete(studentId) {
+    meConfirm({
+      confirmButtonColor: "danger",
+      onConfirm: () => {
+        dispatch(deleteTeacher(studentId));
+      }
+    })
+  }
+
   return (
     <CCard>
       <Helmet>
@@ -69,18 +82,34 @@ export default function TeacherDetails() {
           <>
             <CCardHeader className="d-flex justify-content-between">
               <h3>Detail Pengajar</h3>
-              {
-                (profile.role !== "TEACHER" || teacherId === auth.uid) && (
-                  <Link to={`/teachers/${teacherId}/edit`}>
-                    <CButton
-                      color="primary"
-                      variant="outline"
-                    >
-                      Edit
-                    </CButton>
-                  </Link>
-                )
-              }
+              <div className="d-flex">
+                {
+                  profile.role !== "TEACHER" && (
+                    <div className="mr-3">
+                      <CButton
+                        color="danger"
+                        variant="outline"
+                        className="ml-3"
+                        onClick={() => handleDelete(teacherId)}
+                      >
+                        Hapus
+                      </CButton>
+                    </div>
+                  )
+                }
+                {
+                  (profile.role !== "TEACHER" || teacherId === auth.uid) && (
+                    <Link to={`/teachers/${teacherId}/edit`}>
+                      <CButton
+                        color="primary"
+                        variant="outline"
+                      >
+                        Edit
+                      </CButton>
+                    </Link>
+                  )
+                }
+              </div>
             </CCardHeader>
             <CCardBody>
               <CTabs activeTab="details">

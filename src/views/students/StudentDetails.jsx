@@ -2,11 +2,14 @@ import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CDataTable, 
 import moment from 'moment';
 import React from 'react'
 import { Helmet } from 'react-helmet';
+import { useDispatch } from 'react-redux';
 import { useFirestore, useFirestoreConnect } from 'react-redux-firebase';
 import { Link, useParams } from 'react-router-dom'
+import meConfirm from 'src/components/meConfirm';
 import MESpinner from 'src/components/MESpinner';
 import ScheduleCalendar from 'src/components/ScheduleCalendar';
 import { useGetData, useGetOrdered, useGetProfile, useGetSchoolId } from 'src/hooks/getters';
+import { deleteStudent } from 'src/store/actions/studentActions';
 
 export default function StudentDetails() {
   const { studentId } = useParams();
@@ -55,6 +58,16 @@ export default function StudentDetails() {
     title: classes?.find(({ id }) => id === schedules[sId].classId)?.name,
   })) : [];
 
+  const dispatch = useDispatch();
+  function handleDelete(studentId) {
+    meConfirm({
+      confirmButtonColor: "danger",
+      onConfirm: () => {
+        dispatch(deleteStudent(studentId));
+      }
+    })
+  }
+
   return (
     <CCard>
     <Helmet>
@@ -69,14 +82,26 @@ export default function StudentDetails() {
             <h3>Detail Pelajar</h3>
             {
               profile.role !== "TEACHER" && (
-                <Link to={`/students/${studentId}/edit`}>
-                  <CButton
-                    color="primary"
-                    variant="outline"
-                  >
-                    Edit
-                  </CButton>
-                </Link>
+                <div className="d-flex">
+                  <div className="mr-3">
+                    <CButton
+                      color="danger"
+                      variant="outline"
+                      className="ml-3"
+                      onClick={() => handleDelete(studentId)}
+                    >
+                      Hapus
+                    </CButton>
+                  </div>
+                  <Link to={`/students/${studentId}/edit`}>
+                    <CButton
+                      color="primary"
+                      variant="outline"
+                    >
+                      Edit
+                    </CButton>
+                  </Link>
+                </div>
               )
             }
           </CCardHeader>

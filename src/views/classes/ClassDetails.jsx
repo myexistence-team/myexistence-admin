@@ -14,7 +14,7 @@ import { SCHEDULE_START_DATE_MS } from 'src/constants';
 import { createSchedule, updateSchedule } from 'src/store/actions/scheduleActions';
 import { useDispatch } from 'react-redux';
 import { MdArrowLeft, MdArrowRight } from 'react-icons/md';
-import { ENROLLMENT_ACTIONS, updateClassStudent } from 'src/store/actions/classActions';
+import { deleteClass, ENROLLMENT_ACTIONS, updateClassStudent } from 'src/store/actions/classActions';
 import meToaster from 'src/components/toaster';
 import { Helmet } from 'react-helmet';
 import { ATTENDANCE_STATUS_ENUM } from 'src/enums';
@@ -23,6 +23,7 @@ import meColors from 'src/components/meColors';
 import { CChart } from '@coreui/react-chartjs';
 import MESelect from 'src/components/MESelect';
 import ScheduleModal from 'src/components/ScheduleModal';
+import meConfirm from 'src/components/meConfirm';
 moment.locale('id', {
   week: {
     dow: 1
@@ -81,6 +82,15 @@ export function ClassStudents(props) {
   const auth = useGetAuth();
   const profile = useGetProfile();
   const isOwnClassOrAdmin = classObj?.teacherIds?.includes(auth.uid) || profile.role !== "TEACHER";
+
+  function handleDelete(classId) {
+    meConfirm({
+      confirmButtonColor: "danger",
+      onConfirm: () => {
+        dispatch(deleteClass(classId));
+      }
+    })
+  }
 
   return (
     <CRow className="mt-3">
@@ -434,6 +444,16 @@ export default function ClassDetails() {
   const profile = useGetProfile();
   const isOwnClassOrAdmin = classObj?.teacherIds?.includes(auth.uid) || profile.role !== "TEACHER";
 
+  const dispatch = useDispatch();
+  function handleDelete(classId) {
+    meConfirm({
+      confirmButtonColor: "danger",
+      onConfirm: () => {
+        dispatch(deleteClass(classId));
+      }
+    })
+  }
+
   return (
     <CCard>
       <Helmet>
@@ -446,14 +466,26 @@ export default function ClassDetails() {
               <h3>Detail Kelas</h3>
               {
                 profile.role !== "TEACHER" && (
-                  <Link to={`/classes/${classId}/edit`}>
-                    <CButton
-                      color="primary"
-                      variant="outline"
-                    >
-                      Edit
-                    </CButton>
-                  </Link>
+                  <div className="d-flex">
+                    <div className="mr-3">
+                      <CButton
+                        color="danger"
+                        variant="outline"
+                        className="ml-3"
+                        onClick={() => handleDelete(classId)}
+                      >
+                        Hapus
+                      </CButton>
+                    </div>
+                    <Link to={`/classes/${classId}/edit`}>
+                      <CButton
+                        color="primary"
+                        variant="outline"
+                      >
+                        Edit
+                      </CButton>
+                    </Link>
+                  </div>
                 )
               }
             </CCardHeader>

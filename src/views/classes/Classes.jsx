@@ -2,10 +2,14 @@ import { CButton, CCard, CCardBody, CCardHeader, CDataTable, CPagination } from 
 import React from 'react'
 import { Helmet } from 'react-helmet';
 import { useForm } from 'react-hook-form'
+import { FaEdit, FaTrash } from 'react-icons/fa';
+import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom'
+import meConfirm from 'src/components/meConfirm';
 import { useGetProfile } from 'src/hooks/getters';
 import { useFirestorePagination } from 'src/hooks/useFirestorePagination';
 import useQueryString from 'src/hooks/useQueryString';
+import { deleteClass } from 'src/store/actions/classActions';
 import { number, object } from 'yup';
 
 export default function Classes() {
@@ -22,6 +26,16 @@ export default function Classes() {
   } = useFirestorePagination("classes", query)
 
   const profile = useGetProfile();
+
+  const dispatch = useDispatch();
+  function handleDelete(classId) {
+    meConfirm({
+      confirmButtonColor: "danger",
+      onConfirm: () => {
+        dispatch(deleteClass(classId));
+      }
+    })
+  }
 
   return (
     <CCard>
@@ -67,12 +81,24 @@ export default function Classes() {
             ),
             actions: (c) => (
               <td className="d-flex justify-content-end">
+                {
+                  profile.role !== "TEACHER" && (
+                    <CButton
+                      color="danger"
+                      variant="outline"
+                      className="mr-3"
+                      onClick={() => handleDelete(c.id)}
+                    >
+                      <FaTrash/>
+                    </CButton>
+                  )
+                }
                 <Link to={`/classes/${c.id}/edit`}>
                   <CButton
                     color="primary"
                     variant="outline"
                   >
-                    Edit
+                    <FaEdit/>
                   </CButton>
                 </Link>
               </td>

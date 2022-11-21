@@ -4,6 +4,7 @@ import React, { useMemo } from 'react'
 import Avatar from 'react-avatar'
 import { Helmet } from 'react-helmet'
 import { useForm } from 'react-hook-form'
+import { FaEdit, FaTrash } from 'react-icons/fa'
 import { MdCheck } from 'react-icons/md'
 import { useDispatch } from 'react-redux'
 import { isLoaded } from 'react-redux-firebase'
@@ -106,27 +107,27 @@ export default function Teachers() {
             actions: (t) => (
               <td className="d-flex justify-content-end">
                 {
+                  profile.role !== "TEACHER" && (
+                    <CButton
+                      color="danger"
+                      variant="outline"
+                      className="mr-3"
+                      onClick={() => handleDelete(t.id)}
+                    >
+                      <FaTrash/>
+                    </CButton>
+                  )
+                }
+                {
                   (profile.role !== "TEACHER" || selfUser.uid === t.id) && (
                     <Link to={`/teachers/${t.id}/edit`}>
                       <CButton
                         color="primary"
                         variant="outline"
                       >
-                        Edit
+                        <FaEdit/>
                       </CButton>
                     </Link>
-                  )
-                }
-                {
-                  profile.role !== "TEACHER" && (
-                    <CButton
-                      color="danger"
-                      variant="outline"
-                      className="ml-3"
-                      onClick={() => handleDelete(t.id)}
-                    >
-                      Delete
-                    </CButton>
                   )
                 }
               </td>
