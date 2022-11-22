@@ -543,7 +543,7 @@ export default function ClassDetails() {
                   <CTabPane data-tab="schedule">
                     <h4 className="mt-3 mb-0">Jadwal</h4>
                     <div className="mb-3">
-                      <small>Jadwal yang dibuat akan diulang per minggu</small>
+                      <small>Sesi yang dibuat akan diulang per minggu</small>
                     </div>
                     <ClassSchedule classId={classId}/>
                   </CTabPane>

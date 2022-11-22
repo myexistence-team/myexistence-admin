@@ -233,9 +233,9 @@ function ScheduleModal({
         <CModalHeader className="d-flex justify-content-between">
           {
             schedule.status === "CLOSED" ? (
-              <h4>{isOwnClassOrAdmin ? "Edit Jadwal" : "Detail Jadwal"}</h4>
+              <h4>{isOwnClassOrAdmin ? "Edit Sesi Kelas" : "Detail Sesi Kelas"}</h4>
             ) : (
-              <h4>Sesi Jadwal ({SCHEDULE_OPEN_METHODS_ENUM[schedule.openMethod]})</h4>
+              <h4>Sesi Kelas ({SCHEDULE_OPEN_METHODS_ENUM[schedule.openMethod]})</h4>
             )
           }
           {
