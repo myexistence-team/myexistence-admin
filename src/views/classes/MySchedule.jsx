@@ -1,15 +1,9 @@
-import { CButton, CCard, CCardBody, CCol, CLabel, CModal, CModalBody, CModalHeader, CRow } from '@coreui/react';
-import moment from 'moment';
-import React, { useEffect, useState } from 'react'
-import { Calendar, momentLocalizer } from 'react-big-calendar';
+import { CCard, CCardBody } from '@coreui/react';
+import React, { useEffect } from 'react'
 import { Helmet } from 'react-helmet';
-import { firestoreConnect, useFirestore, useFirestoreConnect } from 'react-redux-firebase';
-import { Link, useHistory } from 'react-router-dom';
-import MESpinner from 'src/components/MESpinner';
+import { useFirestore, useFirestoreConnect } from 'react-redux-firebase';
 import ScheduleCalendar from 'src/components/ScheduleCalendar';
-import { DAY_NUMBERS, SCHEDULE_START_DATE_MS } from 'src/constants';
 import { useGetData, useGetProfile, useGetSchoolId } from 'src/hooks/getters';
-const localizer = momentLocalizer(moment);
 
 export default function MySchedule() {
   const firestore = useFirestore();
