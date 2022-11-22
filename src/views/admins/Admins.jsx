@@ -71,6 +71,7 @@ export default function Admins() {
             "email",
             { key: "role", label: "Peran" },
             { key: "isVerified", label: "Terverifikasi" },
+            { key: "hasRegistered", label: "Terdaftar" },
             { key: "actions", label: "" },
           ]}
           scopedSlots={{
@@ -109,6 +110,11 @@ export default function Admins() {
             isVerified: (t) => (
               <td>
                 {t.isVerified && <MdCheck/>}
+              </td>
+            ),
+            hasRegistered: (t) => (
+              <td>
+                {t.hasRegistered && <MdCheck/>}
               </td>
             ),
           }}

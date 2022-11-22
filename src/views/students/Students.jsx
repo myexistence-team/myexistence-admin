@@ -71,6 +71,7 @@ export default function Students() {
             { key: "displayName", label: "Nama Lengkap" },
             "email",
             { key: "isVerified", label: "Terverifikasi" },
+            { key: "hasRegistered", label: "Terdaftar" },
             ...profile.role !== "TEACHER" ? [{ key: "actions", label: "" }] : [],
           ]}
           scopedSlots={{
@@ -124,6 +125,11 @@ export default function Students() {
             isVerified: (t) => (
               <td>
                 {t.isVerified && <MdCheck/>}
+              </td>
+            ),
+            hasRegistered: (t) => (
+              <td>
+                {t.hasRegistered && <MdCheck/>}
               </td>
             ),
           }}

@@ -80,6 +80,7 @@ export default function Teachers() {
             "email",
             { key: "createdAt", label: "Tanggal Dibuat" },
             { key: "isVerified", label: "Terverifikasi" },
+            { key: "hasRegistered", label: "Terdaftar" },
             { key: "actions", label: "" },
           ]}
           scopedSlots={{
@@ -135,6 +136,11 @@ export default function Teachers() {
             isVerified: (t) => (
               <td>
                 {t.isVerified && <MdCheck/>}
+              </td>
+            ),
+            hasRegistered: (t) => (
+              <td>
+                {t.hasRegistered && <MdCheck/>}
               </td>
             ),
             createdAt: (t) => (
