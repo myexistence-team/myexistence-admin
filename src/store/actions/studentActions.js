@@ -32,6 +32,7 @@ export function createStudent(student) {
       photoUrl,
       role: "STUDENT",
       isVerified: true,
+      hasRegistered: false,
       createdBy: auth.uid,
       createdAt: new Date(),
       updatedBy: auth.uid,

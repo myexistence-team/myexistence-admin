@@ -40,19 +40,12 @@ export function updateClass(classId, newClass) {
     const exClass = classSnapshot.data();
     const removedTeacherIds = exClass.teacherIds.filter((tId) => !newClass.teacherIds.includes(tId));
 
-    var teachersRef = [];
-    if (newClass.teacherIds.length) {
-      teachersRef = await firestore.collection("users").where(firestore.FieldPath.documentId(), "in", newClass.teacherIds).get();
-      teachersRef = teachersRef.docs.map((d) => d.ref)
-    }
-    
     removedTeacherIds.forEach(teacherId => {        
       batch.update(
         firestore
         .collection("users")
         .doc(teacherId), {
           classIds: firestore.FieldValue.arrayRemove(classId),
-          classes: firestore.FieldValue.arrayRemove(classRef),
         }
       )
     });
@@ -63,7 +56,6 @@ export function updateClass(classId, newClass) {
         .collection("users")
         .doc(teacherId), {
           classIds: firestore.FieldValue.arrayUnion(classId),
-          classes: firestore.FieldValue.arrayUnion(classRef),
         }
       )
     });
@@ -76,7 +68,6 @@ export function updateClass(classId, newClass) {
       .doc(classId)
       .update({ 
         ...newClass, 
-        teachers: teachersRef,
         updatedBy: auth.uid,
         updatedAt: new Date()
       });
@@ -100,14 +91,6 @@ export function updateClassStudent(action, classId, studentId) {
     const auth = getState().firebase.auth;
     const profile = getState().firebase.profile;
 
-    const classRef = firestore
-      .collection("schools")
-      .doc(profile.schoolId)
-      .collection("classes")
-      .doc(classId);
-    const studentRef = firestore.collection("users").doc(studentId);
-
-
     await firestore
       .collection("users")
       .doc(studentId)
@@ -115,9 +98,6 @@ export function updateClassStudent(action, classId, studentId) {
         classIds: action === ENROLLMENT_ACTIONS.ENROLL 
           ? firestore.FieldValue.arrayUnion(classId)
           : firestore.FieldValue.arrayRemove(classId),
-        classes: action === ENROLLMENT_ACTIONS.ENROLL 
-          ? firestore.FieldValue.arrayUnion(classRef)
-          : firestore.FieldValue.arrayRemove(classRef),
         updatedBy: auth.uid,
         updatedAt: new Date()
       });
@@ -131,9 +111,6 @@ export function updateClassStudent(action, classId, studentId) {
         studentIds: action === ENROLLMENT_ACTIONS.ENROLL 
           ? firestore.FieldValue.arrayUnion(studentId) 
           : firestore.FieldValue.arrayRemove(studentId), 
-        students: action === ENROLLMENT_ACTIONS.ENROLL 
-          ? firestore.FieldValue.arrayUnion(studentRef) 
-          : firestore.FieldValue.arrayRemove(studentRef), 
         updatedBy: auth.uid,
         updatedAt: new Date()
       });

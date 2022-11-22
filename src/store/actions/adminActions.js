@@ -17,6 +17,7 @@ export function createAdmin(admin) {
         ...admin, 
         role: "ADMIN",
         isVerified: true,
+        hasRegistered: false,
         createdBy: auth.uid,
         createdAt: new Date(),
         updatedBy: auth.uid,
@@ -97,6 +98,7 @@ export function signUpAsAdmin(admin) {
         role: "ADMIN",
         schoolId: admin.schoolId,
         isVerified: exAdmin.isVerified || false,
+        hasRegistered: true,
         createdAt: new Date(),
       })
     }
