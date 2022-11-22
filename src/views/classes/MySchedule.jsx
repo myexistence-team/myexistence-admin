@@ -19,7 +19,7 @@ export default function MySchedule() {
   const [classes] = useGetData("classes");
 
   useFirestoreConnect([
-    {
+    ...profile.classIds?.length ? [{
       collection: "schools",
       doc: schoolId,
       subcollections: [{
@@ -27,7 +27,7 @@ export default function MySchedule() {
         where: [[firestore.FieldPath.documentId(), "in", profile?.classIds || []]],
       }],
       storeAs: "classes"
-    },
+    }] : [],
   ])
 
   function handleGetSchedules() {
@@ -42,8 +42,10 @@ export default function MySchedule() {
   }
 
   useEffect(() => {
-    handleGetSchedules();
-  }, [])
+    if (profile.classIds) {
+      handleGetSchedules();
+    }
+  }, [profile])
 
   const [schedules, schedulesLoading] = useGetData("schedules");
   const schedulesOrdered = schedules ? Object.keys(schedules).map((sId) => ({ 
@@ -61,11 +63,17 @@ export default function MySchedule() {
       </Helmet>
       <CCard>
         <CCardBody>
-          <ScheduleCalendar
-            events={schedulesOrdered}
-            loading={schedulesLoading}
-            onRefresh={handleRefresh}
-          />
+          {
+            profile.classIds?.length ? (
+              <ScheduleCalendar
+                events={schedulesOrdered}
+                loading={schedulesLoading}
+                onRefresh={handleRefresh}
+              />
+            ) : (
+              <h4>Anda belum mengikuti kelas. Mohon hubungi administrator sekolah.</h4>
+            )
+          }
         </CCardBody>
       </CCard>
     </div>

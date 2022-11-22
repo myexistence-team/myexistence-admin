@@ -16,8 +16,6 @@ export const signInWithGoogle = () => {
       provider: "google",
       type: "popup"
     });
-    console.log("NEW USER", newUser);
-    console.log("NEW USER", newUser.user.uid);
   }
 }
 

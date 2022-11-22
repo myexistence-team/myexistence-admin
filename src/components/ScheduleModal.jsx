@@ -232,7 +232,7 @@ function ScheduleModal({
       <CForm onSubmit={handleSubmit(onSubmitEvent)}>
         <CModalHeader className="d-flex justify-content-between">
           {
-            schedule.status === "CLOSED" ? (
+            schedule.status !== "OPENED" ? (
               <h4>{isOwnClassOrAdmin ? "Edit Sesi Kelas" : "Detail Sesi Kelas"}</h4>
             ) : (
               <h4>Sesi Kelas ({SCHEDULE_OPEN_METHODS_ENUM[schedule.openMethod]})</h4>

@@ -47,7 +47,7 @@ export function updateStudent(studentId, student) {
     const firebase = getFirebase();
     const auth = getState().firebase.auth;
 
-    var photoUrl = null;
+    var photoUrl = student.photoUrl;
     if (student.profileImage) {
       const uploadRes = await firebase.uploadFile(
         "studentPhotos", 
@@ -92,7 +92,6 @@ export function updateStudentClass(action, studentId, classId) {
       .doc(studentId)
       .get()
     const prevStudent = studentRef.data();
-    console.log(prevStudent);
 
     firestore
       .collection("users")

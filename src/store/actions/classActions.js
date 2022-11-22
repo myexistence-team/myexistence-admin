@@ -15,6 +15,7 @@ export function createClass(newClass) {
       .collection("classes")
       .add({ 
         ...newClass, 
+        studentIds: [],
         createdBy: auth.uid,
         createdAt: new Date(),
         updatedBy: auth.uid,

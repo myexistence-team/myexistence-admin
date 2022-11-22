@@ -10,11 +10,6 @@ export function createStudentPresence({
     const auth = getState().firebase.auth;
     const profile = getState().firebase.profile;
 
-    console.log(studentId);
-    console.log(classId);
-    console.log(scheduleId);
-    console.log(status);
-
     const studentRef = firestore
       .collection("users")
       .doc(studentId);
@@ -27,8 +22,6 @@ export function createStudentPresence({
       .doc(scheduleId)
     const studentLogsRef = scheduleRef.collection("studentLogs");
 
-    console.log("REF DEFINED")
-    
     const scheduleSnap = await scheduleRef.get();
     const schedule = scheduleSnap.data();
 

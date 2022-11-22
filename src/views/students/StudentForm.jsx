@@ -59,10 +59,10 @@ export default function StudentForm() {
   }, [student])
 
   function onSubmit(data) {
+    const payload = { ...data, profileImage, photoUrl };
     meConfirm({
       onConfirm: () => {
         setIsSubmitting(true);
-        const payload = { ...data, profileImage, photoUrl };
         dispatch(editMode ? updateStudent(studentId, payload) : createStudent(payload))
           .then(() => {
             history.push("/students")

@@ -30,6 +30,7 @@ export function createTeacher(newTeacher) {
         ...newTeacher, 
         photoUrl,
         role: "TEACHER",
+        classIds: [],
         isVerified: true,
         createdBy: auth.uid,
         createdAt: new Date(),
