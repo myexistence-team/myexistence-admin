@@ -32,6 +32,7 @@ export function createTeacher(newTeacher) {
         role: "TEACHER",
         classIds: [],
         isVerified: true,
+        hasRegistered: false,
         createdBy: auth.uid,
         createdAt: new Date(),
         updatedBy: auth.uid,
@@ -87,6 +88,7 @@ export function signUpAsTeacher(newTeacher) {
     const firebase = getFirebase();
     const firestore = getFirestore();
 
+    const usersRef = firestore.collection("users");
     const schoolRef = firestore
       .collection("schools")
       .doc(newTeacher.schoolId)
@@ -94,35 +96,55 @@ export function signUpAsTeacher(newTeacher) {
     const school = await schoolRef.get();
     if (!school.exists) {
       throw Error("Sekolah dengan ID tersebut tidak ditemukan")
-    }
-
-    else {
-      const existingTeacher = await firestore
-        .collection("users")
+    } else {
+      const existingTeacherSnaps = await usersRef
         .where("email", "==", newTeacher.email)
         .where("role", "==", "TEACHER")
         .get()
         
       var exTeacher = { ...newTeacher };
-      if (!existingTeacher.empty) {
-        exTeacher = { ...existingTeacher.docs[0].data(), ...newTeacher };
+      var existingTeacher = {};
+      var existingTeacherId = null;
+      if (!existingTeacherSnaps.empty) {
+        existingTeacher = { ...existingTeacherSnaps.docs[0].data() };
+        existingTeacherId = existingTeacherSnaps.docs[0].id;
+        exTeacher = { ...existingTeacher, ...newTeacher };
         await firestore
           .collection("users")
-          .doc(existingTeacher.docs[0].id)
+          .doc(existingTeacherId)
           .delete();
       } 
 
-      await firebase.createUser({
+      const newUser = await firebase.createUser({
         email: newTeacher.email,
         password: newTeacher.password,
-        signIn: false
       }, {
         ...exTeacher,
+        password: null,
+        repassword: null,
         role: "TEACHER",
         schoolId: newTeacher.schoolId,
         isVerified: exTeacher.isVerified || false,
+        hasRegistered: true,
         createdAt: new Date(),
       })
+
+      const newUserSnaps = await usersRef
+        .where("email", "==", newUser.email)
+        .where("role", "==", "TEACHER")
+        .get();
+    
+      if (!existingTeacherSnaps.empty) {
+        const classesSnaps = await firestore.collection("schools").doc(newTeacher.schoolId).collection("classes").get();
+        if (!classesSnaps.empty) {
+          for (const classSnap of classesSnaps.docs) {
+            const classData = classSnap.data();
+            await classSnap.ref.update({
+              teacherIds: classData.teacherIds.filter((tId) => tId !== existingTeacherId).concat(newUserSnaps.docs[0].id)
+            })
+          }
+        }
+      }
     }
   }
 }
