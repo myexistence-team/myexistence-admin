@@ -13,7 +13,7 @@ export default function StudentLogDetailsModal({
   excuseStatusLoading
 }) {
   return (
-    <CModal show={log} centered>
+    <CModal show={log} centered closeOnBackdrop={false}>
       <CModalHeader className="d-flex justify-content-between align-items-center">
         <h4>Detail Kehadiran Pelajar</h4>
         <CButton

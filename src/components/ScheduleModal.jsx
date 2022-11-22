@@ -19,6 +19,7 @@ import { useGetData, useGetProfile } from 'src/hooks/getters';
 import ScheduleStudentLogs from './ScheduleStudentLogs';
 import { Link } from 'react-router-dom';
 import { SCHEDULE_OPEN_METHODS_ENUM } from 'src/enums';
+import { GrClose } from 'react-icons/gr';
 
 function ScheduleModal({
   schedule,
@@ -110,12 +111,12 @@ function ScheduleModal({
     } else if (endDiffToNowInMins < 0) {
       meToaster.warning("Anda tidak bisa buka kelas ini karena jadwal sudah selesai");
     } else {
-      meConfirm({
-        onConfirm: () => {
-          handleOpenScheduleByMethod(openMethod)
-        }
-      })
     }
+    meConfirm({
+      onConfirm: () => {
+        handleOpenScheduleByMethod(openMethod)
+      }
+    })
   }
 
   function handleOpenScheduleByMethod(openMethod) {
@@ -225,6 +226,7 @@ function ScheduleModal({
   return (
     <CModal
       centered 
+      closeOnBackdrop={false}
       show={Boolean(schedule)}
       onClose={() => setSelectedEvent(null)}
       size={schedule?.status === "OPENED" && schedule?.openMethod !== SCHEDULE_OPEN_METHODS.GEOLOCATION && "lg"}
@@ -238,26 +240,34 @@ function ScheduleModal({
               <h4>Sesi Kelas ({SCHEDULE_OPEN_METHODS_ENUM[schedule.openMethod]})</h4>
             )
           }
-          {
-            schedule?.status === "OPENED" ? (
-              <CButton
-                variant="outline"
-                color="danger"
-                onClick={handleCloseSchedule}
-                disabled={isClosing}
-              >
-                Tutup Sesi
-              </CButton>
-            ) : isOwnClassOrAdmin ? (
-              <CButton
-                variant="outline"
-                color="danger"
-                onClick={handleDeleteEvent}
-              >
-                Hapus
-              </CButton>
-            ) : null
-          }
+          <div className="d-flex">
+            {
+              schedule?.status === "OPENED" ? (
+                <CButton
+                  variant="outline"
+                  color="danger"
+                  onClick={handleCloseSchedule}
+                  disabled={isClosing}
+                >
+                  Tutup Sesi
+                </CButton>
+              ) : isOwnClassOrAdmin ? (
+                <CButton
+                  variant="outline"
+                  color="danger"
+                  onClick={handleDeleteEvent}
+                >
+                  Hapus
+                </CButton>
+              ) : null
+            }
+            <CButton
+              className="ml-3"
+              onClick={() => setSelectedEvent(null)}
+            >
+              <GrClose/>
+            </CButton>
+          </div>
         </CModalHeader>
         <CModalBody>
           {
