@@ -122,7 +122,6 @@ export default function ClassForm(props) {
                 where={[
                   ["role", "==", "TEACHER"],
                   ["schoolId", "==", schoolId],
-                  // ["isVerified", "==", true],
                 ]}
                 storeAs="teachers"
                 isMulti
