@@ -5,7 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { object, string } from 'yup';
 import { useForm } from 'react-hook-form';
 import meConfirm from './meConfirm';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { closeSchedule, deleteSchedule, openSchedule, updateSchedule } from 'src/store/actions/scheduleActions';
 import moment from 'moment';
 import meToaster from './toaster';
@@ -36,9 +36,19 @@ function ScheduleModal({
   const profile = useGetProfile();
   const firestore = useFirestore();
 
-  const [classObj] = useGetData("classes", classId);
+  const classObj = useSelector((state) => state.firestore.data[`class/${classId}`]);
+  console.log(classObj);
 
   useFirestoreConnect([
+    {
+      collection: "schools",
+      doc: profile.schoolId,
+      subcollections: [{
+        collection: "classes",
+        doc: classId,
+      }],
+      storeAs: `class/${classId}`
+    },
     {
       collection: "schools",
       doc: profile.schoolId,
@@ -88,7 +98,7 @@ function ScheduleModal({
       onConfirm: () => {
         dispatch(deleteSchedule(classId, schedule.id))
           .finally(() => {
-            onRefresh();
+            onRefresh && onRefresh();
             setSelectedEvent(null);
           })
       },
@@ -134,7 +144,7 @@ function ScheduleModal({
             }))
               .then(() => {
                 setStatusLoading(null);
-                onRefresh();
+                onRefresh && onRefresh();
               })
               .catch((e) => {
                 setStatusLoading(null);
@@ -159,7 +169,7 @@ function ScheduleModal({
       }))
       .then(() => {
         setStatusLoading(null);
-        onRefresh();
+        onRefresh && onRefresh();
       })
       .catch((e) => {
         setStatusLoading(null);
@@ -178,7 +188,7 @@ function ScheduleModal({
           setIsClosing(true)
           dispatch(closeSchedule(classId, schedule.id, schedule))
             .finally(() => {
-              onRefresh();
+              onRefresh && onRefresh();
               setIsClosing(false);
             })
         }
@@ -213,7 +223,7 @@ function ScheduleModal({
     dispatch(updateSchedule(classId, schedule.id, payload))
       .then(() => {
         setSelectedEvent(null);
-        onRefresh();
+        onRefresh && onRefresh();
       })
       .catch((e) => {
         meToaster.danger(e.message)
@@ -229,7 +239,7 @@ function ScheduleModal({
       closeOnBackdrop={false}
       show={Boolean(schedule)}
       onClose={() => setSelectedEvent(null)}
-      size={schedule?.status === "OPENED" && schedule?.openMethod !== SCHEDULE_OPEN_METHODS.GEOLOCATION && "lg"}
+      size={(schedule?.status === "OPENED" && schedule?.openMethod !== SCHEDULE_OPEN_METHODS.GEOLOCATION) ? "lg" : null}
     >
       <CForm onSubmit={handleSubmit(onSubmitEvent)}>
         <CModalHeader className="d-flex justify-content-between">
