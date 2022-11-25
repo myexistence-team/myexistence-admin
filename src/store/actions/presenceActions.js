@@ -25,6 +25,9 @@ export function createStudentPresence({
     const scheduleSnap = await scheduleRef.get();
     const schedule = scheduleSnap.data();
 
+    const time = new Date();
+    // time.setDate(time.getDate() - 12);
+
     const newLog = {
       schedule: {
         start: schedule.start,
@@ -37,7 +40,7 @@ export function createStudentPresence({
       classId,
       teacherId: schedule.openedBy,
       status,
-      time: new Date(),
+      time,
     }
 
     if (studentLogId) {
