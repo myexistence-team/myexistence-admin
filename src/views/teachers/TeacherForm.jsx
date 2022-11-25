@@ -157,17 +157,20 @@ export default function TeacherForm() {
               />
               <METextField
                 { ...register("displayName") }
+                label="Nama Panjang"
                 errors={errors}
                 defaultValue={teacher?.displayName}
               />
               <METextArea
                 { ...register("description") }
+                label="Deskripsi"
                 errors={errors}
                 rows={3}
                 defaultValue={teacher?.description}
               />
               <METextField
                 { ...register("idNumber") }
+                label="Nomor Induk"
                 errors={errors}
                 defaultValue={teacher?.idNumber}
               />

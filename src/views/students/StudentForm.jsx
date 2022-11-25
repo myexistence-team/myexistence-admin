@@ -30,6 +30,7 @@ export default function StudentForm() {
   const studentSchema = object().shape({
     displayName: string().required().strict(),
     description: string(),
+    idNumber: string().required().strict(),
     email: string().email().required().strict(),
     isVerified: boolean()
   })
@@ -138,11 +139,13 @@ export default function StudentForm() {
             </div>
             <METextField
               { ...register("displayName") }
+              label="Nama Panjang"
               defaultValue={student?.displayName}
               errors={errors}
             />
             <METextArea
               { ...register("description") }
+              label="Deskripsi"
               rows={3}
               defaultValue={student?.description}
               errors={errors}
@@ -151,6 +154,12 @@ export default function StudentForm() {
               { ...register("email") }
               defaultValue={student?.email}
               errors={errors}
+            />
+            <METextField
+              { ...register("idNumber") }
+              label="Nomor Induk"
+              errors={errors}
+              defaultValue={student?.idNumber}
             />
             {
               editMode && (

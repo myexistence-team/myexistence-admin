@@ -84,6 +84,7 @@ export default function AdminForm() {
             <CCardBody>
               <METextField
                 { ...register("displayName") }
+                label="Nama Panjang"
                 defaultValue={admin?.displayName}
                 errors={errors}
               />
