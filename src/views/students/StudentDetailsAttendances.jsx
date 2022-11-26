@@ -31,7 +31,8 @@ export default function StudentDetailsAttendances() {
           ...watch("dateEnd") ? [["time", "<=", new Date(watch("dateEnd"))]] : [],
           ...watch("scheduleId") ? [["scheduleId", "==", watch("scheduleId")]] : [],
           ...watch("classId") ? [["classId", "==", watch("classId")]] : [],
-        ]
+        ],
+        orderBy: ["time", "desc"]
       }],
       storeAs: "logs"
     }
