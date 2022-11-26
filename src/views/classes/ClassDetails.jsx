@@ -24,6 +24,9 @@ import { CChart } from '@coreui/react-chartjs';
 import MESelect from 'src/components/MESelect';
 import ScheduleModal from 'src/components/ScheduleModal';
 import meConfirm from 'src/components/meConfirm';
+import METextField from 'src/components/METextField';
+import { useForm } from 'react-hook-form';
+import MEControlledSelect from 'src/components/MEControlledSelect';
 moment.locale('id', {
   week: {
     dow: 1
@@ -300,13 +303,19 @@ export function ClassAttendances(props) {
 
   const schoolId = useGetSchoolId();
 
+  const { register, getValues, watch, control } = useForm();
   useFirestoreConnect([
     {
       collection: "schools",
       doc: schoolId,
       subcollections: [{
         collection: "logs",
-        where: [["classId", "==", classId]],
+        where: [
+          ["classId", "==", classId],
+          ...watch("dateStart") ? [["time", ">=", new Date(watch("dateStart"))]] : [],
+          ...watch("dateEnd") ? [["time", "<=", new Date(watch("dateEnd"))]] : [],
+          ...watch("scheduleId") ? [["scheduleId", "==", watch("scheduleId")]] : [],
+        ],
         orderBy: ["time", "desc"],
 
       }],
@@ -346,10 +355,39 @@ export function ClassAttendances(props) {
   ]
 
   const [status, setStatus] = useState("");
+  const schedules = useSelector((state) => state.firestore.ordered.schedules);
 
   return (
     <CRow className="mt-3">
       <CCol xs={12} sm={6}>
+        <h5>Filter</h5>
+        <CRow>
+          <CCol xs={6}>
+            <METextField
+              { ...register("dateStart") }
+              label="Dari"
+              type="date"
+            />
+          </CCol>
+          <CCol xs={6}>
+            <METextField
+              { ...register("dateEnd") }
+              label="Sampai"
+              type="date"
+            />
+          </CCol>
+          <CCol xs={12}>
+            <MEControlledSelect
+              control={control}
+              name="scheduleId"
+              label="Jadwal"
+              options={schedules?.map((s) => ({
+                value: s.id,
+                label: `${moment(s.start.toDate()).format("dddd, HH:mm - ")} ${moment(s.end.toDate()).format("HH:mm")}`
+              }))}
+            />
+          </CCol>
+        </CRow>
         <CDataTable
           items={modifiedLogs}
           pagination={true}
