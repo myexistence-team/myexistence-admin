@@ -17,10 +17,9 @@ import { firebase } from './utils/firebase';
 import moment from "moment";
 import 'firebase/compat/storage';
 import { PersistGate } from "redux-persist/integration/react";
+require('moment/locale/id.js')
 
 React.icons = icons;
-
-moment.locale("id");
 
 const profileConfig = {
   userProfile: 'users',
