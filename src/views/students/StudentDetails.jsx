@@ -10,6 +10,7 @@ import MESpinner from 'src/components/MESpinner';
 import ScheduleCalendar from 'src/components/ScheduleCalendar';
 import { useGetData, useGetOrdered, useGetProfile, useGetSchoolId } from 'src/hooks/getters';
 import { deleteStudent } from 'src/store/actions/studentActions';
+import StudentDetailsAttendances from './StudentDetailsAttendances';
 
 export default function StudentDetails() {
   const { studentId } = useParams();
@@ -118,6 +119,11 @@ export default function StudentDetails() {
                   Jadwal
                 </CNavLink>
               </CNavItem>
+              <CNavItem>
+                <CNavLink data-tab="attendances">
+                  Kehadiran Pelajar
+                </CNavLink>
+              </CNavItem>
             </CNav>
             <CTabContent>
               <CTabPane data-tab="details">
@@ -175,6 +181,9 @@ export default function StudentDetails() {
                   loading={schedulesLoading}
                   className="mt-3"
                 />
+              </CTabPane>
+              <CTabPane data-tab="attendances">
+                <StudentDetailsAttendances/>
               </CTabPane>
             </CTabContent>
           </CTabs>
