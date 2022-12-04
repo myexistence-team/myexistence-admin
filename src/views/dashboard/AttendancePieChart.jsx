@@ -8,7 +8,9 @@ import { useFirestoreConnect } from 'react-redux-firebase'
 import meColors from 'src/components/meColors'
 import MENativeSelect from 'src/components/MENativeSelect'
 import MESpinner from 'src/components/MESpinner'
+import { QUICK_DATES } from 'src/constants'
 import { useGetOrdered, useGetSchoolId } from 'src/hooks/getters'
+import { getStartOfWeek } from 'src/utils/utilFunctions'
 
 export default function AttendancePieChart() {
 
@@ -17,6 +19,10 @@ export default function AttendancePieChart() {
   const schoolId = useGetSchoolId();
   const nowFromMoment = moment(new Date()).add({days: -7}).toDate();
   const [now, setNow] = useState(nowFromMoment);
+
+  const [quickDate, setQuickDate] = useState(QUICK_DATES.WEEK);
+  const [dateStart, setDateStart] = useState(getStartOfWeek());
+  const [dateEnd, setDateEnd] = useState(new Date());
 
   useEffect(() => {
     setNow(moment(new Date()).add({days: -(parseInt(watch("timespan")))}).toDate())
@@ -27,7 +33,10 @@ export default function AttendancePieChart() {
     doc: schoolId,
     subcollections: [{
       collection: "logs",
-      where: [["time", ">", now]],
+      where: [
+        ["time", ">=", dateStart],
+        ["time", "<=", dateEnd]
+      ],
     }],
     storeAs: "logs"
   }] : [])

@@ -11,14 +11,14 @@ import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { SCHEDULE_START_DATE_MS } from 'src/constants';
-import { createSchedule, updateSchedule } from 'src/store/actions/scheduleActions';
+import { changeExcuseStatus, changeSchoolLogStatus, createSchedule, updateSchedule } from 'src/store/actions/scheduleActions';
 import { useDispatch } from 'react-redux';
 import { MdArrowLeft, MdArrowRight } from 'react-icons/md';
 import { deleteClass, ENROLLMENT_ACTIONS, updateClassStudent } from 'src/store/actions/classActions';
 import meToaster from 'src/components/toaster';
 import { Helmet } from 'react-helmet';
-import { ATTENDANCE_STATUS_ENUM } from 'src/enums';
-import { getAttendanceStatusColor } from 'src/utils/utilFunctions';
+import { ATTENDANCE_STATUS_ENUM, EXCUSE_STATUS_ENUM } from 'src/enums';
+import { getAttendanceStatusColor, percentage } from 'src/utils/utilFunctions';
 import meColors from 'src/components/meColors';
 import { CChart } from '@coreui/react-chartjs';
 import MESelect from 'src/components/MESelect';
@@ -27,6 +27,8 @@ import meConfirm from 'src/components/meConfirm';
 import METextField from 'src/components/METextField';
 import { useForm } from 'react-hook-form';
 import MEControlledSelect from 'src/components/MEControlledSelect';
+import StudentLogDetailsModal from 'src/components/StudentLogDetailsModal';
+import PresencesGraphs from 'src/components/PresencesGraphs';
 moment.locale('id', {
   week: {
     dow: 1
@@ -304,6 +306,7 @@ export function ClassAttendances(props) {
   const schoolId = useGetSchoolId();
 
   const { register, getValues, watch, control } = useForm();
+  const dispatch = useDispatch();
   useFirestoreConnect([
     {
       collection: "schools",
@@ -331,35 +334,67 @@ export function ClassAttendances(props) {
   const [logs, logsLoading] = useGetOrdered("logs");
   const modifiedLogs = logs?.map((l) => ({ ...l, studentName: students?.[l.studentId]?.displayName }));
 
-  const presentCount = logs?.filter((l) => l?.status === "PRESENT")?.length;
-  const lateCount = logs?.filter((l) => l?.status === "LATE")?.length;
-  const excusedCount = logs?.filter((l) => l?.status === "EXCUSED")?.length;
-  const absentCount = logs?.filter((l) => l?.status === "ABSENT")?.length;
-
-  const labels = [
-    "Hadir",
-    "Terlambat",
-    "Izin",
-    "Absen",
-  ]
-  const donutData = [
-    {
-      data: [presentCount, lateCount, excusedCount, absentCount],
-      backgroundColor: [
-        meColors.success.main,
-        meColors.orange,
-        meColors.yellow,
-        meColors.danger,
-      ],
-    }
-  ]
-
   const [status, setStatus] = useState("");
+  const [excuseStatus, setExcuseStatus] = useState("");
   const schedules = useSelector((state) => state.firestore.ordered.schedules);
+
+  const [selectedLogId, setSelectedLogId] = useState(null);
+  const selectedLog = logs?.find((l) => l.id === selectedLogId);
+  function handleSelectLog(logId) {
+    setSelectedLogId(logId);
+  }
+
+  const [excuseStatusLoading, setExcuseStatusLoading] = useState(null);
+  const [logStatusLoading, setLogStatusLoading] = useState(null);
+  function handleExcuseStatus(excuseStatus) {
+    setExcuseStatusLoading(excuseStatus);
+    if (selectedLog) {
+      meConfirm({
+        onConfirm: () => {
+          dispatch(changeExcuseStatus({
+            classId: selectedLog.classId,
+            scheduleId: selectedLog.scheduleId,
+            studentLogId: selectedLog.id,
+            excuseStatus
+          }))
+            .then(() => {
+              setSelectedLogId(null);
+              setExcuseStatusLoading(null);
+            })
+        }
+      })
+    }
+  }
+
+  function handleLogStatusChange(status) {
+    setLogStatusLoading(status);
+    if (selectedLog) {
+      meConfirm({
+        onConfirm: () => {
+          dispatch(changeSchoolLogStatus({
+            logId: selectedLogId,
+            status
+          }))
+            .then(() => {
+              setLogStatusLoading(null);
+            })
+        }
+      })
+    }
+  }
 
   return (
     <CRow className="mt-3">
-      <CCol xs={12} sm={6}>
+      <StudentLogDetailsModal
+        log={selectedLog}
+        excuseStatusLoading={excuseStatusLoading}
+        onExcuseChange={handleExcuseStatus}
+        onStatusChange={handleLogStatusChange}
+        statusLoading={logStatusLoading}
+        setSelectedLogId={setSelectedLogId}
+        showSchedule
+      />
+      <CCol xs={12} sm={7}>
         <h5>Filter</h5>
         <CRow>
           <CCol xs={6}>
@@ -394,7 +429,8 @@ export function ClassAttendances(props) {
           itemsPerPage={10}
           columnFilter
           columnFilterValue={{
-            status
+            status,
+            excuseStatus
           }}
           columnFilterSlot={{
             status: (
@@ -405,13 +441,24 @@ export function ClassAttendances(props) {
                 value={status}
               />
             ),
-            time: <></>
+            excuseStatus: (
+              <MESelect
+                name="excuseStatus"
+                options={EXCUSE_STATUS_ENUM}
+                onChange={(v) => setExcuseStatus(v || "")}
+                value={excuseStatus}
+              />
+            ),
+            time: <></>,
+            actions: <></>,
           }}
           loading={logsLoading}
           fields={[
             { key: "studentName", label: "Nama Pelajar" },
             { key: "time", label: "Tanggal & Waktu Kehadiran" },
             { key: "status", label: "Status" },
+              ...status === "EXCUSED" ? [{ key: "excuseStatus", label: "Status Izin" }] : [],
+              { key: "actions", label: "" },
           ]}
           scopedSlots={{
             studentName: (l) => (
@@ -428,19 +475,36 @@ export function ClassAttendances(props) {
                 </strong>
               </td>
             ),
+            excuseStatus: (l) => (
+              <td>
+                <strong>
+                  {EXCUSE_STATUS_ENUM[l.excuseStatus]}
+                </strong>
+              </td>
+            ),
             time: (l) => (
               <td>
                 {moment(l.time.toDate()).format("LLL")}
               </td>
             ),
+            actions: (l) => (
+              <td>
+                <CButton
+                  color="primary"
+                  variant="outline"
+                  onClick={() => handleSelectLog(l.id)}
+                >
+                  Lihat
+                </CButton>
+              </td>
+            )
           }}
         />
       </CCol>
-      <CCol xs={12} sm={6}>
-        <CChart
-          type="doughnut"
-          datasets={donutData}
-          labels={labels}
+      <CCol xs={12} sm={5}>
+        <PresencesGraphs
+          logs={logs}
+          setStatus={setStatus}
         />
       </CCol>
     </CRow>
