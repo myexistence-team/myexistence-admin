@@ -75,11 +75,23 @@ export function updateStudent(studentId, student) {
 export function deleteStudent(studentId) {
   return async (dispatch, getState, { getFirestore }) => {
     const firestore = getFirestore();
+    const batch = firestore.batch();
+    const { profile } = getState().firebase;
 
-    await firestore
-      .collection("users")
-      .doc(studentId)
-      .delete();
+    const studentRef = firestore.collection("users").doc(studentId);
+    const classesRef = firestore
+      .collection("schools")
+      .doc(profile.schoolId)
+      .collection("classes");
+    const classesQuery = classesRef.where("studentIds", "array-contains", studentId);
+    const classesSnaps = await classesQuery.get();
+    for (const classRef of classesSnaps.docs) {
+      batch.update(classRef, {
+        studentIds: firestore.FieldValue.arrayRemove(studentId)
+      });
+    }
+    await batch.commit();
+    await studentRef.delete();
   }
 }
 

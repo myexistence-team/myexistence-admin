@@ -75,11 +75,23 @@ export function updateTeacher(teacherId, newTeacher) {
 export function deleteTeacher(teacherId) {
   return async (dispatch, getState, { getFirestore }) => {
     const firestore = getFirestore();
+    const batch = firestore.batch();
+    const { profile } = getState().firebase;
 
-    await firestore
-      .collection("users")
-      .doc(teacherId)
-      .delete();
+    const teacherRef = firestore.collection("users").doc(teacherId);
+    const classesRef = firestore
+      .collection("schools")
+      .doc(profile.schoolId)
+      .collection("classes");
+    const classesQuery = classesRef.where("teacherIds", "array-contains", teacherId);
+    const classesSnaps = await classesQuery.get();
+    for (const classRef of classesSnaps.docs) {
+      batch.update(classRef, {
+        teacherIds: firestore.FieldValue.arrayRemove(teacherId)
+      });
+    }
+    await batch.commit();
+    await teacherRef.delete();
   }
 }
 

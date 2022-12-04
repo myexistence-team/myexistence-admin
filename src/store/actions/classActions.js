@@ -77,9 +77,21 @@ export function updateClass(classId, newClass) {
 export function deleteClass(classId) {
   return async (dispatch, getState, { getFirestore }) => {
     const firestore = getFirestore();
+    const batch = firestore.batch();
+    const { profile } = getState().firebase;
 
+    const usersRef = firestore.collection("users");
+    const usersQuery = usersRef.where("classIds", "array-contains", classId);
+    const classesSnaps = await usersQuery.get();
+    for (const classRef of classesSnaps.docs) {
+      batch.update(classRef, {
+        classIds: firestore.FieldValue.arrayRemove(classId)
+      });
+    }
     await firestore
-      .collection("users")
+      .collection("schools")
+      .doc(profile.schoolId)
+      .collection("classes")
       .doc(classId)
       .delete();
   }
