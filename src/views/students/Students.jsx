@@ -70,6 +70,7 @@ export default function Students() {
             { key: "profilePicture", label: "" },
             { key: "displayName", label: "Nama Lengkap" },
             "email",
+            { key: "idNumber", label: "Nomor Induk" },
             { key: "isVerified", label: "Terverifikasi" },
             { key: "hasRegistered", label: "Terdaftar" },
             ...profile.role !== "TEACHER" ? [{ key: "actions", label: "" }] : [],

@@ -146,7 +146,7 @@ export default function TeacherDetails() {
                             <h5>{teacher?.displayName}</h5>
                           </CCol>
                           <CCol xs={12} md={6}>
-                            <label>Nomor ID</label>
+                            <label>Nomor Induk</label>
                             <h5>{teacher?.idNumber}</h5>
                           </CCol>
                           <CCol xs={12}>

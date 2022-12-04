@@ -76,7 +76,7 @@ export default function Teachers() {
           fields={[
             { key: "profilePicture", label: "" },
             { key: "displayName", label: "Nama Lengkap" },
-            "idNumber",
+            { key: "idNumber", label: "Nomor Induk" },
             "email",
             { key: "createdAt", label: "Tanggal Dibuat" },
             { key: "isVerified", label: "Terverifikasi" },

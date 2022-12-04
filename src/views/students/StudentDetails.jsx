@@ -149,7 +149,11 @@ export default function StudentDetails() {
                         <label>Email</label>
                         <h5>{student?.email}</h5>
                       </CCol>
-                      <CCol xs={12}>
+                      <CCol xs={12} md={6}>
+                        <label>Nomor Induk</label>
+                        <h5>{student?.idNumber}</h5>
+                      </CCol>
+                      <CCol xs={12} md={6}>
                         <label>Deskripsi</label>
                         <h5>{student?.description}</h5>
                       </CCol>
