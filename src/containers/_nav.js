@@ -7,7 +7,7 @@ import {
   BiBarChartSquare,
   BiTargetLock
 } from "react-icons/bi";
-import { FaChalkboardTeacher, FaListUl, FaSchool, FaUserGraduate } from "react-icons/fa";
+import { FaChalkboardTeacher, FaHandPaper, FaListUl, FaSchool, FaUserGraduate } from "react-icons/fa";
 import { BsBook } from "react-icons/bs";
 import { FiTarget } from "react-icons/fi";
 import {
@@ -68,6 +68,12 @@ const adminNavs = [
     name: "Administrasi",
     to: "/admins",
     icon: <MdVerifiedUser className="c-sidebar-nav-icon" />
+  },
+  {
+    _tag: "CSidebarNavItem",
+    name: "Permintaan Izin Pelajar",
+    to: "/student-excuses",
+    icon: <FaHandPaper className="c-sidebar-nav-icon" />
   },
 ]
 

@@ -15,6 +15,7 @@ import StudentForm from "./views/students/StudentForm";
 import ClassDetails from "./views/classes/ClassDetails";
 import StudentDetails from "./views/students/StudentDetails";
 import MySchedule from "./views/classes/MySchedule";
+import StudentExcuses from "./views/studentExcuses/StudentExcuses";
 const Dashboard = React.lazy(() => import("./views/dashboard/Dashboard"));
 
 const adminRoutes = [
@@ -26,6 +27,7 @@ const adminRoutes = [
   { path: "/classes/add", name: "Tambahkan Kelas", component: ClassForm, exact: true },
   { path: "/students/add", name: "Tambahkan Pelajar", component: StudentForm, exact: true },
   { path: "/students/:studentId/edit", name: "Edit Pelajar", component: StudentForm, exact: true },
+  { path: "/student-excuses", name: "Permintaan Izin Pelajar", component: StudentExcuses, exact: true }
 ];
 
 const teacherRoutes = [
