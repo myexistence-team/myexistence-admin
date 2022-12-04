@@ -37,10 +37,6 @@ export default function MySchool() {
           school ? (
             <>
               <div className="mb-3">
-                <label>ID Sekolah</label>
-                <h5>{profile.schoolId}</h5>
-              </div>
-              <div className="mb-3">
                 <label>Nama Sekolah</label>
                 <h5>{school.name}</h5>
               </div>
