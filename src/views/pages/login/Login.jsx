@@ -25,6 +25,7 @@ import METextField from "src/components/METextField";
 import { AiOutlineLock, AiOutlineUser } from "react-icons/ai";
 import { isLoaded, useFirebase, useFirebaseConnect } from "react-redux-firebase";
 import meToaster from "src/components/toaster";
+import hadirLogo from "src/images/hadir-logo-blue.png"
 
 const Login = () => {
   useFirebaseConnect(["auth"]);
@@ -112,11 +113,15 @@ const Login = () => {
           <CCard className="p-4">
             <CCardBody>
               <CRow>
-                <CCol sm={12} md={6}>
+                <CCol sm={12} md={6} className="d-flex flex-column align-items-center justify-content-center">
+                  <h3 style={{ color: meColors.primary.main }}>Selamat Datang di</h3>
                   <CImg
-                    // src={loginImg}
+                    src={hadirLogo}
                     className="w-75 mx-auto d-block"
                     align="center"
+                    style={{
+                      objectFit: "contain"
+                    }}
                   />
                 </CCol>
                 <CCol sm={12} md={6}>
