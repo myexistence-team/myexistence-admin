@@ -35,3 +35,9 @@ export const EXCUSE_STATUSES = {
   ACCEPTED: "ACCEPTED",
   REJECTED: "REJECTED",
 }
+
+export const QUICK_DATES = {
+  WEEK: "WEEK",
+  MONTH: "MONTH",
+  YEAR: "YEAR",
+}
