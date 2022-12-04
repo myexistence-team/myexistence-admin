@@ -65,7 +65,7 @@ export function updateStudent(studentId, student) {
       .doc(studentId)
       .update({ 
         ...student, 
-        photoUrl,
+        ...photoUrl ? { photoUrl } : {},
         updatedBy: auth.uid,
         updatedAt: new Date()
       });

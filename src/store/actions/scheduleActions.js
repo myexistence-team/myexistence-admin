@@ -210,7 +210,7 @@ export function openSchedule({ classId, scheduleId, location = null, openMethod 
 export function changeExcuseStatus({ classId, scheduleId, studentLogId, excuseStatus }) {
   return async (dispatch, getState, { getFirestore }) => {
     const firestore = getFirestore();
-    const profile = getState().firebase.profile;
+    const { profile, auth } = getState().firebase;
 
     const studentLogRef = firestore
       .collection("schools")
@@ -223,7 +223,47 @@ export function changeExcuseStatus({ classId, scheduleId, studentLogId, excuseSt
       .doc(studentLogId);
 
     await studentLogRef.update({
-      excuseStatus
+      excuseStatus,
+      updatedBy: auth.uid,
+      updatedAt: new Date()
+    });
+  }
+}
+
+export function changeSchoolLogExcuseStatus({ logId, excuseStatus }) {
+  return async (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore();
+    const { profile, auth } = getState().firebase;
+
+    const logRef = firestore
+      .collection("schools")
+      .doc(profile.schoolId)
+      .collection("logs")
+      .doc(logId);
+
+    await logRef.update({
+      excuseStatus,
+      excuseStatusUpdatedBy: auth.uid,
+      excuseStatusUpdatedAt: new Date()
+    });
+  }
+}
+
+export function changeSchoolLogStatus({ logId, status }) {
+  return async (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore();
+    const { profile, auth } = getState().firebase;
+
+    const logRef = firestore
+      .collection("schools")
+      .doc(profile.schoolId)
+      .collection("logs")
+      .doc(logId);
+
+    await logRef.update({
+      status,
+      updatedBy: auth.uid,
+      updatedAt: new Date()
     });
   }
 }
