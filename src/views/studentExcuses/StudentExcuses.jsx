@@ -23,7 +23,17 @@ export default function StudentExcuses() {
         ["schoolId", "==", schoolId],
         ["status", "==", "EXCUSED"],
         ...waitingOnly ? [["excuseStatus", "==", "WAITING"]] : []
-      ]
+      ],
+      orderBy: ["time", "desc"]
+    },
+    {
+      collectionGroup: "studentLogs",
+      where: [
+        ["schoolId", "==", schoolId],
+        ["status", "==", "EXCUSED"],
+        ...waitingOnly ? [["excuseStatus", "==", "WAITING"]] : []
+      ],
+      orderBy: ["time", "desc"]
     },
     {
       collection: "users",
@@ -32,14 +42,16 @@ export default function StudentExcuses() {
   ])
   const [students] = useGetData("users");
   const [ logsState, logsLoading ] = useGetData("logs");
-  const logs = Object.entries(logsState || {});
+  const [ studentLogsState, studentLogsLoading ] = useGetData("studentLogs");
+  const logs = Object.entries(studentLogsState || {}).concat(Object.entries(logsState || {}));
   const modifiedLogs = logs?.map((l) => ({ id: l[0], ...l[1], studentName: students?.[l[1].studentId]?.displayName }));
 
   const [status, setStatus] = useState("");
   const [selectedLogId, setSelectedLogId] = useState(null);
-  const selectedLog = logsState?.[selectedLogId];
+  const selectedLog = { ...logsState, ...studentLogsState }?.[selectedLogId];
 
   function handleSelectLog(logId) {
+    console.log(logId)
     setSelectedLogId(logId);
   }
 
@@ -101,7 +113,7 @@ export default function StudentExcuses() {
             time: <></>,
             actions: <></>
           }}
-          loading={logsLoading}
+          loading={logsLoading || studentLogsLoading}
           fields={[
             { key: "studentName", label: "Nama Pelajar" },
             { key: "time", label: "Tanggal & Waktu Kehadiran" },
@@ -112,7 +124,7 @@ export default function StudentExcuses() {
             studentName: (l) => (
               <td>
                 <Link to={`/students/${l.studentId}`}>
-                  {l.studentName}
+                  {l.studentName || "JJ Olatunji"}
                 </Link>
               </td>
             ),
