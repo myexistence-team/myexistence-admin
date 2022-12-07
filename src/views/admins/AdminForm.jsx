@@ -83,14 +83,15 @@ export default function AdminForm() {
             </CCardHeader>
             <CCardBody>
               <METextField
+                { ...register("email") }
+                defaultValue={admin?.email}
+                errors={errors}
+                disabled={editMode}
+              />
+              <METextField
                 { ...register("displayName") }
                 label="Nama Panjang"
                 defaultValue={admin?.displayName}
-                errors={errors}
-              />
-              <METextField
-                { ...register("email") }
-                defaultValue={admin?.email}
                 errors={errors}
               />
               {

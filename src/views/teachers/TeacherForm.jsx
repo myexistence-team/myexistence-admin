@@ -154,6 +154,7 @@ export default function TeacherForm() {
                 { ...register("email") }
                 errors={errors}
                 defaultValue={teacher?.email}
+                disabled={editMode}
               />
               <METextField
                 { ...register("displayName") }

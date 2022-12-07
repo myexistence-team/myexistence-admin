@@ -138,6 +138,12 @@ export default function StudentForm() {
               </CRow>
             </div>
             <METextField
+              { ...register("email") }
+              defaultValue={student?.email}
+              errors={errors}
+              disabled={editMode}
+            />
+            <METextField
               { ...register("displayName") }
               label="Nama Panjang"
               defaultValue={student?.displayName}
@@ -148,11 +154,6 @@ export default function StudentForm() {
               label="Deskripsi"
               rows={3}
               defaultValue={student?.description}
-              errors={errors}
-            />
-            <METextField
-              { ...register("email") }
-              defaultValue={student?.email}
               errors={errors}
             />
             <METextField
