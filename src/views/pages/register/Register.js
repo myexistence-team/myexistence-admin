@@ -56,7 +56,7 @@ function RegisterAdmin(props) {
       <h5>Sebagai Admin</h5>
       <METextField
         { ...register("displayName") }
-        label="Nama"
+        label="Nama Lengkap"
         startIcon={AiOutlineUser}
         errors={errors}
       />
@@ -218,7 +218,7 @@ function RegisterTeacher(props) {
     <CForm onSubmit={handleSubmit(onSubmit)}>
       <h5>Sebagai Pengajar</h5>
       <METextField
-        label="Nama"
+        label="Nama Kelas"
         { ...register("displayName") }
         startIcon={AiOutlineUser}
         errors={errors}

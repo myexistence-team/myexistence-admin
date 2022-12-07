@@ -101,7 +101,7 @@ export default function ClassForm(props) {
             </CCardHeader>
             <CCardBody>
               <METextField
-                label="Nama"
+                label="Nama Kelas"
                 { ...register("name") }
                 defaultValue={classObj?.name}
                 errors={errors}
