@@ -8,7 +8,6 @@ import {
 import Avatar from "react-avatar";
 import { useDispatch, useSelector } from "react-redux";
 import { BiLogOut } from "react-icons/bi";
-import fromApi from "src/actions/fromApi";
 import { useHistory } from "react-router";
 import CIcon from "@coreui/icons-react";
 import { signOut } from "src/store/actions/authActions";

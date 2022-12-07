@@ -14,7 +14,6 @@ import {
 } from "@coreui/react";
 import CIcon from "@coreui/icons-react";
 
-import MainChartExample from "../charts/MainChartExample.js";
 import { Helmet } from "react-helmet";
 import { FaChalkboardTeacher, FaSchool } from "react-icons/fa";
 import { IoMdSchool } from "react-icons/io";

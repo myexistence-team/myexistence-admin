@@ -38,8 +38,8 @@ export default function PresencesGraphs({
         <CCol xs={6} className="mb-4">
           <div 
             className="rounded border p-3 text-center"
-            style={{ cursor: "pointer" }}
-            onClick={() => setStatus("PRESENT")}
+            style={{ cursor: setStatus ? "pointer" : "default" }}
+            onClick={() => setStatus && setStatus("PRESENT")}
           >
             <h5 style={{ color: getAttendanceStatusColor("PRESENT") }}>
               Hadir

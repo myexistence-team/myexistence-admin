@@ -4,7 +4,8 @@ import React from 'react'
 import { GrClose } from 'react-icons/gr'
 import { useSelector } from 'react-redux'
 import { DAYS_ARRAY, EXCUSE_STATUSES, PRESENCE_STATUSES } from 'src/constants'
-import { ATTENDANCE_STATUS_ENUM, EXCUSE_TYPE_ENUM } from 'src/enums'
+import { ATTENDANCE_STATUS_ENUM, EXCUSE_STATUS_ENUM, EXCUSE_TYPE_ENUM } from 'src/enums'
+import { useGetProfile } from 'src/hooks/getters'
 import { getAttendanceStatusColor } from 'src/utils/utilFunctions'
 
 export default function StudentLogDetailsModal({
@@ -18,13 +19,14 @@ export default function StudentLogDetailsModal({
 }) {
   // const { schedule } = log;
   // console.log(schedule)
+  const profile = useGetProfile();
   const classes = useSelector((state) => state.firestore.data.classes);
   const classroom = classes?.[log?.classId];
 
   return (
     <CModal show={log} centered closeOnBackdrop={false} size={log?.status === "EXCUSED" ? "xl" : "md"}>
       <CModalHeader className="d-flex justify-content-between align-items-center">
-        <h4>Detail Kehadiran Pelajar</h4>
+        <h4>{ !log?.excuse ? "Detail Kehadiran Pelajar" : "Detail Permintaan Izin" }</h4>
         <CButton
           onClick={() => setSelectedLogId(null)}
         >
@@ -62,7 +64,7 @@ export default function StudentLogDetailsModal({
                 <h5>{moment(log?.time?.toDate()).format("LLL")}</h5>
               </CCol>
               {
-                onStatusChange && !log?.excuse && (
+                profile.role !== "TEACHER" && onStatusChange && !log?.excuse && (
                   <>
                     <CCol xs={4}>
                       <CButton
@@ -112,7 +114,7 @@ export default function StudentLogDetailsModal({
                   <CLabel>Alasan</CLabel>
                   <h5>{log?.excuse?.message}</h5>
                   {
-                    onExcuseChange && (
+                    profile.role !== "TEACHER" ? onExcuseChange ? (
                       <CRow className="mt-3">
                         <CCol xs={6}>
                           <CButton
@@ -139,6 +141,11 @@ export default function StudentLogDetailsModal({
                           </CButton>
                         </CCol>
                       </CRow>
+                    ) : null : (
+                      <>
+                        <CLabel>Status Izin</CLabel>
+                        <h5>{EXCUSE_STATUS_ENUM[log?.excuseStatus]}</h5>
+                      </>
                     )
                   }
                 </>

@@ -37,7 +37,6 @@ function ScheduleModal({
   const firestore = useFirestore();
 
   const classObj = useSelector((state) => state.firestore.data[`class/${classId}`]);
-  console.log(classObj);
 
   useFirestoreConnect([
     {
@@ -88,8 +87,8 @@ function ScheduleModal({
     if (schedule) {
       setValue("day", schedule.day.toString());
       setValue("tolerance", schedule.tolerance.toString());
-      setValue("start", moment(schedule.start).format("HH:mm"));
-      setValue("end", moment(schedule.end).format("HH:mm"));
+      setValue("start", moment(schedule.start.toDate()).format("HH:mm"));
+      setValue("end", moment(schedule.end.toDate()).format("HH:mm"));
     }
   }, [schedule])
 
@@ -197,10 +196,10 @@ function ScheduleModal({
   }
 
   function onSubmitEvent(data) {
-    var startMoment = moment(schedule.start);
+    var startMoment = moment(schedule.start.toDate());
     const startSplit = data.start.split(":");
 
-    var endMoment = moment(schedule.end);
+    var endMoment = moment(schedule.end.toDate());
     const endSplit = data.end.split(":");
 
     const payload = {
@@ -244,15 +243,21 @@ function ScheduleModal({
       <CForm onSubmit={handleSubmit(onSubmitEvent)}>
         <CModalHeader className="d-flex justify-content-between">
           {
-            schedule.status !== "OPENED" ? (
-              <h4>{isOwnClassOrAdmin ? "Edit Sesi Kelas" : "Detail Sesi Kelas"}</h4>
-            ) : (
-              <h4>Sesi Kelas ({SCHEDULE_OPEN_METHODS_ENUM[schedule.openMethod]})</h4>
+            isOwnClassOrAdmin ? "Edit Sesi Kelas" : (
+              <>
+                {
+                  schedule.status !== "OPENED" ? (
+                    <h4>Detail Sesi Kelas</h4>
+                  ) : (
+                    <h4>Sesi Kelas ({SCHEDULE_OPEN_METHODS_ENUM[schedule.openMethod]})</h4>
+                  )
+                }
+              </>
             )
           }
           <div className="d-flex">
             {
-              schedule?.status === "OPENED" ? (
+              !isOwnClassOrAdmin && schedule?.status === "OPENED" ? (
                 <CButton
                   variant="outline"
                   color="danger"
@@ -284,7 +289,7 @@ function ScheduleModal({
             Boolean(schedule) && (
               <>
                 {
-                  schedule.status !== "OPENED" ? (
+                  isOwnClassOrAdmin || schedule.status !== "OPENED" ? (
                     <>
                       {
                         showClassName && (
@@ -325,40 +330,50 @@ function ScheduleModal({
                         disabled={!isOwnClassOrAdmin}
                       />
                       {
-                        isTeacherAndOwnClass && !profile?.currentScheduleId && (
+                        isTeacherAndOwnClass && (
                           <>
-                            <div className="text-center mb-3">Buka sesi kelas menggunakan</div>
                             {
-                              navigator.geolocation && (
-                                <CButton 
-                                  color="primary" 
-                                  size="lg" 
-                                  className="w-100 mb-3"
-                                  onClick={() => handleOpenSchedule(SCHEDULE_OPEN_METHODS.GEOLOCATION)}
-                                  disabled={statusLoading === SCHEDULE_OPEN_METHODS.GEOLOCATION}
-                                >
-                                  Deteksi Lokasi
-                                </CButton>
+                              !profile?.currentScheduleId ? (
+                                <>
+                                  <div className="text-center mb-3">Buka sesi kelas menggunakan</div>
+                                  {
+                                    navigator.geolocation && (
+                                      <CButton 
+                                        color="primary" 
+                                        size="lg" 
+                                        className="w-100 mb-3"
+                                        onClick={() => handleOpenSchedule(SCHEDULE_OPEN_METHODS.GEOLOCATION)}
+                                        disabled={statusLoading === SCHEDULE_OPEN_METHODS.GEOLOCATION}
+                                      >
+                                        Deteksi Lokasi
+                                      </CButton>
+                                    )
+                                  }
+                                  <CButton 
+                                    color="primary" 
+                                    size="lg" 
+                                    className="w-100 mb-3"
+                                    onClick={() => handleOpenSchedule(SCHEDULE_OPEN_METHODS.QR_CODE)}
+                                    disabled={statusLoading === SCHEDULE_OPEN_METHODS.QR_CODE}
+                                  >
+                                    QR Code
+                                  </CButton>
+                                  <CButton 
+                                    color="primary" 
+                                    size="lg" 
+                                    className="w-100"
+                                    onClick={() => handleOpenSchedule(SCHEDULE_OPEN_METHODS.CALLOUT)}
+                                    disabled={statusLoading === SCHEDULE_OPEN_METHODS.CALLOUT}
+                                  >
+                                    Panggil Pelajar
+                                  </CButton>
+                                </>
+                              ) : (
+                                <div className="text-center mt-3">
+                                  <h5>Anda sudah memiliki sesi kelas yang berlangsung.</h5>
+                                </div>
                               )
                             }
-                            <CButton 
-                              color="primary" 
-                              size="lg" 
-                              className="w-100 mb-3"
-                              onClick={() => handleOpenSchedule(SCHEDULE_OPEN_METHODS.QR_CODE)}
-                              disabled={statusLoading === SCHEDULE_OPEN_METHODS.QR_CODE}
-                            >
-                              QR Code
-                            </CButton>
-                            <CButton 
-                              color="primary" 
-                              size="lg" 
-                              className="w-100"
-                              onClick={() => handleOpenSchedule(SCHEDULE_OPEN_METHODS.CALLOUT)}
-                              disabled={statusLoading === SCHEDULE_OPEN_METHODS.CALLOUT}
-                            >
-                              Panggil Pelajar
-                            </CButton>
                           </>
                         )
                       }
@@ -387,7 +402,7 @@ function ScheduleModal({
           }
         </CModalBody>
         {
-          Boolean(schedule) && schedule.status !== "OPENED" && isOwnClassOrAdmin && (
+          Boolean(schedule) && isOwnClassOrAdmin && (
             <CModalFooter className="d-flex justify-content-end">
               <CButton
                 color="primary"

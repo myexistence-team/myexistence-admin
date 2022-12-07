@@ -28,17 +28,21 @@ export default function ScheduleCalendar(props) {
 
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [classes] = useGetData("classes");
+  const [selectedScheduleId, setSelectedScheduleId] = useState(null);
+  const selectedSchedule = events?.find((s) => s.id === selectedScheduleId);
 
   function handleEventClick(event) {
-    setSelectedEvent(event);
+    setSelectedScheduleId(event.id);
+    // setSelectedEvent(event);
   }
 
-  useEffect(() => {
-    if (selectedEvent) {
-      const selectedSchedule = events?.find((s) => s.id === selectedEvent.id);
-      setSelectedEvent(selectedSchedule)
-    }
-  }, [events])
+  // useEffect(() => {
+  //   if (selectedSchedule) {
+  //     const selectedSchedule = events?.find((s) => s.id === selectedEvent.id);
+  //   setSelectedScheduleId(selectedEvent.id);
+  //   setSelectedEvent(selectedSchedule)
+  //   }
+  // }, [events])
 
   const calendarProps = {
     defaultDate: moment(SCHEDULE_START_DATE_MS).toDate(),
@@ -49,7 +53,12 @@ export default function ScheduleCalendar(props) {
     defaultView: "week",
     localizer,
     style: { ...style, height: "100%" },
-    events,
+    events: events.map((e) => ({ 
+      ...e, 
+      start: e.start.toDate(), 
+      end: e.end.toDate(), 
+      title: e.title + (e.status === "OPENED" ? " (Berlangsung)" : "")
+    })),
     components: {
       week: {
         header: ({ date, localizer }) => localizer.format(date, 'dddd')
@@ -60,19 +69,21 @@ export default function ScheduleCalendar(props) {
 
   const profile = useGetProfile();
   const auth = useGetAuth();
-  const isTeacherAndOwnClass = selectedEvent && profile.role === "TEACHER" && classes?.[selectedEvent.classId]?.teacherIds?.includes(auth.uid);
+  const isTeacherAndOwnClass = selectedSchedule && profile.role === "TEACHER" && classes?.[selectedSchedule.classId]?.teacherIds?.includes(auth.uid);
+  const isOwnClassOrAdmin = profile.role !== "TEACHER";
 
   return (
     <div className={className}>
       {
-        selectedEvent && (
+        selectedSchedule && (
           <ScheduleModal
-            schedule={selectedEvent}
-            setSelectedEvent={setSelectedEvent}
+            // schedule={selectedEvent}
+            schedule={selectedSchedule}
+            setSelectedEvent={setSelectedScheduleId}
             isTeacherAndOwnClass={isTeacherAndOwnClass}
-            isOwnClassOrAdmin={true}
+            isOwnClassOrAdmin={isOwnClassOrAdmin}
             showClassName={true}
-            classId={selectedEvent?.classId}
+            classId={selectedSchedule?.classId}
             onRefresh={handleRefresh}
           />
         )

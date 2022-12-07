@@ -44,9 +44,7 @@ export default function MySchedule() {
   const [schedules, schedulesLoading] = useGetData("schedules");
   const schedulesOrdered = schedules ? Object.keys(schedules).map((sId) => ({ 
     ...schedules[sId],
-    id: sId, 
-    start: schedules[sId].start.toDate(),
-    end: schedules[sId].end.toDate(),
+    id: sId,
     title: classes?.[schedules[sId].classId]?.name,
   })) : [];
   

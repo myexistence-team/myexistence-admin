@@ -86,7 +86,8 @@ export function ClassStudents(props) {
 
   const auth = useGetAuth();
   const profile = useGetProfile();
-  const isOwnClassOrAdmin = classObj?.teacherIds?.includes(auth.uid) || profile.role !== "TEACHER";
+  const isOwnClassOrAdmin = profile.role !== "TEACHER";
+  // const isOwnClassOrAdmin = classObj?.teacherIds?.includes(auth.uid) || profile.role !== "TEACHER";
 
   function handleDelete(classId) {
     meConfirm({
@@ -193,20 +194,23 @@ export function ClassSchedule({ classId }) {
   ])
   const [schedules, schedulesLoading] = useGetOrdered("schedules");
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedScheduleId, setSelectedScheduleId] = useState(null);
+  const selectedSchedule = schedules?.find((s) => s.id === selectedScheduleId);
 
   const schedulesForCalendar = schedules?.map((s) => ({
     ...s,
-    title: "Toleransi " + s.tolerance + " Menit",
+    title: "Toleransi " + s.tolerance + " Menit" + (s.status === "OPENED" ? "(Berlangsung)" : ""),
     start: s.start.toDate(),
     end: s.end.toDate(),
   }))
 
-  useEffect(() => {
-    if (selectedEvent) {
-      const selectedSchedule = schedulesForCalendar?.find((s) => s.id === selectedEvent.id);
-      setSelectedEvent(selectedSchedule)
-    }
-  }, [schedules])
+  // useEffect(() => {
+  //   if (selectedSchedule) {
+  //     const selectedSchedule = schedulesForCalendar?.find((s) => s.id === selectedEvent.id);
+  //     setSelectedEvent(selectedSchedule);
+  //     setSelectedScheduleId(selectedEvent.id);
+  //   }
+  // }, [schedules])
 
   function handleEventDrop(slot) {
     const { start, end, event } = slot;
@@ -221,7 +225,9 @@ export function ClassSchedule({ classId }) {
   }
 
   function handleEventClick(event) {
-    setSelectedEvent(event);
+    // console.log(event);
+    // setSelectedEvent(event);
+    setSelectedScheduleId(event.id);
   }
 
   function handleSelectSlot(slot) {
@@ -266,16 +272,18 @@ export function ClassSchedule({ classId }) {
     onEventResize: handleEventDrop, 
   }
 
-  const isOwnClassOrAdmin = classObj?.teacherIds?.includes(auth.uid) || profile.role !== "TEACHER";
+  // const isOwnClassOrAdmin = classObj?.teacherIds?.includes(auth.uid) || profile.role !== "TEACHER";
+  const isOwnClassOrAdmin = profile.role !== "TEACHER";
   const isTeacherAndOwnClass = profile.role === "TEACHER" && classObj?.teacherIds?.includes(auth.uid);
 
   return (
     <>
       {
-        selectedEvent && (
+        selectedSchedule && (
           <ScheduleModal
-            schedule={selectedEvent}
-            setSelectedEvent={setSelectedEvent}
+            // schedule={selectedEvent}
+            schedule={selectedSchedule}
+            setSelectedEvent={setSelectedScheduleId}
             isTeacherAndOwnClass={isTeacherAndOwnClass}
             isOwnClassOrAdmin={isOwnClassOrAdmin}
             classId={classId}

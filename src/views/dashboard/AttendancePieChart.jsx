@@ -8,9 +8,10 @@ import { useFirestoreConnect } from 'react-redux-firebase'
 import meColors from 'src/components/meColors'
 import MENativeSelect from 'src/components/MENativeSelect'
 import MESpinner from 'src/components/MESpinner'
+import PresencesGraphs from 'src/components/PresencesGraphs'
 import { QUICK_DATES } from 'src/constants'
 import { useGetOrdered, useGetSchoolId } from 'src/hooks/getters'
-import { getStartOfWeek } from 'src/utils/utilFunctions'
+import { getStartOfMonth, getStartOfWeek, getStartOfYear } from 'src/utils/utilFunctions'
 
 export default function AttendancePieChart() {
 
@@ -20,13 +21,30 @@ export default function AttendancePieChart() {
   const nowFromMoment = moment(new Date()).add({days: -7}).toDate();
   const [now, setNow] = useState(nowFromMoment);
 
-  const [quickDate, setQuickDate] = useState(QUICK_DATES.WEEK);
   const [dateStart, setDateStart] = useState(getStartOfWeek());
   const [dateEnd, setDateEnd] = useState(new Date());
 
   useEffect(() => {
-    setNow(moment(new Date()).add({days: -(parseInt(watch("timespan")))}).toDate())
-  }, [watch("timespan")])
+    const quickDate = watch("quickDate");
+    switch (quickDate) {
+      case "WEEK":
+        setDateStart(getStartOfWeek());
+        setDateEnd(new Date());
+        break;
+      case "MONTH":
+        setDateStart(getStartOfMonth());
+        setDateEnd(new Date());
+        break;
+      case "YEAR":
+        setDateStart(getStartOfYear());
+        setDateEnd(new Date());
+        break;
+      default:
+        setDateStart(getStartOfWeek())
+        setDateEnd(new Date());
+
+    }
+  }, [watch('quickDate')])
 
   useFirestoreConnect( ...schoolId ? [{
     collection: "schools",
@@ -70,21 +88,24 @@ export default function AttendancePieChart() {
     <>
       <MENativeSelect
         label="Jangka Waktu"
-        { ...register("timespan") }
-        defaultValue={"7"}
+        className="mb-0"
+        { ...register("quickDate") }
+        defaultValue={"WEEK"}
         options={[
-          { value: 7, label: "7 Hari Terakhir" },
-          { value: 30, label: "30 Hari Terakhir" },
+          { value: "WEEK", label: "Minggu Ini" },
+          { value: "MONTH", label: "Bulan Ini" },
+          { value: "YEAR", label: "Tahun Ini" },
         ]}
       />
+      <p className="mb-3">
+        <small>Dihitung dari tanggal {moment(dateStart).format("LL")}</small>
+      </p>
       {
         logsLoading ? (
           <MESpinner/>
         ) : logs?.length ? (
-          <CChart
-            type="doughnut"
-            datasets={donutData}
-            labels={labels}
+          <PresencesGraphs
+            logs={logs}
           />
         ) : (
           <h5>Tidak ada data. Mohon coba ubah jangka waktu.</h5>

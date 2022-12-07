@@ -225,7 +225,7 @@ export default function StudentDetailsAttendances() {
                 const schedule = schedules?.[l.scheduleId];
                 return (
                   <td>
-                    {`${moment(schedule.start.toDate()).format("dddd, HH:mm - ")} ${moment(schedule.end.toDate()).format("HH:mm")}`}
+                    {`${moment(schedule?.start.toDate()).format("dddd, HH:mm - ")} ${moment(schedule?.end.toDate()).format("HH:mm")}`}
                   </td>
                 )
               },

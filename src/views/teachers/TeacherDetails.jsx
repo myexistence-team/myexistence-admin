@@ -55,8 +55,6 @@ export default function TeacherDetails() {
   const schedulesOrdered = schedules ? Object.keys(schedules).map((sId) => ({ 
     ...schedules[sId],
     id: sId, 
-    start: schedules[sId].start.toDate(),
-    end: schedules[sId].end.toDate(),
     title: classes?.find(({ id }) => id === schedules[sId].classId)?.name,
   })) : [];
 
