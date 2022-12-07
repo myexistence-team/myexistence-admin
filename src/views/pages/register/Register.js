@@ -409,7 +409,7 @@ export default function Register() {
       }}>
         <CCard>
           <CCardBody>
-            <h4 className="mb-3">Daftar Akun Baru</h4>
+            <h4 className="mb-3">Daftar Sekolah Baru</h4>
             {
               type === null ? (
                 <>

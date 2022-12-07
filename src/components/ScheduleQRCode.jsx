@@ -20,18 +20,18 @@ export default function ScheduleQRCode({
 }) {
   const dispatch = useDispatch();
 
-  function handleCheckScheduleIsOpen() {
-    const currentScheduleTime = getCurrentScheduleTime();
-    const endDiffInMs = schedule.end.getTime() - currentScheduleTime.getTime();
-    const endDiffToNowInMins = Math.floor(endDiffInMs/60000);
-    if (endDiffToNowInMins < 0) {
-      dispatch(closeSchedule(classId, scheduleId, schedule))
-    }
-  }
+  // function handleCheckScheduleIsOpen() {
+  //   const currentScheduleTime = getCurrentScheduleTime();
+  //   const endDiffInMs = schedule.end.toDate().getTime() - currentScheduleTime.getTime();
+  //   const endDiffToNowInMins = Math.floor(endDiffInMs/60000);
+  //   if (endDiffToNowInMins < 0) {
+  //     dispatch(closeSchedule(classId, scheduleId, schedule))
+  //   }
+  // }
 
-  useEffect(() => {
-    handleCheckScheduleIsOpen()
-  }, [])
+  // useEffect(() => {
+  //   handleCheckScheduleIsOpen()
+  // }, [])
 
   const schoolId = useGetSchoolId();
   useFirestoreConnect([
