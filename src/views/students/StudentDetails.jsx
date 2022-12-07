@@ -194,7 +194,7 @@ export default function StudentDetails() {
             <small>Dibuat oleh {createdByUser?.displayName} pada {moment(student.createdAt.toDate()).format("LLL")}</small>
             <br/>
             {
-              student.updatedAt.seconds !== student.createdAt.seconds && (
+              student.updatedAt?.seconds !== student.createdAt.seconds && (
                 <small>Diedit oleh {updatedByUser?.displayName} pada {moment(student.updatedAt.toDate()).format("LLL")}</small>
               )
             }

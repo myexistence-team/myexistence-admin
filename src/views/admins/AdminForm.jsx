@@ -26,7 +26,7 @@ export default function AdminForm() {
 
   const adminSchema = object().shape({
     displayName: string().required(),
-    email: string().required(),
+    ...editMode ? { email: string().required() } : {},
     isVerified: boolean()
   })
   const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm({
@@ -82,12 +82,16 @@ export default function AdminForm() {
               <h3>{editMode ? "Edit Admin" : "Tambahkan Admin"}</h3>
             </CCardHeader>
             <CCardBody>
-              <METextField
-                { ...register("email") }
-                defaultValue={admin?.email}
-                errors={errors}
-                disabled={editMode}
-              />
+              {
+                !editMode && (
+                  <METextField
+                    { ...register("email") }
+                    defaultValue={admin?.email}
+                    errors={errors}
+                    disabled={editMode}
+                  />
+                )
+              }
               <METextField
                 { ...register("displayName") }
                 label="Nama Panjang"

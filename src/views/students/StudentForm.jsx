@@ -31,7 +31,7 @@ export default function StudentForm() {
     displayName: string().required().strict(),
     description: string(),
     idNumber: string().required().strict(),
-    email: string().email().required().strict(),
+    ...!editMode ? { email: string().email().required().strict() } : {},
     isVerified: boolean()
   })
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm({
@@ -137,12 +137,16 @@ export default function StudentForm() {
                 </CCol>
               </CRow>
             </div>
-            <METextField
-              { ...register("email") }
-              defaultValue={student?.email}
-              errors={errors}
-              disabled={editMode}
-            />
+            {
+              !editMode && (
+                <METextField
+                  { ...register("email") }
+                  defaultValue={student?.email}
+                  errors={errors}
+                  disabled={editMode}
+                />
+              )
+            }
             <METextField
               { ...register("displayName") }
               label="Nama Panjang"

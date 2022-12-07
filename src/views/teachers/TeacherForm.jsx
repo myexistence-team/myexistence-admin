@@ -27,23 +27,23 @@ export default function TeacherForm() {
   const [profileImage, setProfileImage] = useState(null);
   const [profileImageUrl, setProfileImageUrl] = useState(null);
 
-  const teacherSchema = object().shape({
-    displayName: string().required().strict(),
-    description: string(),
-    idNumber: string().required().strict(),
-    email: string().required().strict(),
-    isVerified: boolean()
-  })
-  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm({
-    resolver: yupResolver(teacherSchema)
-  })
-
+  
   useFirestoreConnect({
     collection: "users",
     doc: teacherId,
   })
-
+  
   const [teacher, teacherLoading] = useGetData("users", teacherId);
+  const teacherSchema = object().shape({
+    displayName: string().required().strict(),
+    description: string(),
+    idNumber: string().required().strict(),
+    ...!editMode ? {email: string().required()} : {},
+    isVerified: boolean()
+  })
+  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm({
+    resolver: yupResolver(teacherSchema),
+  })
 
   useEffect(() => {
     if (teacher) {
@@ -103,7 +103,7 @@ export default function TeacherForm() {
             </Helmet>
             <h3>Pengajar dengan ID {teacherId} tidak ditemukan.</h3>
           </CCardBody>
-        ) : (
+        ) : teacher && (
           <CForm onSubmit={handleSubmit(onSubmit)}>
             <Helmet>
               <title>{editMode ? `${teacher.displayName || "Loading..."} - Edit Pengajar` : "Tambahkan Pengajar"}</title>
@@ -150,12 +150,16 @@ export default function TeacherForm() {
                   </CCol>
                 </CRow>
               </div>
-              <METextField
-                { ...register("email") }
-                errors={errors}
-                defaultValue={teacher?.email}
-                disabled={editMode}
-              />
+              {
+                !editMode && (
+                  <METextField
+                    { ...register("email") }
+                    errors={errors}
+                    defaultValue={teacher?.email}
+                    disabled={editMode}
+                  />
+                )
+              }
               <METextField
                 { ...register("displayName") }
                 label="Nama Panjang"

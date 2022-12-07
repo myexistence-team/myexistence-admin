@@ -670,7 +670,7 @@ export default function ClassDetails() {
               <small>Dibuat oleh {createdByUser?.displayName} pada {moment(classObj.createdAt.toDate()).format("LLL")}</small>
               <br/>
               {
-                classObj.updatedAt.seconds !== classObj.createdAt.seconds && (
+                classObj.updatedAt?.seconds !== classObj.createdAt.seconds && (
                   <small>Diedit oleh {updatedByUser?.displayName} pada {moment(classObj.updatedAt.toDate()).format("LLL")}</small>
                 )
               }

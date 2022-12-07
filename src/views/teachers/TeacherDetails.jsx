@@ -169,7 +169,7 @@ export default function TeacherDetails() {
               <small>Dibuat oleh {createdByUser?.displayName} pada {moment(teacher.createdAt.toDate()).format("LLL")}</small>
               <br/>
               {
-                teacher.updatedAt.seconds !== teacher.createdAt.seconds && (
+                teacher.updatedAt && teacher.updatedAt.seconds !== teacher.createdAt.seconds && (
                   <small>Diedit oleh {updatedByUser?.displayName} pada {moment(teacher.updatedAt.toDate()).format("LLL")}</small>
                 )
               }

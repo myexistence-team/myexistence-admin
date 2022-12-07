@@ -46,12 +46,15 @@ export function updateTeacher(teacherId, newTeacher) {
   return async (dispatch, getState, { getFirestore, getFirebase }) => {
     const firestore = getFirestore();
     const firebase = getFirebase();
-    const profile = getState().firebase.auth;
+    const profile = getState().fir
 
-    const emailAvailable = await checkEmailAvailability(firestore, newTeacher.email, profile.schoolId);
-    if (!emailAvailable) {
-      throw Error("Pengajar dengan email tersebut sudah ada")
+    if (newTeacher.email) {
+      const emailAvailable = await checkEmailAvailability(firestore, newTeacher.email, profile.schoolId);
+      if (!emailAvailable) {
+        throw Error("Pengajar dengan email tersebut sudah ada")
+      }
     }
+    
     const auth = getState().firebase.auth;
     const teacherRef = firestore
       .collection("users")
