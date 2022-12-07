@@ -18,8 +18,6 @@ export default function StudentLogDetailsModal({
   showSchedule,
   canBeEdited = false,
 }) {
-  // const { schedule } = log;
-  // console.log(schedule)
   const profile = useGetProfile();
   const classes = useSelector((state) => state.firestore.data.classes);
   const classroom = classes?.[log?.classId];

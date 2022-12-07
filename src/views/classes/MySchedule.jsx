@@ -1,7 +1,9 @@
 import { CCard, CCardBody } from '@coreui/react';
 import React, { useEffect } from 'react'
+import { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useFirestore, useFirestoreConnect } from 'react-redux-firebase';
+import MESpinner from 'src/components/MESpinner';
 import ScheduleCalendar from 'src/components/ScheduleCalendar';
 import { useGetData, useGetProfile, useGetSchoolId } from 'src/hooks/getters';
 
@@ -13,22 +15,34 @@ export default function MySchedule() {
   const [classes] = useGetData("classes");
 
   useFirestoreConnect([
-    ...profile.classIds?.length ? [{
-      collection: "schools",
-      doc: schoolId,
-      subcollections: [{
-        collection: "classes",
-        where: [[firestore.FieldPath.documentId(), "in", profile?.classIds || []]],
-      }],
-      storeAs: "classes"
-    }] : [],
+    ...profile.classIds?.length ? [
+      {
+        collection: "schools",
+        doc: schoolId,
+        subcollections: [{
+          collection: "classes",
+          where: [[firestore.FieldPath.documentId(), "in", profile?.classIds || []]],
+        }],
+        storeAs: "classes"
+      }, 
+      // {
+      //   collection: "users",
+      //   where: [
+      //     ["classIds", "array-contains-any", profile?.classIds || []],
+      //     ["role", "==", "STUDENT"],
+      //   ]
+      // }
+    ] : [],
   ])
 
-  function handleGetSchedules() {
+  const [isLoading, setIsLoading] = useState(false);
+  async function handleGetSchedules() {
+    setIsLoading(true);
     firestore.get({
       collectionGroup: "schedules",
       where: [["classId", "in", profile.classIds]]
     })
+    setIsLoading(false);
   }
 
   function handleRefresh() {
@@ -41,7 +55,7 @@ export default function MySchedule() {
     }
   }, [profile])
 
-  const [schedules, schedulesLoading] = useGetData("schedules");
+  const [schedules] = useGetData("schedules");
   const schedulesOrdered = schedules ? Object.keys(schedules).map((sId) => ({ 
     ...schedules[sId],
     id: sId,
@@ -59,7 +73,7 @@ export default function MySchedule() {
             profile.classIds?.length ? (
               <ScheduleCalendar
                 events={schedulesOrdered}
-                loading={schedulesLoading}
+                loading={isLoading}
                 onRefresh={handleRefresh}
               />
             ) : (

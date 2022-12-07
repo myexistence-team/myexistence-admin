@@ -15,11 +15,12 @@ import { useFirestore, useFirestoreConnect } from 'react-redux-firebase';
 import ScheduleQRCode from './ScheduleQRCode';
 import ScheduleCallout from './ScheduleCallout';
 import { getCurrentScheduleTime } from 'src/utils/getters';
-import { useGetData, useGetProfile } from 'src/hooks/getters';
+import { useGetData, useGetOrdered, useGetProfile } from 'src/hooks/getters';
 import ScheduleStudentLogs from './ScheduleStudentLogs';
 import { Link } from 'react-router-dom';
 import { SCHEDULE_OPEN_METHODS_ENUM } from 'src/enums';
 import { GrClose } from 'react-icons/gr';
+import MESpinner from './MESpinner';
 
 function ScheduleModal({
   schedule,
@@ -35,6 +36,8 @@ function ScheduleModal({
   const [statusLoading, setStatusLoading] = useState(null);
   const profile = useGetProfile();
   const firestore = useFirestore();
+
+  const [students, studentsLoading] = useGetOrdered("students");
 
   const classObj = useSelector((state) => state.firestore.data[`class/${classId}`]);
 
@@ -243,7 +246,7 @@ function ScheduleModal({
       <CForm onSubmit={handleSubmit(onSubmitEvent)}>
         <CModalHeader className="d-flex justify-content-between">
           {
-            isOwnClassOrAdmin ? "Edit Sesi Kelas" : (
+            isOwnClassOrAdmin ? <h4>Edit Sesi Kelas</h4> : (
               <>
                 {
                   schedule.status !== "OPENED" ? (
@@ -286,7 +289,9 @@ function ScheduleModal({
         </CModalHeader>
         <CModalBody>
           {
-            Boolean(schedule) && (
+            studentsLoading ? (
+              <MESpinner/>
+            ) : Boolean(schedule) && students?.length && (
               <>
                 {
                   isOwnClassOrAdmin || schedule.status !== "OPENED" ? (

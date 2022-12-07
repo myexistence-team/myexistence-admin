@@ -51,7 +51,6 @@ export default function StudentExcuses() {
   const selectedLog = { ...logsState, ...studentLogsState }?.[selectedLogId];
 
   function handleSelectLog(logId) {
-    console.log(logId)
     setSelectedLogId(logId);
   }
 

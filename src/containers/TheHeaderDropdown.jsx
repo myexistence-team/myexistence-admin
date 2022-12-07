@@ -17,7 +17,6 @@ const TheHeaderDropdown = () => {
   const dispatch = useDispatch();
   const history = useHistory();
   const auth = useSelector(state => state.firebase.auth);
-  console.log(auth)
   const profile = useSelector(state => state.firebase.profile);
 
   async function handleSignOut() {

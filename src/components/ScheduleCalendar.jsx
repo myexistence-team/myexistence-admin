@@ -26,7 +26,6 @@ export default function ScheduleCalendar(props) {
     onRefresh && onRefresh();
   }
 
-  const [selectedEvent, setSelectedEvent] = useState(null);
   const [classes] = useGetData("classes");
   const [selectedScheduleId, setSelectedScheduleId] = useState(null);
   const selectedSchedule = events?.find((s) => s.id === selectedScheduleId);
