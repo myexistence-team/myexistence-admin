@@ -10,7 +10,7 @@ export function createStudent(student) {
 
     const emailAvailable = await checkEmailAvailability(firestore, student.email, profile.schoolId);
     if (!emailAvailable) {
-      throw Error("Pengguna dengan email tersebut sudah ada")
+      throw Error("Pelajar dengan email tersebut sudah ada")
     }
 
     var photoUrl = null;
@@ -48,10 +48,10 @@ export function updateStudent(studentId, student) {
     const firebase = getFirebase();
     const auth = getState().firebase.auth;
     const profile = getState().firebase.profile;
-    
+
     const emailAvailable = await checkEmailAvailability(firestore, student.email, profile.schoolId);
     if (!emailAvailable) {
-      throw Error("Pengguna dengan email tersebut sudah ada")
+      throw Error("Pelajar dengan email tersebut sudah ada")
     }
 
     var photoUrl = student.photoUrl;

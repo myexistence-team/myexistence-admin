@@ -70,7 +70,7 @@ export function signUpAsAdmin(admin) {
 
     const emailAvailable = await checkEmailAvailability(firestore, admin.email);
     if (!emailAvailable) {
-      throw Error("Pengajar dengan email tersebut sudah ada")
+      throw Error("Admin dengan email tersebut sudah ada")
     }
 
     const schoolRef = firestore
