@@ -43,7 +43,7 @@ const METextField = React.forwardRef((props, ref) => {
           type={type}
           id={name}
           name={name}
-          placeholder={placeholder || `Enter ${label || capitalCase(name)}`}
+          placeholder={placeholder || `Masukkan ${label || capitalCase(name)}`}
           invalid={Boolean(error || errors?.[name])}
           innerRef={ref}
           {...rest}

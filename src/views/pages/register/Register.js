@@ -4,7 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet';
 import { useForm } from 'react-hook-form';
-import { AiOutlineLock, AiOutlineMail, AiOutlineUser } from 'react-icons/ai';
+import { AiOutlineFieldNumber, AiOutlineLock, AiOutlineMail, AiOutlineUser } from 'react-icons/ai';
 import { MdVisibility, MdVisibilityOff } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { useFirestore, useFirestoreConnect } from 'react-redux-firebase';
@@ -24,9 +24,9 @@ import { checkSchoolExistance } from 'src/utils/checksFunctions';
 import { object, string } from 'yup';
 
 function RegisterAdmin(props) {
-  const { onSubmit, onBack, isSubmitting, adminOnly } = props;
+  const { onSubmit, onBack, isSubmitting, adminOnly, registeringSchool } = props;
   const adminSchema = object().shape({
-    email: string().lowercase().required().strict(),
+    email: string().email().required().strict(),
     displayName: string().required().strict(),
     password: string().required(),
   })
@@ -55,13 +55,14 @@ function RegisterAdmin(props) {
     <CForm onSubmit={handleSubmit(onSubmit)}>
       <h5>Sebagai Admin</h5>
       <METextField
-        { ...register("email") }
-        startIcon={AiOutlineMail}
+        { ...register("displayName") }
+        label="Nama"
+        startIcon={AiOutlineUser}
         errors={errors}
       />
       <METextField
-        { ...register("displayName") }
-        startIcon={AiOutlineUser}
+        { ...register("email") }
+        startIcon={AiOutlineMail}
         errors={errors}
       />
       <CLabel htmlFor="password">Password</CLabel>
@@ -77,7 +78,7 @@ function RegisterAdmin(props) {
         <METextField
           className="w-100 ml-3"
           startIcon={AiOutlineLock}
-          placeholder="Confirm Password"
+          placeholder="Ketik Ulang Password"
           { ...register("repassword") }
           errors={errors}
           label={false}
@@ -118,7 +119,7 @@ function RegisterAdmin(props) {
           type="submit"
           disabled={!isValid || isSubmitting}
         >
-          Daftar
+          {registeringSchool ? "Lanjutkan" : "Daftar"}
         </CButton>
       </div>
     </CForm>
@@ -191,14 +192,27 @@ function RegisterSchool(props) {
 
 function RegisterTeacher(props) {
   const { onSubmit, onBack, isSubmitting } = props;
+  const [passwordInputVisibility, setPasswordInputVisibility] = useState(false);
+  const [isValid, setIsValid] = useState(true);
   const teacherSchema = object().shape({
     displayName: string().required().strict(),
-    email: string().required().strict(),
+    idNumber: string().required().strict(),
+    email: string().email().required().strict(),
     password: string().required().strict(),
   })
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit, formState: { errors }, watch } = useForm({
     resolver: yupResolver(teacherSchema)
   })
+
+  const handlePasswordInputVisibility = () => {
+    setPasswordInputVisibility(!passwordInputVisibility);
+  };
+
+  const password = watch("password");
+  const repassword = watch("repassword");
+  useEffect(() => {
+    setIsValid(password === repassword);
+  }, [password, repassword])
 
   return (
     <CForm onSubmit={handleSubmit(onSubmit)}>
@@ -206,16 +220,53 @@ function RegisterTeacher(props) {
       <METextField
         label="Nama"
         { ...register("displayName") }
+        startIcon={AiOutlineUser}
         errors={errors}
       />
       <METextField
         { ...register("email") }
+        startIcon={AiOutlineMail}
         errors={errors}
       />
       <METextField
-        { ...register("password") }
+        { ...register("idNumber") }
+        label="Nomor Induk"
+        startIcon={AiOutlineFieldNumber}
         errors={errors}
       />
+      <CLabel htmlFor="password">Password</CLabel>
+      <div className="d-flex">
+        <METextField
+          className="w-100"
+          startIcon={AiOutlineLock}
+          { ...register("password") }
+          errors={errors}
+          label={false}
+          type={passwordInputVisibility ? "text" : "password"}
+        />
+        <METextField
+          className="w-100 ml-3"
+          startIcon={AiOutlineLock}
+          placeholder="Confirm Password"
+          { ...register("repassword") }
+          errors={errors}
+          label={false}
+          type={passwordInputVisibility ? "text" : "password"}
+        />
+        <CButton
+          className="ml-3"
+          style={{
+            height: "fit-content"
+          }}
+          onClick={handlePasswordInputVisibility}
+        >
+          {passwordInputVisibility ? (
+            <MdVisibilityOff />
+          ) : (
+            <MdVisibility />
+          )}
+        </CButton>
+      </div>
       <div className="d-flex">
         {
           onBack && (
@@ -235,7 +286,7 @@ function RegisterTeacher(props) {
           size="lg"
           className="w-100"
           type="submit"
-          disabled={isSubmitting}
+          disabled={!isValid || isSubmitting}
         >
           Daftar
         </CButton>
@@ -418,7 +469,7 @@ export default function Register() {
               ) : hasRegistered ? (
                 <RegisterSchool onBack={handleBackFromSchool} onSubmit={onSubmitSchool}/>
               ) : (
-                <RegisterAdmin onBack={handleBack} onSubmit={onSubmitAdmin}/>
+                <RegisterAdmin registeringSchool onBack={handleBack} onSubmit={onSubmitAdmin}/>
               )
             }
             

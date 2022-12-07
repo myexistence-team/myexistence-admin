@@ -44,7 +44,7 @@ function MECreatableSelect(props) {
           ? modifiedOptions.find(c => c.value === value)
           : modifiedOptions.filter(c => value?.includes(c.value))
       }
-      placeholder={placeholder || `Search ${label || capitalCase(name)}`}
+      placeholder={placeholder || `Cari ${label || capitalCase(name)}`}
       styles={{
         control: provided => ({
           ...provided,

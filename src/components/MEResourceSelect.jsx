@@ -125,7 +125,7 @@ function MEResourceSelect(props) {
       label || capitalCase((isMulti ? pluralName : singularName) || pluralName),
     placeholder:
       placeholder ||
-      `Search ${capitalCase(
+      `Cari ${capitalCase(
         (isMulti ? pluralName : singularName) || pluralName
       )}${searchKey ? ` by ${capitalCase(searchKey)}` : ""}`,
     ...props

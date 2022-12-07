@@ -26,6 +26,7 @@ import { AiOutlineLock, AiOutlineUser } from "react-icons/ai";
 import { isLoaded, useFirebase, useFirebaseConnect } from "react-redux-firebase";
 import meToaster from "src/components/toaster";
 import hadirLogo from "src/images/hadir-logo-blue.png"
+import { BsGoogle } from "react-icons/bs";
 
 const Login = () => {
   useFirebaseConnect(["auth"]);
@@ -168,8 +169,8 @@ const Login = () => {
                     </CButton>
                     <span>atau masuk menggunakan</span>
                     <div className="d-flex my-3">
-                      <CButton onClick={loginWithGoogle}>
-                        Google
+                      <CButton color="primary" style={{ backgroundColor: "#DE5246" }} onClick={loginWithGoogle}>
+                        <BsGoogle className="mr-1"/>Google
                       </CButton>
                     </div>
                     <span>Tidak punya akun? <Link to="/register">Daftar disini!</Link></span>
