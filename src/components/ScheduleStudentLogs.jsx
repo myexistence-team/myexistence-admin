@@ -9,18 +9,26 @@ import { useDispatch } from 'react-redux';
 import { changeExcuseStatus, changeLogStatus, changeSchoolLogStatus } from 'src/store/actions/scheduleActions';
 import StudentLogDetailsModal from './StudentLogDetailsModal';
 import meConfirm from './meConfirm';
+import { createStudentPresence } from 'src/store/actions/presenceActions';
+
 
 export default function ScheduleStudentLogs({
   scheduleId,
   classId,
   currentStudentId,
 }) {
+  const defaultLog = {
+    id: "NEW",
+    scheduleId,
+    classId,
+  }
   const dispatch = useDispatch();
-  const studentLogs = useSelector((state) => state.firestore.ordered.studentLogs)?.filter((sl) => sl.scheduleId === scheduleId);
+  const studentLogs = useSelector((state) => state.firestore.ordered.studentLogs)?.filter((sl) => sl.scheduleId === scheduleId).concat([defaultLog]);
   const classObj = useSelector((state) => state.firestore.data[`class/${classId}`]);
   const [students] = useGetOrdered("students", classObj?.studentIds);
 
   const [selectedLogId, setSelectedStudentLogId] = useState(null);
+  const [selectedStudentId, setSelectedStudentId] = useState(null);
   const selectedStudentLog = studentLogs?.find((sl) => sl.id === selectedLogId);
 
   const [excuseStatusLoading, setExcuseStatusLoading] = useState(null);
@@ -28,13 +36,14 @@ export default function ScheduleStudentLogs({
   const [logStatusLoading, setLogStatusLoading] = useState(null);
   function handleLogStatusChange(status) {
     setLogStatusLoading(status);
-    if (selectedStudentLog) {
+    if (selectedStudentLog && selectedStudentId) {
       meConfirm({
         onConfirm: () => {
-          dispatch(changeLogStatus({
+          dispatch(createStudentPresence({
             classId: selectedStudentLog.classId,
             scheduleId: selectedStudentLog.scheduleId,
-            studentLogId: selectedLogId,
+            studentLogId: selectedLogId !== "NEW" ? selectedLogId : null,
+            studentId: selectedStudentId,
             status
           }))
             .then(() => {
@@ -74,7 +83,7 @@ export default function ScheduleStudentLogs({
         students?.length === 0 ? (
           <>Kelas ini tidak memiliki pelajar.</>
         ) : students?.map((student, sIdx) => {
-          const studentLog = studentLogs?.find((sl) => sl.studentId === student.id);
+          const studentLog = studentLogs?.find((sl) => sl.studentId === student.id) || defaultLog;
           return (
             <CCard
               key={sIdx}
@@ -82,16 +91,19 @@ export default function ScheduleStudentLogs({
                 borderWidth: student.id === currentStudentId ? "1px" : "0px",
                 borderStyle: "solid",
                 borderColor: student.id === currentStudentId ? meColors.primary.main : null,
-                cursor: studentLog && "pointer"
+                cursor: "pointer"
               }}
-              onClick={() => studentLog ? setSelectedStudentLogId(studentLog.id) : undefined}
+              onClick={() => {
+                setSelectedStudentLogId(studentLog.id);
+                setSelectedStudentId(student.id);
+              }}
             >
               <CCardBody
                 className="d-flex flex-row justify-content-between align-items-center"
               >
                 {student.displayName}
                 {
-                  studentLog && (
+                  studentLog.status && (
                     <MEPresenceIcon status={studentLog.status}/>
                   )
                 }

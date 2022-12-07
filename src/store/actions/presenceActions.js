@@ -41,6 +41,8 @@ export function createStudentPresence({
       teacherId: schedule.openedBy,
       status,
       time,
+      updatedBy: auth.uid,
+      updatedAt: new Date(),
     }
 
     if (studentLogId) {

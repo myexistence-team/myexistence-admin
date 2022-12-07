@@ -235,21 +235,36 @@ export function changeLogStatus({ classId, scheduleId, studentLogId, status }) {
     const firestore = getFirestore();
     const { profile, auth } = getState().firebase;
 
-    const studentLogRef = firestore
-      .collection("schools")
-      .doc(profile.schoolId)
-      .collection("classes")
-      .doc(classId)
-      .collection("schedules")
-      .doc(scheduleId)
-      .collection("studentLogs")
-      .doc(studentLogId);
+    if (studentLogId) {
+      const studentLogRef = firestore
+        .collection("schools")
+        .doc(profile.schoolId)
+        .collection("classes")
+        .doc(classId)
+        .collection("schedules")
+        .doc(scheduleId)
+        .collection("studentLogs")
+        .doc(studentLogId);
+  
+      await studentLogRef.update({
+        status,
+        updatedBy: auth.uid,
+        updatedAt: new Date()
+      });
+    } else {
+      const studentLogsRef = firestore
+        .collection("schools")
+        .doc(profile.schoolId)
+        .collection("classes")
+        .doc(classId)
+        .collection("schedules")
+        .doc(scheduleId)
+        .collection("studentLogs")
 
-    await studentLogRef.update({
-      status,
-      updatedBy: auth.uid,
-      updatedAt: new Date()
-    });
+      await studentLogsRef.add({
+        
+      })
+    }
   }
 }
 
