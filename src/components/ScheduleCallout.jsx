@@ -27,7 +27,7 @@ export default function ScheduleCallout({
   const [students] = useGetOrdered("students", classObj?.studentIds);
   const studentLogs = useSelector((state) => state.firestore.ordered.studentLogs);
 
-  const [currentStudentIdx, setCurrentStudentId] = useState(0);
+  const [currentStudentIdx, setCurrentStudentIdx] = useState(0);
   const currentStudent = students[currentStudentIdx];
   const currentStudentLog = studentLogs?.find((sl) => sl.studentId === currentStudent?.id);
 
@@ -59,7 +59,7 @@ export default function ScheduleCallout({
         studentLogId: currentStudentLog ? currentStudentLog.id : undefined
       }))
         .then(() => {
-          setCurrentStudentId((prev) => prev + 1);
+          setCurrentStudentIdx((prev) => prev + 1);
         })
         .finally(() => {
           setStatusLoading(null);
@@ -71,7 +71,7 @@ export default function ScheduleCallout({
     <CRow>
       <CCol xs={8}>
         {
-          currentStudent && (
+          currentStudent ? (
             <CRow>
               <CCol xs={2}>
                 {
@@ -81,7 +81,7 @@ export default function ScheduleCallout({
                       size="lg" 
                       color="primary" 
                       variant="ghost"
-                      onClick={() => setCurrentStudentId((prev) => prev - 1)}
+                      onClick={() => setCurrentStudentIdx((prev) => prev - 1)}
                     >
                       <BsChevronLeft/>
                     </CButton>
@@ -129,7 +129,7 @@ export default function ScheduleCallout({
                       size="lg" 
                       color="primary" 
                       variant="ghost"
-                      onClick={() => setCurrentStudentId((prev) => prev + 1)}
+                      onClick={() => setCurrentStudentIdx((prev) => prev + 1)}
                     >
                       <BsChevronRight/>
                     </CButton>
@@ -137,6 +137,19 @@ export default function ScheduleCallout({
                 }
               </CCol>
             </CRow>
+          ) : (
+            <div className="text-center mt-4">
+              <h5>Semua pelajar sudah tercatat! 👍</h5>
+              <CButton
+                color="primary"
+                variant="outline"
+                onClick={() => {
+                  setCurrentStudentIdx(0);
+                }}
+              >
+                Ulang Pencatatan
+              </CButton>
+            </div>
           )
         }
       </CCol>
