@@ -107,10 +107,10 @@ function ScheduleModal({
 
   function handleOpenSchedule(openMethod) {
     const currentScheduleTime = getCurrentScheduleTime();
-    const startDiffInMs = schedule.start.getTime() - currentScheduleTime.getTime();
+    const startDiffInMs = schedule.start.toDate().getTime() - currentScheduleTime.getTime();
     const startDiffToNowInMins = Math.floor(startDiffInMs/60000);
 
-    const endDiffInMs = schedule.end.getTime() - currentScheduleTime.getTime();
+    const endDiffInMs = schedule.end.toDate().getTime() - currentScheduleTime.getTime();
     const endDiffToNowInMins = Math.floor(endDiffInMs/60000);
 
     if (profile.currentScheduleId) {
