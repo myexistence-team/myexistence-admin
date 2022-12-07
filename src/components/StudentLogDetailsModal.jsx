@@ -15,7 +15,8 @@ export default function StudentLogDetailsModal({
   onStatusChange,
   excuseStatusLoading,
   statusLoading,
-  showSchedule
+  showSchedule,
+  canBeEdited = false,
 }) {
   // const { schedule } = log;
   // console.log(schedule)
@@ -64,7 +65,7 @@ export default function StudentLogDetailsModal({
                 <h5>{moment(log?.time?.toDate()).format("LLL")}</h5>
               </CCol>
               {
-                profile.role !== "TEACHER" && onStatusChange && !log?.excuse && (
+                (profile.role !== "TEACHER" || canBeEdited) && onStatusChange && !log?.excuse && (
                   <>
                     <CCol xs={4}>
                       <CButton
@@ -114,7 +115,7 @@ export default function StudentLogDetailsModal({
                   <CLabel>Alasan</CLabel>
                   <h5>{log?.excuse?.message}</h5>
                   {
-                    profile.role !== "TEACHER" ? onExcuseChange ? (
+                    (canBeEdited || profile.role !== "TEACHER") ? onExcuseChange ? (
                       <CRow className="mt-3">
                         <CCol xs={6}>
                           <CButton

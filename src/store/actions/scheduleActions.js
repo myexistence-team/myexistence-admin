@@ -230,6 +230,29 @@ export function changeExcuseStatus({ classId, scheduleId, studentLogId, excuseSt
   }
 }
 
+export function changeLogStatus({ classId, scheduleId, studentLogId, status }) {
+  return async (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore();
+    const { profile, auth } = getState().firebase;
+
+    const studentLogRef = firestore
+      .collection("schools")
+      .doc(profile.schoolId)
+      .collection("classes")
+      .doc(classId)
+      .collection("schedules")
+      .doc(scheduleId)
+      .collection("studentLogs")
+      .doc(studentLogId);
+
+    await studentLogRef.update({
+      status,
+      updatedBy: auth.uid,
+      updatedAt: new Date()
+    });
+  }
+}
+
 export function changeSchoolLogExcuseStatus({ logId, excuseStatus }) {
   return async (dispatch, getState, { getFirestore }) => {
     const firestore = getFirestore();

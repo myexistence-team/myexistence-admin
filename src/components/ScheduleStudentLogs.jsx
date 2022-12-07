@@ -6,8 +6,9 @@ import { useGetOrdered } from 'src/hooks/getters';
 import meColors from './meColors';
 import MEPresenceIcon from './MEPresenceIcon';
 import { useDispatch } from 'react-redux';
-import { changeExcuseStatus } from 'src/store/actions/scheduleActions';
+import { changeExcuseStatus, changeLogStatus, changeSchoolLogStatus } from 'src/store/actions/scheduleActions';
 import StudentLogDetailsModal from './StudentLogDetailsModal';
+import meConfirm from './meConfirm';
 
 export default function ScheduleStudentLogs({
   scheduleId,
@@ -23,6 +24,27 @@ export default function ScheduleStudentLogs({
   const selectedStudentLog = studentLogs?.find((sl) => sl.id === selectedLogId);
 
   const [excuseStatusLoading, setExcuseStatusLoading] = useState(null);
+
+  const [logStatusLoading, setLogStatusLoading] = useState(null);
+  function handleLogStatusChange(status) {
+    setLogStatusLoading(status);
+    if (selectedStudentLog) {
+      meConfirm({
+        onConfirm: () => {
+          dispatch(changeLogStatus({
+            classId: selectedStudentLog.classId,
+            scheduleId: selectedStudentLog.scheduleId,
+            studentLogId: selectedLogId,
+            status
+          }))
+            .then(() => {
+              setLogStatusLoading(null);
+            })
+        }
+      })
+    }
+  }
+
   function handleExcuseStatus(excuseStatus) {
     setExcuseStatusLoading(excuseStatus);
     dispatch(changeExcuseStatus({
@@ -43,7 +65,10 @@ export default function ScheduleStudentLogs({
         log={selectedStudentLog}
         setSelectedLogId={setSelectedStudentLogId}
         excuseStatusLoading={excuseStatusLoading}
+        statusLoading={logStatusLoading}
         onExcuseChange={handleExcuseStatus}
+        onStatusChange={handleLogStatusChange}
+        canBeEdited={true}
       />
       {
         students?.length === 0 ? (
