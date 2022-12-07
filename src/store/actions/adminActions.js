@@ -6,7 +6,7 @@ export function createAdmin(admin) {
     const auth = getState().firebase.auth;
     const profile = getState().firebase.profile;
 
-    const emailAvailable = await checkEmailAvailability(firestore, admin.email);
+    const emailAvailable = await checkEmailAvailability(firestore, admin.email, profile.schoolId);
     if (!emailAvailable) {
       throw Error("Admin dengan email tersebut sudah ada")
     }
@@ -33,6 +33,11 @@ export function updateAdmin(adminId, newAdmin) {
     const firestore = getFirestore();
     const auth = getState().firebase.auth;
     const profile = getState().firebase.profile;
+
+    const emailAvailable = await checkEmailAvailability(firestore, newAdmin.email, profile.schoolId);
+    if (!emailAvailable) {
+      throw Error("Admin dengan email tersebut sudah ada")
+    }
     
     firestore
       .collection("users")
@@ -62,6 +67,11 @@ export function signUpAsAdmin(admin) {
   return async (dispatch, getState, { getFirebase, getFirestore }) => {
     const firebase = getFirebase();
     const firestore = getFirestore();
+
+    const emailAvailable = await checkEmailAvailability(firestore, admin.email);
+    if (!emailAvailable) {
+      throw Error("Pengajar dengan email tersebut sudah ada")
+    }
 
     const schoolRef = firestore
       .collection("schools")

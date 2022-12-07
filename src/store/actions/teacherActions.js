@@ -7,7 +7,7 @@ export function createTeacher(newTeacher) {
     const auth = getState().firebase.auth;
     const profile = getState().firebase.profile;
 
-    const emailAvailable = await checkEmailAvailability(firestore, newTeacher.email);
+    const emailAvailable = await checkEmailAvailability(firestore, newTeacher.email, profile.schoolId);
     if (!emailAvailable) {
       throw Error("Pengajar dengan email tersebut sudah ada")
     }
@@ -46,6 +46,12 @@ export function updateTeacher(teacherId, newTeacher) {
   return async (dispatch, getState, { getFirestore, getFirebase }) => {
     const firestore = getFirestore();
     const firebase = getFirebase();
+    const profile = getState().firebase.auth;
+
+    const emailAvailable = await checkEmailAvailability(firestore, newTeacher.email, profile.schoolId);
+    if (!emailAvailable) {
+      throw Error("Pengajar dengan email tersebut sudah ada")
+    }
     const auth = getState().firebase.auth;
     const teacherRef = firestore
       .collection("users")
@@ -99,6 +105,10 @@ export function signUpAsTeacher(newTeacher) {
   return async (dispatch, getState, { getFirebase, getFirestore }) => {
     const firebase = getFirebase();
     const firestore = getFirestore();
+    const emailAvailable = await checkEmailAvailability(firestore, newTeacher.email);
+    if (!emailAvailable) {
+      throw Error("Pengajar dengan email tersebut sudah ada")
+    }
 
     const usersRef = firestore.collection("users");
     const schoolRef = firestore
