@@ -11,6 +11,7 @@ import { BiLogOut } from "react-icons/bi";
 import { useHistory } from "react-router";
 import CIcon from "@coreui/icons-react";
 import { signOut } from "src/store/actions/authActions";
+import meConfirm from "src/components/meConfirm";
 
 const TheHeaderDropdown = () => {
   const dispatch = useDispatch();
@@ -20,9 +21,13 @@ const TheHeaderDropdown = () => {
   const profile = useSelector(state => state.firebase.profile);
 
   async function handleSignOut() {
-    await dispatch(signOut());
-    await localStorage.clear();
-    history.replace("/");
+    meConfirm({
+      onConfirm: async () => {
+        await dispatch(signOut());
+        await localStorage.clear();
+        history.replace("/");
+      }
+    })
   }
 
   return (
