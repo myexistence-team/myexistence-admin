@@ -158,7 +158,11 @@ export function signUpAsTeacher(newTeacher) {
         .where("email", "==", newUser.email)
         .where("role", "==", "TEACHER")
         .get();
-    
+
+      await newUserSnaps.docs[0].ref.update({
+        createdBy: newUserSnaps.docs[0].id
+      });
+
       if (!existingTeacherSnaps.empty) {
         const classesSnaps = await firestore.collection("schools").doc(newTeacher.schoolId).collection("classes").get();
         if (!classesSnaps.empty) {
