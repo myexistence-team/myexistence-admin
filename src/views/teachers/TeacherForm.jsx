@@ -150,16 +150,12 @@ export default function TeacherForm() {
                   </CCol>
                 </CRow>
               </div>
-              {
-                !editMode && (
-                  <METextField
-                    { ...register("email") }
-                    errors={errors}
-                    defaultValue={teacher?.email}
-                    disabled={editMode}
-                  />
-                )
-              }
+              <METextField
+                { ...register("email") }
+                errors={errors}
+                defaultValue={teacher?.email}
+                readOnly={editMode}
+              />
               <METextField
                 { ...register("displayName") }
                 label="Nama Panjang"

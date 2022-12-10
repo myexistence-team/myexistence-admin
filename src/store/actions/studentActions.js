@@ -49,11 +49,6 @@ export function updateStudent(studentId, student) {
     const auth = getState().firebase.auth;
     const profile = getState().firebase.profile;
 
-    const emailAvailable = await checkEmailAvailability(firestore, student.email, profile.schoolId);
-    if (!emailAvailable) {
-      throw Error("Pelajar dengan email tersebut sudah ada")
-    }
-
     var photoUrl = student.photoUrl;
     if (student.profileImage) {
       const uploadRes = await firebase.uploadFile(
@@ -71,7 +66,7 @@ export function updateStudent(studentId, student) {
       .doc(studentId)
       .update({ 
         ...student, 
-        ...photoUrl ? { photoUrl } : {},
+        ...photoUrl !== undefined ? { photoUrl } : { photoUrl: null },
         updatedBy: auth.uid,
         updatedAt: new Date()
       });
